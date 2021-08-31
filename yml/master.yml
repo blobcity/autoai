@@ -1,0 +1,55 @@
+# Copyright 2021 BlobCity, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+problem:
+   type: classification / regression
+
+data_read:
+  type: csv
+  class: df
+  file: 'something.csv'
+
+features: 
+  X_values: "X1,X2,X3"
+  y_value: "Y_value" 
+
+cleaning: 
+  categorialEncoding: LabelEncoding / OneHotEncoding
+  missingValues: mean / median / mode
+    col1: mean
+    col2: median
+
+pre_processing:
+  scaling: StandardScalar
+  featureTransformation: PolynomialFeatures
+  typeConversion: int8
+
+train_test_split:
+  ratio: 0.2
+
+model:
+  type: SVC
+  parameters:
+    c: 2.0
+    gamma: 4
+    kernel: 'rbf'
+    degree: 2
+
+model: 
+  type: TensorFlow
+  h5file: "my_model.h5"
+
+predict:
+
+evaluate:
