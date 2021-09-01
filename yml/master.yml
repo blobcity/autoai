@@ -31,8 +31,8 @@ cleaning:
     col2: median
 
 pre_processing:
-  scaling: StandardScalar
-  featureTransformation: PolynomialFeatures
+  scaling: StandardScalar / MinMaxScaler / RobustScaler / MaxAbsScaler
+  featureTransformation: PolynomialFeatures / PowerTransformer /QuantileTransformer
   typeConversion: int8
 
 train_test_split:
