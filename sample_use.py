@@ -16,25 +16,25 @@
 # Here is a sample use of blobcity for representation purpose.
 # THIS CODE IS NOT EXPECTED TO RUN
 
-import pandas as pd;
-import blobcity as bc;
+import blobcity.blobcity as bc;
 
-df = pd.read_csv('test.csv')
+#df = pd.read_csv('test.csv')
 
 # Will perform a training workload keeping the target column in mind. 
 # Type of problem: Regression / Classification; is figured out automatically based on nature of the target column
 # An automatic feature selection will be performed.
 # An overloaded function is available to manually specify the columns to use, and thereby avoid feature selection
-model = bc.train(df, 'target_column');
 
+model = bc.train('file_path', 'target_column_name')
 # Will get the features used by the model.
 # An automatic feature selection could have been carried out
-features = model.features();
+
+features = model.features()
 
 # Use a trained model to predict values. 
 # This should be new / unseen data for the model.
 # The invocation will return the predicted y_value
-prediction = model.predict(df[features]);
+prediction = model.predict(df[features])
 
 # Use to generate source code for using the model.
 # Where possible training code will also be generated.
