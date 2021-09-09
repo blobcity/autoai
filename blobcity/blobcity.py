@@ -19,18 +19,28 @@
 # Should output progress, in an interactive manner while training is in progress
 #
 # In future other formats are required instead of DataFrame. Like CSV, Excel, Log files etc. 
-def train(df, target):
+from blobcity.store import DictClass
+from blobcity.utils import getDataFrameType
+from blobcity.utils import dataCleaner
+from blobcity.utils import AutoFeatureSelection as AFS
+from blobcity.utils import writeYml
+def train(file_path=None, target=None,feature_list=None):
     # this should internally create and a yml file. The yml file is used for generating the code in the future.
     # this should also store a pickle / tensorflow file based on the model used
-
-    # perform a feature selection
-
-    # train the model based on the selected features
-    train(df, target, 'selected_features')
-
+    # Data read
+    #below function read tabular/Structured/Semi-Structured data based on file type and returns dataframe object.
+    dc=DictClass()
+    #data read
+    dataframe=getDataFrameType(file_path,dc)
+    if(feature_list==None):
+        featureList=AFS.FeatureSelection(dataframe,target,dc)
+        CleanedDF=dataCleaner(dataframe,featureList,target,dc)
+    else:
+        CleanedDF=dataCleaner(dataframe,feature_list,target,dc)
+    writeYml(dc.getdict())
+    return CleanedDF
 # Performs an automated model training. 
-def train(df, target, X_values):
-    print('Actually does the training')
+
 
 # Reads a BlobCity published model file, and loads it into memory.
 # This can be combination of yml and other related artifacts of a trained model
