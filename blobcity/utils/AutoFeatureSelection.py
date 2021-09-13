@@ -143,7 +143,7 @@ class AutoFeatureSelection:
         and finally return List of features to utilize ahead for processing and model training.
         """
         df=dataCleaner(dataframe,dataframe.drop(target,axis=1).columns.to_list(),target,dc)
-        if(dc.getdict()['problem']=='Classification'):score_func=f_classif 
+        if(dc.getdict()['problem']["type"]=='Classification'):score_func=f_classif 
         else: score_func=f_regression
         
         X=df.drop(target,axis=1)
