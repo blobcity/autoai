@@ -1,0 +1,9 @@
+joblib>=.0.0
+numpy>=1.21.0
+scikit-learn>=0.23.0
+optuna>=2.6.0
+imbalanced-learn >= 0.8.0
+xgboost>=1.4.0
+catboost>=0.26
+lightgbm>=3.2.0
+pandas>=1.2.0
