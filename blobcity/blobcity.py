@@ -24,6 +24,7 @@ from blobcity.utils import getDataFrameType
 from blobcity.utils import dataCleaner
 from blobcity.utils import AutoFeatureSelection as AFS
 from blobcity.utils import writeYml
+from blobcity.modelSelection import modelSearch
 def train(file_path=None, target=None,feature_list=None):
     # this should internally create and a yml file. The yml file is used for generating the code in the future.
     # this should also store a pickle / tensorflow file based on the model used
@@ -37,8 +38,13 @@ def train(file_path=None, target=None,feature_list=None):
         CleanedDF=dataCleaner(dataframe,featureList,target,dc)
     else:
         CleanedDF=dataCleaner(dataframe,feature_list,target,dc)
+    #model search space
+    modelClass = modelSearch(CleanedDF,target,dc)
+
+    #YML generation
     writeYml(dc.getdict())
-    return CleanedDF
+    #return modelClass object
+    return modelClass
 # Performs an automated model training. 
 
 

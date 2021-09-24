@@ -28,3 +28,10 @@ features:
   - symmetry_worst
   - fractal_dimension_worst
   Y_values: diagnosis
+model:
+  type: ExtraTreesClassifier
+  parameters:
+    criterion: gini
+    n_estimators: 832
+    max_features: sqrt
+    max_depth: 39

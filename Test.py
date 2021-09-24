@@ -13,9 +13,8 @@
 # limitations under the License.
 
 
-
 """
-This Python file is test file consisting of initial stage code for testing performance.
+This Python file is test file consisting of initial stage code for testing performance and code functionality.
 """
 import blobcity.blobcity as bc
 import time
@@ -23,4 +22,6 @@ file_path,target="https://raw.githubusercontent.com/Thilakraj1998/Datasets_gener
 #features=['radius_mean','texture_mean','smoothness_mean','compactness_mean','concavity_mean']
 #st=time.time()
 model=bc.train(file_path,target,feature_list=None)
+print(model.features())
+#print(model.predict([[1,1,1,1,1]]))
 #print(time.time()-st)
