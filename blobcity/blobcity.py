@@ -25,7 +25,7 @@ from blobcity.utils import dataCleaner
 from blobcity.utils import AutoFeatureSelection as AFS
 from blobcity.utils import writeYml
 from blobcity.modelSelection import modelSearch
-def train(file_path=None, target=None,feature_list=None):
+def train(file_path=None, target=None,features=None):
     # this should internally create and a yml file. The yml file is used for generating the code in the future.
     # this should also store a pickle / tensorflow file based on the model used
     # Data read
@@ -33,11 +33,11 @@ def train(file_path=None, target=None,feature_list=None):
     dc=DictClass()
     #data read
     dataframe=getDataFrameType(file_path,dc)
-    if(feature_list==None):
+    if(features==None):
         featureList=AFS.FeatureSelection(dataframe,target,dc)
         CleanedDF=dataCleaner(dataframe,featureList,target,dc)
     else:
-        CleanedDF=dataCleaner(dataframe,feature_list,target,dc)
+        CleanedDF=dataCleaner(dataframe,features,target,dc)
     #model search space
     modelClass = modelSearch(CleanedDF,target,dc)
 
