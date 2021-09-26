@@ -41,3 +41,13 @@ bc.spill("my_code.py", docs=True)
 ```
 Pass the optional `docs` parameter to generate Python code along with full code documentation. 
 
+# Specifying `X_Values`
+Framework automatically performs a feature selection. All features are selected by default for feature selection.
+Framework is smart enough to remove ID / Primary key columns. 
+
+Use the below code if you would like to manually specify the features to be used for training. 
+
+``` Python
+bc.train("data.csv", target="Y_value", features=["col1", "col2", "col3"])
+```
+
