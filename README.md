@@ -4,8 +4,12 @@ A framework to find, train and generate code for the best performing AI model. W
 Framework is currently designed for tabluar data, and is being extended to support images, videos and natural language. 
 
 # Getting Started
+``` shell
+pip install blobcity
+```
+
 ``` Python
-!pip install blobcity as bc
+import blobcity as bc
 bc.train("data.csv", "Y_column")
 bc.spill("my_code.ipynb")
 ```
