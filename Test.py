@@ -21,7 +21,7 @@ import time
 file_path,target="https://raw.githubusercontent.com/Thilakraj1998/Datasets_general/main/BreastCancer1.csv",'diagnosis'
 #features=['radius_mean','texture_mean','smoothness_mean','compactness_mean','concavity_mean']
 #st=time.time()
-model=bc.train(file_path,target,feature_list=None)
+model=bc.train(file_path,target,features=None)
 print(model.features())
 #print(model.predict([[1,1,1,1,1]]))
 #print(time.time()-st)
