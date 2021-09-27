@@ -32,6 +32,6 @@ model:
   type: ExtraTreesClassifier
   parameters:
     criterion: gini
-    n_estimators: 832
+    n_estimators: 833
     max_features: sqrt
-    max_depth: 39
+    max_depth: 18
