@@ -49,7 +49,7 @@ class classifier_config:
                 "C":{"int":[1,3]},
                 "loss":{'str':['hinge', 'squared_hinge']},
                 'tol':{'float':[1e-3,0.1]},
-                "penalty":{'str':['l1','l2']}, 
+                "penalty":{'str':['l2']}, 
             }
         ],
         "decisiontree":[

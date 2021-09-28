@@ -16,7 +16,7 @@
 """
 This python file Consist of Function to Generate YAML file from complete process record/log  for OPENSOURCE CODE GENERATION.
 """
-
+import os
 import yaml
 def writeYml(val):
     """
@@ -24,5 +24,5 @@ def writeYml(val):
 
     Funciton take dictionary object and converts the data into YAML file format.
     """
-    with open(r'./yml/Process.yaml', 'w') as file:
+    with open(os.getcwd()+'\Process.yaml', 'w') as file:
         yaml.dump(val, file,sort_keys=False)

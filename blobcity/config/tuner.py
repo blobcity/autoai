@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import optuna
-from blobcity import modelSelection
+from blobcity.main import modelSelection
 from sklearn.model_selection import cross_val_score
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 """
