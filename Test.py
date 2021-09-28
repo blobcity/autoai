@@ -14,14 +14,13 @@
 
 
 """
-This Python file is test file consisting of initial stage code for testing performance and code functionality.
+This Python file is test file consisting of core code functionality.
 """
-import blobcity.blobcity as bc
-import time
-file_path,target="https://raw.githubusercontent.com/Thilakraj1998/Datasets_general/main/BreastCancer1.csv",'diagnosis'
+import blobcity as bc
+
+file_path,target="https://raw.githubusercontent.com/Thilakraj1998/Datasets_general/main/Iris.csv",'Species'
 #features=['radius_mean','texture_mean','smoothness_mean','compactness_mean','concavity_mean']
-#st=time.time()
+
 model=bc.train(file_path,target,features=None)
 print(model.features())
 #print(model.predict([[1,1,1,1,1]]))
-#print(time.time()-st)

@@ -24,13 +24,14 @@ from blobcity.utils import getDataFrameType
 from blobcity.utils import dataCleaner
 from blobcity.utils import AutoFeatureSelection as AFS
 from blobcity.utils import writeYml
-from blobcity.modelSelection import modelSearch
+from blobcity.main.modelSelection import modelSearch
 def train(file_path=None, target=None,features=None):
     # this should internally create and a yml file. The yml file is used for generating the code in the future.
     # this should also store a pickle / tensorflow file based on the model used
     # Data read
     #below function read tabular/Structured/Semi-Structured data based on file type and returns dataframe object.
     dc=DictClass()
+    dc.resetVar()
     #data read
     dataframe=getDataFrameType(file_path,dc)
     if(features==None):
@@ -44,6 +45,7 @@ def train(file_path=None, target=None,features=None):
     #YML generation
     writeYml(dc.getdict())
     #return modelClass object
+    dc.resetVar()
     return modelClass
 # Performs an automated model training. 
 

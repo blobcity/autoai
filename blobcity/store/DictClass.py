@@ -25,7 +25,7 @@ class DictClass:
     def __int__(self):
         self.ObjectExist=False
         self.ObjectList=None
-        
+        self.YAML={}
     def addKeyValue(self, key,value):
         """
         param1:Class reference/Class object 
@@ -72,3 +72,12 @@ class DictClass:
         else:
             self.YAML[key]={}
             self.YAML[key][key2]=value
+            
+    def resetVar(self):
+        """
+        Function to reset class variables
+        """
+        self.ObjectExist=False
+        self.ObjectList=None
+        self.YAML={}
+    

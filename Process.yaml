@@ -1,0 +1,22 @@
+data_read:
+  type: csv
+  file: https://raw.githubusercontent.com/Thilakraj1998/Datasets_general/main/Iris.csv
+  class: df
+problem:
+  type: Classification
+cleaning:
+  encode:
+    Y: LabelEncoder
+features:
+  X_values:
+  - SepalLengthCm
+  - SepalWidthCm
+  - PetalLengthCm
+  Y_values: Species
+model:
+  type: LinearSVC
+  parameters:
+    C: 3
+    loss: squared_hinge
+    tol: 0.07737688747462901
+    penalty: l2
