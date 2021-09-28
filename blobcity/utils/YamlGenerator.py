@@ -24,5 +24,9 @@ def writeYml(val):
 
     Funciton take dictionary object and converts the data into YAML file format.
     """
+    """
     with open(os.getcwd()+'\Process.yaml', 'w') as file:
+        yaml.dump(val, file,sort_keys=False)
+    """
+    with open(r'./Process.yaml', 'w') as file:
         yaml.dump(val, file,sort_keys=False)
