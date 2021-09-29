@@ -18,5 +18,5 @@ model:
   parameters:
     C: 3
     loss: squared_hinge
-    tol: 0.07737688747462901
+    tol: 0.006337746657497314
     penalty: l2

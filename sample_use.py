@@ -16,7 +16,7 @@
 # Here is a sample use of blobcity for representation purpose.
 # THIS CODE IS NOT EXPECTED TO RUN
 
-import blobcity.blobcity as bc;
+import blobcity as bc;
 
 #df = pd.read_csv('test.csv')
 
