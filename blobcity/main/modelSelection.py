@@ -108,16 +108,16 @@ def modelSearch(dataframe,target,DictClass):
     and update YAML dictionary with appropriate model details such has selected type and parameters.
     finally return model class object.
     """
-    if(DictClass.getdict()['problem']["type"]=='Classification'): modelsList=classifier_config().models
-    else: modelsList=regressor_config().models
+    ptype=DictClass.getdict()['problem']["type"]
+    modelsList=classifier_config().models if ptype=="Classification" else regressor_config().models
     if dataframe.shape[0]>500:
         best=trainOnFull(dataframe,target,modelsList,trainOnSample(dataframe,target,modelsList,DictClass),DictClass)
     else:
         best=trainOnFull(dataframe,target,modelsList,modelsList,DictClass)
-    modelResult = Tuner.tuneModel(dataframe,target,best,modelsList)
+    modelResult = Tuner.tuneModel(dataframe,target,best,modelsList,ptype)
     modelData=Model()
     modelData.featureList=dataframe.drop(target,axis=1).columns.to_list()
-    modelData.model,modelData.params,acc = modelResult
+    modelData.model,modelData.params,acc,modelData.metrics = modelResult
     DictClass.addKeyValue('model',{'type': modelData.model.__class__.__name__})
     DictClass.UpdateNestedKeyValue('model','parameters',modelResult[1])
     print("{} CV Score : {:.2f}".format(modelData.model.__class__.__name__,acc))
