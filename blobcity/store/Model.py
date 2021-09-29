@@ -20,8 +20,13 @@ class Model:
     params=dict()
     featureList=[]
     model=None
+    metrics=dict()
     def __init__(self):
-        pass
+        self.params=dict()
+        self.featureList=[]
+        self.model=None
+        self.metrics=dict()
+        
 
     def predict(self,test):
         """
@@ -49,3 +54,9 @@ class Model:
         function return List of feature used by model to train
         """
         return self.featureList
+
+    def stats(self):
+        """
+        function return all the metric associated with problem type for the selected trained model.
+        """
+        return self.metrics

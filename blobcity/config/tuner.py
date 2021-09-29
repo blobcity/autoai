@@ -86,7 +86,7 @@ def tuneModel(dataframe,target,modelkey,modelList):
         study = optuna.create_study(direction="maximize")
         study.optimize(objective, n_trials=5,n_jobs=-1)
         model = modelName(**study.best_params).fit(X,Y)
-        return (model,study.best_params)
+        return (model,study.best_params,study.best_value)
     except Exception as e:
         print(e)
         return None
