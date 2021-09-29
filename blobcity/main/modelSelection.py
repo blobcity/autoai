@@ -117,10 +117,9 @@ def modelSearch(dataframe,target,DictClass):
     modelResult = Tuner.tuneModel(dataframe,target,best,modelsList)
     modelData=Model()
     modelData.featureList=dataframe.drop(target,axis=1).columns.to_list()
-    modelData.model=modelResult[0]
-    modelData.params=modelResult[1]
+    modelData.model,modelData.params,acc = modelResult
     DictClass.addKeyValue('model',{'type': modelData.model.__class__.__name__})
     DictClass.UpdateNestedKeyValue('model','parameters',modelResult[1])
-
+    print("{} CV Score : {:.2f}".format(modelData.model.__class__.__name__,acc))
     return modelData
 
