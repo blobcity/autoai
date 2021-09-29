@@ -57,6 +57,10 @@ class Model:
 
     def stats(self):
         """
-        function return all the metric associated with problem type for the selected trained model.
+        function print/log/display all the metric associated with problem type for the selected trained model.
         """
-        return self.metrics
+        print ("{:<10} {:<10}".format('METRIC', 'VALUE'))
+ 
+        # print each data item.
+        for key, value in self.metrics.items():
+            print ("{:<10} {:<10}".format(key, value))
