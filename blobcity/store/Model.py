@@ -49,3 +49,9 @@ class Model:
         function return List of feature used by model to train
         """
         return self.featureList
+
+    def save(self, path_pref='./'):
+        final_path = os.path.join(path_pref, 'my_model.pkl')
+        pickle.dumps(final_path)
+        # print(final_path)
+        return final_path
