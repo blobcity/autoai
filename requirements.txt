@@ -8,3 +8,4 @@ xgboost>=1.4.0
 catboost>=0.26
 lightgbm>=3.2.0
 pandas>=1.2.0
+tensorflow>=2.5.0

@@ -33,7 +33,12 @@ def train(file_path=None, df=None, target=None,features=None):
     dc=DictClass()
     dc.resetVar()
     #data read
-    dataframe = getDataFrameType(file_path, dc) if file_path else df
+    if file_path!=None:
+        dataframe= getDataFrameType(file_path, dc)
+    else: 
+        dataframe = df
+        dc.addKeyValue('data_read',{"class":"df"})
+        
     if(features==None):
         featureList=AFS.FeatureSelection(dataframe,target,dc)
         CleanedDF=dataCleaner(dataframe,featureList,target,dc)

@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import pickle
+import os
+import tensorflow as tf
 """
 Python file consist of Class Model to initialize/store and retrive data associated to trained machine learning model.
 """
@@ -69,7 +71,7 @@ class Model:
             extension = path_components[2]
 
         if extension == '/':
-            final_path = os.path.join(path_pref, 'my_model.pkl')
+            final_path = os.path.join(path_pref, 'autoaimodel.pkl')
             pickle.dump(self.model, open(final_path, 'wb'))
             print("The model is stored at {}".format(final_path))
             return final_path
@@ -99,7 +101,7 @@ class Model:
 
         function loads the serialized model from .pkl or .h5 format to usable format.
         """
-        path_components = path_pref.split('.')
+        path_components = filepath.split('.')
         if len(path_components)<=2:
             extension = path_components[1]
         else:
