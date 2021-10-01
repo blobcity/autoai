@@ -20,8 +20,13 @@ class Model:
     params=dict()
     featureList=[]
     model=None
+    metrics=dict()
     def __init__(self):
-        pass
+        self.params=dict()
+        self.featureList=[]
+        self.model=None
+        self.metrics=dict()
+        
 
     def predict(self,test):
         """
@@ -105,3 +110,14 @@ class Model:
         elif extension == 'h5':
             self.model = tf.keras.models.load_model(filepath)
         return self.model
+
+    def stats(self):
+        """
+        function print/log/display all the metric associated with problem type for the selected trained model.
+        """
+        print ("{:<10} {:<10}".format('METRIC', 'VALUE'))
+ 
+        # print each data item.
+        for key, value in self.metrics.items():
+            print ("{:<10} {:<10}".format(key, value))
+
