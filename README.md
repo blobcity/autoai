@@ -68,4 +68,5 @@ bc.train("data.csv", target="Y_value", features=["col1", "col2", "col3"])
 # Printing Model Stats
 ``` Python
 model = bc.train(file='./test.csv')
+model.stats()
 ```
