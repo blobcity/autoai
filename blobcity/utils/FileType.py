@@ -19,6 +19,9 @@ This Python File consists of function to fetch and read dataset from various dat
 
 import os.path
 import pandas as pd
+import io
+import requests
+from requests.models import HTTPError
 def getDataFrameType(file_path,dc):
 
     """
@@ -32,21 +35,43 @@ def getDataFrameType(file_path,dc):
         and finally return the dataframe object.
     """
     extension = os.path.splitext(file_path)[1]
-    if(extension==".csv"):
-        Types = "csv"
-        df=pd.read_csv(file_path)
-    elif extension==".xlsx":
-        Types = "xlsx"
-        df=pd.read_xlsx(file_path)
-    elif extension==".excel":
-        df=pd.read_excel(file_path)
-    elif extension==".parquet":
-        df=pd.read_parquet(file_path)
-    elif extension==".json":
-        Types = "JSON"
-        df=pd.read_json(file_path)
-    elif extension==".pkl":
-        df=pd.read_pickle(file_path)
-        Types="Pickle"
+    try:
+        if(extension==".csv"):
+            Types = "csv"
+            df=pd.read_csv(file_path)
+        elif extension==".xlsx":
+            Types = "xlsx"
+            df=pd.read_xlsx(file_path)
+        elif extension==".excel":
+            df=pd.read_excel(file_path)
+        elif extension==".parquet":
+            df=pd.read_parquet(file_path)
+        elif extension==".json":
+            Types = "JSON"
+            df=pd.read_json(file_path)
+        elif extension==".pkl":
+            df=pd.read_pickle(file_path)
+            Types="Pickle"
+    
+    except HTTPError:
+        response = requests.get(file_path)
+        file_object = io.StringIO(response.content.decode('utf-8'))
+        if(extension==".csv"):
+            Types = "csv"
+            df=pd.read_csv(file_object)
+        elif extension==".xlsx":
+            Types = "xlsx"
+            df=pd.read_xlsx(file_object)
+        elif extension==".excel":
+            df=pd.read_excel(file_object)
+        elif extension==".parquet":
+            df=pd.read_parquet(file_object)
+        elif extension==".json":
+            Types = "JSON"
+            df=pd.read_json(file_object)
+        elif extension==".pkl":
+            df=pd.read_pickle(file_object)
+            Types="Pickle"
+
     dc.addKeyValue('data_read',{"type":Types,"file":file_path,"class":"df"})
     return df
