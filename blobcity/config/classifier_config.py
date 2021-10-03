@@ -15,6 +15,7 @@
 import numpy as np
 import sklearn as sk
 import xgboost
+import catboost
 from sklearn import tree,ensemble,svm,linear_model,neighbors
 
 """
@@ -126,6 +127,14 @@ class classifier_config:
                 'max_depth': range (2, 10, 1),
                 'n_estimators': range(60, 220, 40),
                 'learning_rate': [0.1, 0.01, 0.05]
+            }
+        ],
+        "catboost":[
+            catboost.CatBoostClassifier,
+            {
+                'depth'         : [4,5,6,7,8,9, 10],
+                'learning_rate' : [0.01,0.02,0.03,0.04],
+                'iterations'    : [10, 20,30,40,50,60,70,80,90, 100]
             }
         ]
     }
