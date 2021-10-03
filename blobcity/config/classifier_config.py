@@ -15,7 +15,7 @@
 import numpy as np
 import sklearn as sk
 import xgboost
-from sklearn import tree,ensemble,svm,linear_model,neighbors
+from sklearn import tree,ensemble,svm,linear_model,neighbors,naive_bayes
 
 """
 This python file consist of Class variable models to store detail regarding different model to be utilized for classification problem
@@ -127,5 +127,13 @@ class classifier_config:
                 'n_estimators': range(60, 220, 40),
                 'learning_rate': [0.1, 0.01, 0.05]
             }
-        ]
+        ],
+        "bernoullinb":[
+            naive_bayes.BernoulliNB,
+            {
+                'alpha':[0.01,0.1,0.5,1],
+                'fit_prior': [True,False]
+            }
+        ],
+
     }
