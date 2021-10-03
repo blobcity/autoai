@@ -127,5 +127,17 @@ class classifier_config:
                 'n_estimators': range(60, 220, 40),
                 'learning_rate': [0.1, 0.01, 0.05]
             }
+        ],
+        "radius":[
+            neighbors.RadiusNeighborsClassifier,
+            {
+                "n_neighbors":{'int':[3,10]},
+                "weights":{'str':['uniform','distance']},
+                "algorithm":{'str':['auto', 'ball_tree', 'kd_tree', 'brute']},
+                "p":{'int':[1,2]},
+                "metric":{'int':[None]},
+                "leaf_size":{'int':[10,50]},
+                "outlier_label":{'int':[None]}
+            }
         ]
     }
