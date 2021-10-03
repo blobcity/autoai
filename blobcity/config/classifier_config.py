@@ -14,6 +14,7 @@
 
 import numpy as np
 import sklearn as sk
+import xgboost
 from sklearn import tree,ensemble,svm,linear_model,neighbors
 
 """
@@ -117,6 +118,14 @@ class classifier_config:
                 "algorithm":{'str':['auto', 'ball_tree', 'kd_tree', 'brute']},
                 "p":{'int':[1,2]},
                 "leaf_size":{'int':[10,50]}
+            }
+        ],
+        "xgboost":[
+            xgboost.XGBClassifier,
+            {
+                'max_depth': range (2, 10, 1),
+                'n_estimators': range(60, 220, 40),
+                'learning_rate': [0.1, 0.01, 0.05]
             }
         ]
     }
