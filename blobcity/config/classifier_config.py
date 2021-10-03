@@ -15,6 +15,7 @@
 import numpy as np
 import sklearn as sk
 import xgboost
+import lightgbm as lgbm
 from sklearn import tree,ensemble,svm,linear_model,neighbors
 
 """
@@ -126,6 +127,20 @@ class classifier_config:
                 'max_depth': range (2, 10, 1),
                 'n_estimators': range(60, 220, 40),
                 'learning_rate': [0.1, 0.01, 0.05]
+            }
+        ],
+        "lgbm":[
+            lgbm.LGBMClassifier,
+            {
+                'n_estimators': [400, 700, 1000],
+                'colsample_bytree': [0.7, 0.8],
+                'max_depth': [15,20,25],
+                'num_leaves': [50, 100, 200],
+                'reg_alpha': [1.1, 1.2, 1.3],
+                'reg_lambda': [1.1, 1.2, 1.3],
+                'min_split_gain': [0.3, 0.4],
+                'subsample': [0.7, 0.8, 0.9],
+                'subsample_freq': [20]
             }
         ]
     }
