@@ -1,2 +1,2 @@
-from .main import train
+from .main import train,load
 from .store import Model

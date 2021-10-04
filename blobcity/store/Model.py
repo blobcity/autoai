@@ -72,13 +72,13 @@ class Model:
 
         if extension == '/':
             final_path = os.path.join(path_pref, 'autoaimodel.pkl')
-            pickle.dump(self.model, open(final_path, 'wb'))
+            pickle.dump(self, open(final_path, 'wb'))
             print("The model is stored at {}".format(final_path))
             return final_path
 
         elif extension == 'pkl':
             final_path = path_pref
-            pickle.dump(self.model, open(final_path, 'wb'))
+            pickle.dump(self, open(final_path, 'wb'))
             print("The model is stored at {}".format(final_path))
             return final_path
 
@@ -94,24 +94,6 @@ class Model:
         else:
             raise TypeError(f"{extension} file type must be .pkl or .h5")
 
-    def load(self, filepath):
-        """
-        param: (required) the filepath to the stored model. Supports .h5 or .pkl models.
-        returns: Model file
-
-        function loads the serialized model from .pkl or .h5 format to usable format.
-        """
-        path_components = filepath.split('.')
-        if len(path_components)<=2:
-            extension = path_components[1]
-        else:
-            extension = path_components[2]
-        
-        if extension == 'pkl':
-            self.model = pickle.load(open(filepath, 'rb'))
-        elif extension == 'h5':
-            self.model = tf.keras.models.load_model(filepath)
-        return self.model
 
     def stats(self):
         """
