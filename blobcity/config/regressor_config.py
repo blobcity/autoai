@@ -111,5 +111,19 @@ class regressor_config:
                 "p":{'int':[1,2]},
                 "leaf_size":{'int':[10,50]}
             }
+        ],
+        "sgdregressor":[
+            linear_model.SGDRegressor,
+            {
+                "penalty":{'str':['l2','l1','elasticnet']},
+                "alpha":{'float':[1e-4,1.0]},
+                "fit_intercept":{'bool':[True,False]},
+                "max_iter":{'int':[500,1000]},
+                "tol":{"float":[1e-3,1]},
+                "shuffle":{'bool':[True,False]},
+                "epsilon":{"float":[1e-1,1.5]},
+                "learning_rate":{"str":['invscaling','constant','optimal','adaptive']},
+                "early_stopping":{'bool':[True,False]}
+            }
         ]
     }
