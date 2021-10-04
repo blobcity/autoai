@@ -15,7 +15,7 @@
 import numpy as np
 import sklearn as sk
 import xgboost
-from sklearn import tree,ensemble,svm,linear_model,neighbors
+from sklearn import tree,ensemble,svm,linear_model,neighbors,naive_bayes
 
 """
 This python file consist of Class variable models to store detail regarding different model to be utilized for classification problem
@@ -27,6 +27,7 @@ class classifier_config:
     """
     
     models={
+        
         "svc":[
             svm.SVC,
             {
