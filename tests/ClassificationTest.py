@@ -14,7 +14,7 @@
 
 
 """
-This Python file is test file consisting of core code functionality.
+This file runs a sample classification problem on the AutoAI framework. Can be used to check general functioning after adding Classification type models in the library.
 """
 import blobcity as bc
 import pandas as pd
@@ -25,6 +25,3 @@ df=pd.read_csv(file_path)
 model=bc.train(df=df,target=target,features=features)
 
 model.stats()
-#print(model.predict([[1,1,1,1,1]]))
-#print(model.features())
-#model.save()
