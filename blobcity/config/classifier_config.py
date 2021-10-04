@@ -131,8 +131,8 @@ class classifier_config:
         "bernoullinb":[
             naive_bayes.BernoulliNB,
             {
-                'alpha':[0.01,0.1,0.5,1],
-                'fit_prior': [True,False]
+                "alpha":{'float':[1e-2,1.0]},
+                "fit_prior":{'bool':[True,False]}
             }
         ],
 
