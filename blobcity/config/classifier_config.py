@@ -140,4 +140,11 @@ class classifier_config:
                 "fit_prior":{'bool':[True,False]}
             }
         ],
+        "Nearest Centroid":[
+            neighbors.NearestCentroid,
+            {
+                "metric":{'str':['l1', 'l2']}
+                "shrink_threshold":{'float':[3.0, 3.4]}
+            }
+        ],
     }
