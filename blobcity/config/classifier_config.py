@@ -25,6 +25,7 @@ class classifier_config:
     Class variable model consist of a model type key with a list datatype value.
     where the list consist of model class object and dictionary of parameters specific to the model
     """
+    
     models={
         "svc":[
             svm.SVC,
@@ -123,9 +124,12 @@ class classifier_config:
         "xgboost":[
             xgboost.XGBClassifier,
             {
-                'max_depth': range (2, 10, 1),
-                'n_estimators': range(60, 220, 40),
-                'learning_rate': [0.1, 0.01, 0.05]
+                'max_depth': {'int':[3,50]},
+                'n_estimators': {'int':[100,1000]},
+                'learning_rate': {'float':[1e-3,0.1]},
+                'reg_alpha': {'int':[1, 1.5]},
+                'reg_lambda': {'int':[1, 1.5]},
+                'booster':{'str':['gbtree', 'gblinear','dart']}
             }
         ]
     }
