@@ -140,4 +140,12 @@ class classifier_config:
                 "fit_prior":{'bool':[True,False]}
             }
         ],
+        "adaboost":[
+            ensemble.AdaBoostClassifier,
+            {
+                "algorithm":{"str":['SAMME','SAMME.R']},
+                "n_estimators":{"int":[50,100]},
+                "learning_rate": {'float':[1e-3,0.1]},
+            }
+        ]
     }
