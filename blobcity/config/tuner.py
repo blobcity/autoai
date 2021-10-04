@@ -103,7 +103,7 @@ def getParams(trial):
                 params[key]=trial.suggest_int(key,arg[0],arg[1])
             elif datatype=="float":
                 params[key]=trial.suggest_float(key,arg[0],arg[1])
-            elif datatype=='str':
+            elif datatype=='str' or datatype=='bool':
                 params[key]=trial.suggest_categorical(key,arg)
     return params
 
