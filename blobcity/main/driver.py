@@ -78,6 +78,7 @@ def load(modelFile):
             model = pickle.load(open(modelFile, 'rb'))
         elif extension == 'h5':
             model = tf.keras.models.load_model(modelFile)
+       
         return model    
 
 
