@@ -131,5 +131,12 @@ class classifier_config:
                 'reg_lambda': {'int':[1, 1.5]},
                 'booster':{'str':['gbtree', 'gblinear','dart']}
             }
-        ]
+        ],
+         "bernoullinb":[
+            naive_bayes.BernoulliNB,
+            {
+                "alpha":{'float':[1e-2,1.0]},
+                "fit_prior":{'bool':[True,False]}
+            }
+        ],
     }
