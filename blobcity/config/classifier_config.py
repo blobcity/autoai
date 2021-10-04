@@ -127,5 +127,12 @@ class classifier_config:
                 'n_estimators': range(60, 220, 40),
                 'learning_rate': [0.1, 0.01, 0.05]
             }
-        ]
+        ],
+         "bernoullinb":[
+            naive_bayes.BernoulliNB,
+            {
+                "alpha":{'float':[1e-2,1.0]},
+                "fit_prior":{'bool':[True,False]}
+            }
+        ],
     }
