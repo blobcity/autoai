@@ -17,8 +17,7 @@
 # Should do automatic feature selection
 # Should return a trained model
 # Should output progress, in an interactive manner while training is in progress
-#
-# In future other formats are required instead of DataFrame. Like CSV, Excel, Log files etc. 
+
 import pickle
 import tensorflow as tf
 from blobcity.store import DictClass
@@ -27,11 +26,15 @@ from blobcity.utils import dataCleaner
 from blobcity.utils import AutoFeatureSelection as AFS
 from blobcity.utils import writeYml
 from blobcity.main.modelSelection import modelSearch
+
 def train(file=None, df=None, target=None,features=None):
-    # this should internally create and a yml file. The yml file is used for generating the code in the future.
-    # this should also store a pickle / tensorflow file based on the model used
-    # Data read
-    #below function read tabular/Structured/Semi-Structured data based on file type and returns dataframe object.
+    """
+    Performs a model search on the data proivded. A yaml file is generated once the best fit model configuration
+    is discovered. The yaml file is later used for generating source code. 
+
+    Input to the function must be one of file or data frame (df). Passing both parameters of file and df in a single
+    invocation is an incorrect use.
+    """
     dc=DictClass()
     dc.resetVar()
     #data read
@@ -79,6 +82,6 @@ def load(modelFile):
         elif extension == 'h5':
             model = tf.keras.models.load_model(modelFile)
        
-        return model    
+        return model
 
 

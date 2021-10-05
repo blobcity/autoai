@@ -28,7 +28,7 @@ def getKFold(X):
 
     return : integer 
 
-    Function return number of kfold to consider for Cross validation cross on the basis of dataset row counts
+    Function returns number of kfold to consider for Cross validation on the basis of dataset row counts
     """
     k=2
     rows=X.shape[0]
@@ -46,7 +46,7 @@ def cvScore(model,X,Y,k):
     param4: integer for kfold 
     return: float
 
-    function get above mentioned argument and uses cross_val_score to calculate average accuracy on specified kfolds
+    function gets above mentioned argument and uses cross_val_score to calculate average accuracy on specified kfolds
     """
     accuracy = cross_val_score(model, X, Y, cv = k,n_jobs=-1)
     return accuracy.mean()
@@ -56,7 +56,7 @@ def sortScore(modelScore):
     param1: Dictionary
     return: Dictionary
 
-    Function return a sorted dictionary on the basis of values.
+    Function returns a sorted dictionary on the basis of values.
     """
     return dict(sorted(modelScore.items(), key=lambda item: item[1],reverse=True))
 
@@ -68,8 +68,8 @@ def trainOnSample(dataframe,target,models,DictClass):
     param4: Class object
     return: Dictionary
 
-    function returns top 5 models with best accuracy in a dictionary.
-    The models are accuracy is calculate on 10% sample data from the dataset.
+    Function returns top 5 models with best accuracy in a dictionary.
+    The models where accuracy is calculate on 10% sample data from the dataset.
     Accuracy is calculated using average cross validation score on specified kfold counts.
     """
     df=dataframe.sample(frac=0.1,random_state=123)
@@ -86,7 +86,7 @@ def trainOnFull(dataframe,target,models,best,DictClass):
     param4: Class object
     return: Dictionary
 
-    function returns single best models with best accuracy in a dictionary. 
+    Function returns single best model with best accuracy in a dictionary. 
     Accuracy is calculated using average cross validation score on specified kfold counts.
     """
     X,Y=dataframe.drop(target,axis=1),dataframe[target]
@@ -101,14 +101,14 @@ def modelSearch(dataframe,target,DictClass):
     param3: Class object
     return: Class object
 
-    Function first fetchs model dictionary which consist of model object and required parameter,
+    Function first fetches model dictionary which consists of model object and required parameter,
     on the basis of problem type a specific class variable for dictionary is fetched.
-    if the dataset has more than 500 entries then first fetch top 5 best performing model on 10% sample dataset 
-    then run the top 5 model on full dataset to get single best model for hyper parameter tuning.
-    then the single model is sent for hyper parameter tuning to tuneModel function of tuner Class.
-    which return a model object and model tuning parameters which is assigned to class variable in model class.
-    and update YAML dictionary with appropriate model details such has selected type and parameters.
-    finally return model class object.
+    If the dataset has more than 500 entries then first fetch top 5 best performing models on 10% sample dataset 
+    then run the top 5 models on full dataset to get single best model for hyper parameter tuning.
+    The single model is then sent for hyper parameter tuning to tuneModel function of tuner Class,
+    which returns a model object and model tuning parameters which are assigned to class variable in model class.
+    Then update YAML dictionary with appropriate model details such has selected type and parameters.
+    Function finally return a model class object.
     """
     ptype=DictClass.getdict()['problem']["type"]
     modelsList=classifier_config().models if ptype=="Classification" else regressor_config().models

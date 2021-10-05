@@ -16,7 +16,7 @@ import pickle
 import os
 import tensorflow as tf
 """
-Python file consist of Class Model to initialize/store and retrive data associated to trained machine learning model.
+Python file consists of Class Model to initialize/store and retrive data associated to trained machine learning model.
 """
 class Model:
     params=dict()
@@ -45,7 +45,7 @@ class Model:
         """
         return: Dictionary
 
-        function return dictionary consisting of tuned parameters value for the trained model.
+        Function returns dictionary consisting of tuned parameters value for the trained model.
         """
         return self.params
 
@@ -53,7 +53,7 @@ class Model:
         """
         return: List/Array
 
-        function return List of feature used by model to train
+        Function returns List of features used by model to train. This is also used to recognise the features to be passed as input into the predict function.
         """
         return self.featureList
 
@@ -62,7 +62,7 @@ class Model:
         param: Path Prefix or Entire Path. Supported formats are .pkl and .h5. Default is .pkl
         returns: Final filepath of stored serialized file
 
-        function saves the model and its weights serially and returns the filepath where it is saved.
+        Function saves the model and its weights serially and returns the filepath where it is saved.
         """
         path_components = path_pref.split('.')
         if len(path_components)<=2:
@@ -97,7 +97,7 @@ class Model:
 
     def stats(self):
         """
-        function print/log/display all the metric associated with problem type for the selected trained model.
+        Function to print/log/display all the metrics associated with problem type for the selected trained model. Usally used to check the effectiveness of training, or to assess the model fit. 
         """
         print ("{:<10} {:<10}".format('METRIC', 'VALUE'))
  
