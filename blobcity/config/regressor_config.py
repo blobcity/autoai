@@ -115,6 +115,7 @@ class regressor_config:
         "sgdregressor":[
             linear_model.SGDRegressor,
             {
+                "loss":{"str":['squared_error','hubber','epsilon_insensitive','squared_epsilon_insensitive']},
                 "penalty":{'str':['l2','l1','elasticnet']},
                 "alpha":{'float':[1e-4,1.0]},
                 "fit_intercept":{'bool':[True,False]},
