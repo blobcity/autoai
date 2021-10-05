@@ -15,6 +15,7 @@
 import numpy as np
 import sklearn as sk
 import xgboost
+from sklearn.experimental import enable_hist_gradient_boosting
 from sklearn import tree,ensemble,svm,linear_model,neighbors,naive_bayes
 
 """
@@ -27,7 +28,6 @@ class classifier_config:
     """
     
     models={
-        
         "svc":[
             svm.SVC,
             {
@@ -159,5 +159,6 @@ class classifier_config:
                 "n_estimators":{"int":[50,100]},
                 "learning_rate": {'float':[1e-3,0.1]},
             }
+        ] 
 
     }

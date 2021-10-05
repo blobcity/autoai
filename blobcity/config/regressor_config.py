@@ -14,6 +14,7 @@
 
 
 import numpy as np
+from sklearn.experimental import enable_hist_gradient_boosting
 from sklearn import tree,ensemble,svm,linear_model,neighbors
 """
 This python file consist of Class variable models to store detail regarding different model to be utilized for Regression problem
@@ -24,6 +25,7 @@ class regressor_config:
     where the list consist of model class object and dictionary of parameters specific to the model
     """
     models={
+        
         "svr":[
             svm.SVR,
             {
