@@ -19,6 +19,8 @@
 # Should output progress, in an interactive manner while training is in progress
 #
 # In future other formats are required instead of DataFrame. Like CSV, Excel, Log files etc. 
+import pickle
+import tensorflow as tf
 from blobcity.store import DictClass
 from blobcity.utils import getDataFrameType
 from blobcity.utils import dataCleaner
@@ -60,6 +62,23 @@ def train(file=None, df=None, target=None,features=None):
 # Need to see if a h5 file of TensorFlow, and a pickel file for other models can be combined into say a .bcm file for storage
 # .bcm would be a custom format, standing for a BlobCity Model
 def load(modelFile):
-    print('Loading model')
+        """
+        param: (required) the filepath to the stored model. Supports .h5 or .pkl models.
+        returns: Model file
+
+        function loads the serialized model from .pkl or .h5 format to usable format.
+        """
+        path_components = modelFile.split('.')
+        if len(path_components)<=2:
+            extension = path_components[1]
+        else:
+            extension = path_components[2]
+        
+        if extension == 'pkl':
+            model = pickle.load(open(modelFile, 'rb'))
+        elif extension == 'h5':
+            model = tf.keras.models.load_model(modelFile)
+       
+        return model    
 
 

@@ -126,5 +126,15 @@ class regressor_config:
                 "learning_rate":{"str":['invscaling','constant','optimal','adaptive']},
                 "early_stopping":{'bool':[True,False]}
             }
+        ],
+        "poissonregressor":[
+            linear_model.PoissonRegressor,
+            {
+                "alpha":{'float':[1e-3,0.1]},
+                "fit_intercept":{'bool':[True,False]},
+                "max_iter":{'int':[1000,5000]},
+                'tol':{'float':[1e-3,0.1]},
+
+            }
         ]
     }

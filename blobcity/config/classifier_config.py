@@ -140,4 +140,24 @@ class classifier_config:
                 "fit_prior":{'bool':[True,False]}
             }
         ],
+        "histgradientboosting":[
+            ensemble.HistGradientBoostingClassifier,
+            {
+                "loss":{"str":['binary_crossentropy', 'categorical_crossentropy', 'auto']},
+                "learning_rate":{'float':[1e-3,0.1]},
+                "max_iter":{"int":[1000,5000]},
+                "max_depth":{"int":[3,50]},
+                "l2_regularization":{"float":[1e-3,0.1]},
+                "tol":{"float":[1e-7,0.1]},
+                "scoring":{"str":["accuracy", "precision", "loss"]},
+            }
+        ],
+        "adaboost":[
+            ensemble.AdaBoostClassifier,
+            {
+                "algorithm":{"str":['SAMME','SAMME.R']},
+                "n_estimators":{"int":[50,100]},
+                "learning_rate": {'float':[1e-3,0.1]},
+            }
+
     }
