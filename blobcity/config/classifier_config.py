@@ -167,5 +167,18 @@ class classifier_config:
                 "shrink_threshold":{'float':[1.0, 5.0]}
             }
         ],
-
+        "sgd":[
+            linear_model.SGDClassifier,
+            {
+                "loss":{"str":['squared_loss', 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive']},
+                "penalty":{'str':['l1','l2','elasticnet']},
+                "alpha":{'float':[1e-2,1.0]},
+                "l1_ratio":{'float':[0,1]},
+                "tol":{"float":[1e-3,0.1]},
+                "learning_rate":{'str':['optimal','constant','invscaling','adaptive']},
+                "eta0":{'float':[0.0, 0.1]},
+                "power_t":{'float':[0.01, 0.5]]},
+                "epsilon":{'float':[1e-8, 0.1]},
+            }
+        ],
     }
