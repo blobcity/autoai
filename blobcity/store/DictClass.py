@@ -15,7 +15,7 @@
 
 
 """
-This is a Custom Class to store Class reference data for Yaml generation and Process log.
+This is a Custom Class to store Class reference data for YAML generation and process logging.
 """
 class DictClass:
 
@@ -32,7 +32,7 @@ class DictClass:
         param2: String key
         param3: String value
 
-        Function add new key value pair into the class dictionary object
+        Function adds new key value pair into the class dictionary object
         """
         self.YAML[key]=value
 
@@ -40,7 +40,7 @@ class DictClass:
         """
         return : Dictionary 
 
-        Function return Complete Stored Dictionary 
+        Function returns the complete dictionary in current state
         """
         return self.YAML
 
@@ -50,7 +50,7 @@ class DictClass:
         param2: String key
         param2: String /Dicionary
 
-        Function Updates a simple Dictionary Key value if the key exists else creates the entry
+        Function updates a simple Dictionary Key value if the key exists else creates the entry
         """
         if key in self.YAML.keys():
             self.YAML[key]=value
@@ -65,7 +65,7 @@ class DictClass:
         param3:String key
         param4:String/Dictionary
 
-        Function Updates a nested Dictionary Value if the key exists else create the entry for the key
+        Function Updates a nested Dictionary Value if the key exists else creates an entry for the key
         """
         if key in self.YAML.keys():
             self.YAML[key][key2]=value
