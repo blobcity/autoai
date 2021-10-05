@@ -111,5 +111,14 @@ class regressor_config:
                 "p":{'int':[1,2]},
                 "leaf_size":{'int':[10,50]}
             }
+        ],
+        "poissonregressor":[
+            linear_model.PoissonRegressor,
+            {
+                "alpha":{'float':[1e-3,0.1]},
+                "fit_intercept":{'bool':[True,False]},
+                "max_iter":{'int':[1000,5000]},
+                'tol':{'float':[1e-3,0.1]},
+            }
         ]
     }
