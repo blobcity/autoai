@@ -131,7 +131,6 @@ class classifier_config:
         "radius":[
             neighbors.RadiusNeighborsClassifier,
             {
-                "n_neighbors":{'int':[3,10]},
                 "weights":{'str':['uniform','distance']},
                 "algorithm":{'str':['auto', 'ball_tree', 'kd_tree', 'brute']},
                 "p":{'int':[1,2]},
