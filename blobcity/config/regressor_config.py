@@ -149,4 +149,5 @@ class regressor_config:
                 "loss":{'str':['linear', 'square', 'exponential']}
             }
         ]
+        
     }
