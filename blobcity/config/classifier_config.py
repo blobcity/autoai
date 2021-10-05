@@ -163,8 +163,8 @@ class classifier_config:
         "Nearest Centroid":[
             neighbors.NearestCentroid,
             {
-                "metric":{'str':['l1', 'l2', 'manhattan', 'euclidean']}
-                "shrink_threshold":{'float':[3.0, 3.4]}
+                "metric":{'str':['l1', 'l2', 'manhattan', 'euclidean']},
+                "shrink_threshold":{'float':[1.0, 5.0]}
             }
         ],
 

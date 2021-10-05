@@ -25,7 +25,6 @@ class regressor_config:
     where the list consist of model class object and dictionary of parameters specific to the model
     """
     models={
-        
         "svr":[
             svm.SVR,
             {
@@ -126,11 +125,11 @@ class regressor_config:
         "sgdregressor":[
             linear_model.SGDRegressor,
             {
-                "loss":{"str":['squared_error','hubber','epsilon_insensitive','squared_epsilon_insensitive']},
+                "loss":{"str":['huber','epsilon_insensitive','squared_epsilon_insensitive','squared_loss']},
                 "penalty":{'str':['l2','l1','elasticnet']},
                 "alpha":{'float':[1e-4,1.0]},
                 "fit_intercept":{'bool':[True,False]},
-                "max_iter":{'int':[500,1000]},
+                "max_iter":{'int':[500,2000]},
                 "tol":{"float":[1e-3,1]},
                 "shuffle":{'bool':[True,False]},
                 "epsilon":{"float":[1e-1,1.5]},
