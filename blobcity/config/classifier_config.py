@@ -159,6 +159,13 @@ class classifier_config:
                 "n_estimators":{"int":[50,100]},
                 "learning_rate": {'float':[1e-3,0.1]},
             }
-        ] 
+        ] ,
+        "Nearest Centroid":[
+            neighbors.NearestCentroid,
+            {
+                "metric":{'str':['l1', 'l2', 'manhattan', 'euclidean']}
+                "shrink_threshold":{'float':[3.0, 3.4]}
+            }
+        ],
 
     }
