@@ -141,9 +141,9 @@ class regressor_config:
         "adaboostregressor":[
             ensemble.AdaBoostRegressor.
             {
-                "base_estimator":{'object':[ensemble.DecisionTreeClassifier(max_depth=3),ensemble.DecisionTreeClassifier(max_depth=5),\
-                                                                                         ensemble.DecisionTreeClassifier(max_depth=7),\
-                                                                                         ensemble.DecisionTreeClassifier(max_depth=10))]},
+                "base_estimator":{'object':[tree.DecisionTreeRegressor(max_depth=3),tree.DecisionTreeRegressor(max_depth=5),\
+                                                                                        tree.DecisionTreeRegressor(max_depth=7),\
+                                                                                         tree.DecisionTreeRegressor(max_depth=10))]},
                 "n_estimators":{'int':[10, 50, 100, 500, 1000, 5000]},
                 "learning_rate":{'float':[1e-3,0.1,0.2,0.3,0.4,0.5]},
                 "loss":{'str':['linear', 'square', 'exponential']}
