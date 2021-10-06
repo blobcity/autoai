@@ -1,9 +1,9 @@
-<a href="https://blobcity.com"><img src="https://blobcity.com/assets/img/blobcity-logo.svg" style="width: 40%"/></a>
+<a href="https://pix.blobcity.com/I1Nk23FY"><img src="https://blobcity.com/assets/img/blobcity-logo.svg" style="width: 40%"/></a>
 
 # BlobCity AutoAI
 A framework to find, train and generate code for the best performing AI model. Works on Classification and Regression problems. The framework is currently designed for tabluar data, and is being extended to support images, videos and natural language. 
 
-[![Join BlobCity Community on Slack](https://cdn.blobcity.com/assets/slack_logo-24.png)](https://join.slack.com/t/blobcity-ai/shared_invite/zt-5b0rdvhs-Ovpx08mvw6Rc0I~D3jIxgA)
+[![Join BlobCity Community on Slack](https://pix.blobcity.com/E2Bepr4w)
 
 
 # Getting Started
