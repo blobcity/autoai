@@ -85,7 +85,7 @@ class classifier_config:
         "gradientboosting":[
             ensemble.GradientBoostingClassifier,
             {
-                "criterion":{'str':['mse','friedman_mse']},
+                "criterion":{'str':['squared_error','friedman_mse']},
                 "n_estimators":{'int':[100,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
                 "max_depth":{'int':[3,50]},
@@ -125,6 +125,7 @@ class classifier_config:
         "xgboost":[
             xgboost.XGBClassifier,
             {
+                'use_label_encoder':{'bool':[False]},
                 'max_depth': {'int':[3,50]},
                 'n_estimators': {'int':[100,1000]},
                 'learning_rate': {'float':[1e-3,0.1]},

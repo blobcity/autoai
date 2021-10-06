@@ -55,7 +55,7 @@ class regressor_config:
         "decisiontree":[
             tree.DecisionTreeRegressor,
             {
-                "criterion":{'str':['mse', 'friedman_mse', 'mae', 'poisson']},
+                "criterion":{'str':['squared_error', 'friedman_mse', 'absolute_error', 'poisson']},
                 "splitter":{'str':['random','best']},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
                 "max_depth":{'int':[3,50]}
@@ -64,7 +64,7 @@ class regressor_config:
         "randomforest":[
             ensemble.RandomForestRegressor,
             {
-                "criterion":{'str':['mse','mae']},
+                "criterion":{'str':['absolute_error','squared_error']},
                 "n_estimators":{'int':[100,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
                 "max_depth":{'int':[3,50]}
@@ -73,7 +73,7 @@ class regressor_config:
         "extratrees":[
             ensemble.ExtraTreesRegressor,
             {
-                "criterion":{'str':['mse','mae']},
+                "criterion":{'str':['squared_error','absolute_error']},
                 "n_estimators":{'int':[100,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
                 "max_depth":{'int':[3,50]}
@@ -82,7 +82,7 @@ class regressor_config:
         "gradientboosting":[
             ensemble.GradientBoostingRegressor,
             {
-                "criterion":{'str':['mse','friedman_mse']},
+                "criterion":{'str':['squared_error','friedman_mse']},
                 "n_estimators":{'int':[100,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
                 "max_depth":{'int':[3,50]},
