@@ -136,5 +136,19 @@ class regressor_config:
                 "learning_rate":{"str":['invscaling','constant','optimal','adaptive']},
                 "early_stopping":{'bool':[True,False]}
             }
+        ],
+        "adaboostregressor":[
+            ensemble.AdaBoostRegressor.
+            {
+                "base_estimator":{'object':[
+                                tree.DecisionTreeRegressor(max_depth=3),
+                                tree.DecisionTreeRegressor(max_depth=5),
+                                tree.DecisionTreeRegressor(max_depth=7),
+                                tree.DecisionTreeRegressor(max_depth=10)]},
+                "n_estimators":{'int':[10, 5000]},
+                "learning_rate":{'float':[1e-3,2.1]},
+                "loss":{'str':['linear', 'square', 'exponential']}
+            }
         ]
+        
     }
