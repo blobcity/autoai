@@ -135,7 +135,7 @@ class classifier_config:
                 "weights":{'str':['uniform','distance']},
                 "algorithm":{'str':['auto', 'ball_tree', 'kd_tree', 'brute']},
                 "p":{'int':[1,2]},
-                "metric":{'str':['minkowski']},
+                "metric":{'str':['euclidean', 'manhattan', 'chebyshev', 'minkowski', 'wminkowski', 'seuclidean', 'mahalanobis']},
                 "leaf_size":{'int':[10,50]},
                 "outlier_label":{'int':[None]}
             }
