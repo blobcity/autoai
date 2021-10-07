@@ -131,13 +131,13 @@ class classifier_config:
         "radius":[
             neighbors.RadiusNeighborsClassifier,
             {
-                "radius":{'float':[1.0]},
+                "radius":{'float':[1.0,10.0]},
                 "weights":{'str':['uniform','distance']},
                 "algorithm":{'str':['auto', 'ball_tree', 'kd_tree', 'brute']},
                 "p":{'int':[1,2]},
-                "metric":{'str':['euclidean', 'manhattan', 'chebyshev', 'minkowski', 'wminkowski', 'seuclidean', 'mahalanobis']},
+                "metric":{'str':['euclidean', 'manhattan', 'chebyshev', 'minkowski']},
                 "leaf_size":{'int':[10,50]},
-                "outlier_label":{'int':[None]}
+                "outlier_label":{'str':['most_frequent']}
             }
         ]
     }
