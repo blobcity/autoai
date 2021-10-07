@@ -42,7 +42,7 @@ def train(file=None, df=None, target=None,features=None):
         dataframe= getDataFrameType(file, dc)
     else: 
         dataframe = df
-        dc.addKeyValue('data_read',{"class":"df"})
+        dc.addKeyValue('data_read',{"type":"df","class":"df"})
         
     if(features==None):
         featureList=AFS.FeatureSelection(dataframe,target,dc)
