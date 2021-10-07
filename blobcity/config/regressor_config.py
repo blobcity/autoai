@@ -148,10 +148,9 @@ class regressor_config:
          "LassoRegressor":[
             linear_model.Lasso,
             {
-                "alpha":{'float':[0.0001, 0.001]}
-                "max_iter":{'int':[10000, 20000]}
-                "tol":{'float':[0.001, 0.01]}
-                "random_state":{'int':[0, 10]}
+                "alpha":{'float':[0.0001, 0.001]},
+                "max_iter":{'int':[1000, 10000]},
+                "tol":{'float':[0.001, 0.01]},
                 "selection":{'str':['cyclic', 'random']}
             }
         ],
