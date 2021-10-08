@@ -147,5 +147,4 @@ def tuneModel(dataframe,target,modelkey,modelList,ptype):
         model = modelName(**study.best_params).fit(X,Y)
         return (model,study.best_params,study.best_value,metric_result)
     except Exception as e:
-        print(e)
-        return None
+        raise TypeError(f"{e}")
