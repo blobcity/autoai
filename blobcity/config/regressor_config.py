@@ -144,6 +144,16 @@ class regressor_config:
                 "learning_rate":{'float':[1e-3,2.1]},
                 "loss":{'str':['linear', 'square', 'exponential']}
             }
-        ]
-        
+        ],
+        "lars":[
+            linear_model.Lars,
+            {
+                "fit_intercept":{'bool':[True,False]},
+                "verbose":{'bool':[True,False]},
+                "normalize":{'bool':[True,False]},
+                "n_nonzero_coefs":{"int":[500,2000]},
+                "eps":{'float':[2e-16,1]},
+                "fit_path":{'bool':[True,False]},
+            }
+        ]         
     }
