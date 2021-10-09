@@ -33,7 +33,7 @@ If loading data from a Database or external system, create a DataFrame from your
 
 ## From a URL
 ``` Python
-bc.train(file="https://example.com/data.csv", target="Y_column")
+model = bc.train(file="https://example.com/data.csv", target="Y_column")
 ```
 
 The `file` parameter can be a local file, or a URL. The function will load data from the specified URL. The file at the URL must be either in CSV or XLSX format. The URL should be accessible publicly without authentication. 
@@ -43,20 +43,20 @@ Multiple formats of code generation is supported by the framework. The `spill` f
 
 ### Generate Jupyter Notebook
 ``` Python
-bc.spill("my_code.ipynb");
+model.spill("my_code.ipynb");
 ```
-Generates an ipynb file with full markdown documentation explain the code.
+Generates an ipynb file with full markdown documentation containing code explanations. 
 
 ### Generate Python Code
 ``` Python
-bc.spill("my_code.py")
+model.spill("my_code.py")
 ```
 Generates a Python code file. Code documentation is intentionally avoided by default to keep the Python code clean. 
 
 ``` Python
-bc.spill("my_code.py", docs=True)
+model.spill("my_code.py", docs=True)
 ```
-Pass the optional `docs` parameter to generate Python code along with full code documentation. The code documentation is included as multi-line strings. 
+Pass the optional `docs` parameter to specify if relevant source code documentation should be included in the generated code.
 
 # Specifying Features
 Framework automatically performs a feature selection. All features (except target) are considered by default for feature selection.
