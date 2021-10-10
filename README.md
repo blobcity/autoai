@@ -72,13 +72,13 @@ This does not guarantee that all specified features will be used in the final mo
 
 # Printing Model Stats
 ``` Python
-model = bc.train(file='./test.csv')
 model.stats()
 ```
 
+Key models parameters, such as Precision, Recall, F1-Score are printed using the `stats` function. The parameters change based on the type of AutoAI problem. 
+
 # Saving the Model
 ``` Python
-model = bc.train(file='./test.csv')
 model.save('./my_model.pkl')
 ```
 
