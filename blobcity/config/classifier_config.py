@@ -134,7 +134,19 @@ class classifier_config:
                 'booster':{'str':['gbtree', 'gblinear','dart']}
             }
         ],
-        "bernoullinb":[
+        "radius":[
+            neighbors.RadiusNeighborsClassifier,
+            {
+                "radius":{'float':[1.0,10.0]},
+                "weights":{'str':['uniform','distance']},
+                "algorithm":{'str':['auto', 'ball_tree', 'kd_tree', 'brute']},
+                "p":{'int':[1,2]},
+                "metric":{'str':['euclidean', 'manhattan', 'chebyshev', 'minkowski']},
+                "leaf_size":{'int':[10,50]},
+                "outlier_label":{'str':['most_frequent']}
+            }
+        ],
+         "bernoullinb":[
             naive_bayes.BernoulliNB,
             {
                 "alpha":{'float':[1e-2,1.0]},
@@ -190,3 +202,4 @@ class classifier_config:
             }
         ],
     }
+
