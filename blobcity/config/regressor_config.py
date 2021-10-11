@@ -144,6 +144,15 @@ class regressor_config:
                 "learning_rate":{'float':[1e-3,2.1]},
                 "loss":{'str':['linear', 'square', 'exponential']}
             }
-        ]
+        ],
+         "LassoRegressor":[
+            linear_model.Lasso,
+            {
+                "alpha":{'float':[0.0001, 0.001]},
+                "max_iter":{'int':[1000, 10000]},
+                "tol":{'float':[0.001, 0.01]},
+                "selection":{'str':['cyclic', 'random']}
+            }
+        ],
         
     }
