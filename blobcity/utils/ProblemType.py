@@ -38,7 +38,7 @@ class ProType:
         if(data.dtype in ['object']): return dict({'type':'Classification'})
         else:
             target_length =len(np.unique(data))
-            if data.dtype in ['int','float'] and target_length<=50: 
+            if data.dtype in ['int64','float64','int32','float32','int16','float16'] and target_length<=10: 
                 return dict({'type':'Classification'})
             else: 
                 return dict({'type':'Regression'})

@@ -27,6 +27,6 @@ def save(folderLoc):
     print('Saving model + yml')
 
 # Generates a py / ipynb file at the location specified. Path name must include .py or .ipynb.
-# Correspondingly generate an appropriate file
+# Correspondingly generates an appropriate file
 def spill(fileLoc): 
     print('Generating code')

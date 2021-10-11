@@ -103,7 +103,7 @@ def getParams(trial):
                 params[key]=trial.suggest_int(key,arg[0],arg[1])
             elif datatype=="float":
                 params[key]=trial.suggest_float(key,arg[0],arg[1])
-            elif datatype=='str':
+            elif datatype in ['str','bool','object']:
                 params[key]=trial.suggest_categorical(key,arg)
     return params
 
@@ -147,5 +147,4 @@ def tuneModel(dataframe,target,modelkey,modelList,ptype):
         model = modelName(**study.best_params).fit(X,Y)
         return (model,study.best_params,study.best_value,metric_result)
     except Exception as e:
-        print(e)
-        return None
+        raise TypeError(f"{e}")

@@ -14,6 +14,7 @@
 
 
 import numpy as np
+from sklearn.experimental import enable_hist_gradient_boosting
 from sklearn import tree,ensemble,svm,linear_model,neighbors
 """
 This python file consist of Class variable models to store detail regarding different model to be utilized for Regression problem
@@ -54,7 +55,7 @@ class regressor_config:
         "decisiontree":[
             tree.DecisionTreeRegressor,
             {
-                "criterion":{'str':['mse', 'friedman_mse', 'mae', 'poisson']},
+                "criterion":{'str':['squared_error', 'friedman_mse', 'absolute_error', 'poisson']},
                 "splitter":{'str':['random','best']},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
                 "max_depth":{'int':[3,50]}
@@ -63,7 +64,7 @@ class regressor_config:
         "randomforest":[
             ensemble.RandomForestRegressor,
             {
-                "criterion":{'str':['mse','mae']},
+                "criterion":{'str':['absolute_error','squared_error']},
                 "n_estimators":{'int':[100,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
                 "max_depth":{'int':[3,50]}
@@ -72,7 +73,7 @@ class regressor_config:
         "extratrees":[
             ensemble.ExtraTreesRegressor,
             {
-                "criterion":{'str':['mse','mae']},
+                "criterion":{'str':['squared_error','absolute_error']},
                 "n_estimators":{'int':[100,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
                 "max_depth":{'int':[3,50]}
@@ -81,7 +82,7 @@ class regressor_config:
         "gradientboosting":[
             ensemble.GradientBoostingRegressor,
             {
-                "criterion":{'str':['mse','friedman_mse']},
+                "criterion":{'str':['squared_error','friedman_mse']},
                 "n_estimators":{'int':[100,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
                 "max_depth":{'int':[3,50]},
@@ -111,5 +112,38 @@ class regressor_config:
                 "p":{'int':[1,2]},
                 "leaf_size":{'int':[10,50]}
             }
+        ],
+        "poissonregressor":[
+            linear_model.PoissonRegressor,
+            {
+                "alpha":{'float':[1e-3,0.1]},
+                "fit_intercept":{'bool':[True,False]},
+                "max_iter":{'int':[1000,5000]},
+                'tol':{'float':[1e-3,0.1]},
+            }
+        ],
+        "sgdregressor":[
+            linear_model.SGDRegressor,
+            {
+                "loss":{"str":['huber','epsilon_insensitive','squared_epsilon_insensitive','squared_loss']},
+                "penalty":{'str':['l2','l1','elasticnet']},
+                "alpha":{'float':[1e-4,1.0]},
+                "fit_intercept":{'bool':[True,False]},
+                "max_iter":{'int':[500,2000]},
+                "tol":{"float":[1e-3,1]},
+                "shuffle":{'bool':[True,False]},
+                "epsilon":{"float":[1e-1,1.5]},
+                "learning_rate":{"str":['invscaling','constant','optimal','adaptive']},
+                "early_stopping":{'bool':[True,False]}
+            }
+        ],        
+        "adaboostregressor":[
+            ensemble.AdaBoostRegressor,
+            {
+                "n_estimators":{'int':[10, 5000]},
+                "learning_rate":{'float':[1e-3,2.1]},
+                "loss":{'str':['linear', 'square', 'exponential']}
+            }
         ]
+        
     }

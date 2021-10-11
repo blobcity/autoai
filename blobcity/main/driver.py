@@ -17,19 +17,22 @@
 # Should do automatic feature selection
 # Should return a trained model
 # Should output progress, in an interactive manner while training is in progress
-#
-# In future other formats are required instead of DataFrame. Like CSV, Excel, Log files etc. 
+
+import pickle
+import tensorflow as tf
 from blobcity.store import DictClass
-from blobcity.utils import getDataFrameType
-from blobcity.utils import dataCleaner
+from blobcity.utils import getDataFrameType,dataCleaner
 from blobcity.utils import AutoFeatureSelection as AFS
-from blobcity.utils import writeYml
 from blobcity.main.modelSelection import modelSearch
+from blobcity.code_gen import pycoder,codegen_type,yml_reader
 def train(file=None, df=None, target=None,features=None):
-    # this should internally create and a yml file. The yml file is used for generating the code in the future.
-    # this should also store a pickle / tensorflow file based on the model used
-    # Data read
-    #below function read tabular/Structured/Semi-Structured data based on file type and returns dataframe object.
+    """
+    Performs a model search on the data proivded. A yaml file is generated once the best fit model configuration
+    is discovered. The yaml file is later used for generating source code. 
+
+    Input to the function must be one of file or data frame (df). Passing both parameters of file and df in a single
+    invocation is an incorrect use.
+    """
     dc=DictClass()
     dc.resetVar()
     #data read
@@ -37,7 +40,7 @@ def train(file=None, df=None, target=None,features=None):
         dataframe= getDataFrameType(file, dc)
     else: 
         dataframe = df
-        dc.addKeyValue('data_read',{"class":"df"})
+        dc.addKeyValue('data_read',{"type":"df","class":"df"})
         
     if(features==None):
         featureList=AFS.FeatureSelection(dataframe,target,dc)
@@ -46,10 +49,8 @@ def train(file=None, df=None, target=None,features=None):
         CleanedDF=dataCleaner(dataframe,features,target,dc)
     #model search space
     modelClass = modelSearch(CleanedDF,target,dc)
-
-    #YML generation
-    writeYml(dc.getdict())
     #return modelClass object
+    modelClass.yamldata=dc.getdict()
     dc.resetVar()
     return modelClass
 # Performs an automated model training. 
@@ -60,6 +61,38 @@ def train(file=None, df=None, target=None,features=None):
 # Need to see if a h5 file of TensorFlow, and a pickel file for other models can be combined into say a .bcm file for storage
 # .bcm would be a custom format, standing for a BlobCity Model
 def load(modelFile):
-    print('Loading model')
+        """
+        param: (required) the filepath to the stored model. Supports .h5 or .pkl models.
+        returns: Model file
+
+        function loads the serialized model from .pkl or .h5 format to usable format.
+        """
+        path_components = modelFile.split('.')
+        if len(path_components)<=2:
+            extension = path_components[1]
+        else:
+            extension = path_components[2]
+        
+        if extension == 'pkl':
+            model = pickle.load(open(modelFile, 'rb'))
+        elif extension == 'h5':
+            model = tf.keras.models.load_model(modelFile)
+       
+        return model
+
+def spill(filepath,yaml_path=None,doc=None):
+    """
+    param1:string : filepath and format of generated file to store. either .py or .ipynb
+    param2:string : filepath of already generated YAML file 
+    param3:boolean : whether generate code along with documentation
+    """
+    if yaml_path in [None,""] : raise TypeError("YAML file path can't be None")
+    data=yml_reader(yaml_path)
+    ftype = "py" if (filepath in ["",None]) else codegen_type(filepath)
+    CGpath= f"CodeGen.{ftype}" if (filepath in ["",None]) else filepath
+    if ftype=="py" and doc in [None,False]:
+        pycoder(data,CGpath,doc=False)
+    elif ftype=="py" and doc==True:
+        pycoder(data,CGpath,doc=True)
 
 

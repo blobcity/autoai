@@ -14,7 +14,7 @@
 
 
 """
-This Python file is test file consisting of core code functionality.
+This file runs a sample classification problem on the AutoAI framework. Can be used to check general functioning after adding Classification type models in the library.
 """
 import blobcity as bc
 import pandas as pd
@@ -22,9 +22,12 @@ file_path,target="https://raw.githubusercontent.com/Thilakraj1998/Datasets_gener
 features=['radius_mean','texture_mean','smoothness_mean','compactness_mean','concavity_mean']
 
 df=pd.read_csv(file_path)
-model=bc.train(df=df,target=target,features=features)
+model=bc.train(file=file_path,target=target,features=None) # function to test AutoAI Process
 
-model.stats()
-#print(model.predict([[1,1,1,1,1]]))
-#print(model.features())
-#model.save()
+model.stats() # function to test metrics analysis
+
+model.spill(doc=True) #function to test code generation 
+
+model.generate_yaml() #function to test yaml generation
+
+bc.spill("codefile.py","./Process.yaml",doc=True) #funciton to test yaml generation from specified yaml file

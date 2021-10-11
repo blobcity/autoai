@@ -15,19 +15,23 @@
 import pickle
 import os
 import tensorflow as tf
+from blobcity.code_gen import codegen_type,pycoder
+import yaml
 """
-Python file consist of Class Model to initialize/store and retrive data associated to trained machine learning model.
+Python file consists of Class Model to initialize/store and retrive data associated to trained machine learning model.
 """
 class Model:
     params=dict()
     featureList=[]
     model=None
     metrics=dict()
+    yamldata=None
     def __init__(self):
         self.params=dict()
         self.featureList=[]
         self.model=None
         self.metrics=dict()
+        self.yamldata=None
         
 
     def predict(self,test):
@@ -45,7 +49,7 @@ class Model:
         """
         return: Dictionary
 
-        function return dictionary consisting of tuned parameters value for the trained model.
+        Function returns dictionary consisting of tuned parameters value for the trained model.
         """
         return self.params
 
@@ -53,7 +57,7 @@ class Model:
         """
         return: List/Array
 
-        function return List of feature used by model to train
+        Function returns List of features used by model to train. This is also used to recognise the features to be passed as input into the predict function.
         """
         return self.featureList
 
@@ -62,7 +66,7 @@ class Model:
         param: Path Prefix or Entire Path. Supported formats are .pkl and .h5. Default is .pkl
         returns: Final filepath of stored serialized file
 
-        function saves the model and its weights serially and returns the filepath where it is saved.
+        Function saves the model and its weights serially and returns the filepath where it is saved.
         """
         path_components = path_pref.split('.')
         if len(path_components)<=2:
@@ -72,13 +76,13 @@ class Model:
 
         if extension == '/':
             final_path = os.path.join(path_pref, 'autoaimodel.pkl')
-            pickle.dump(self.model, open(final_path, 'wb'))
+            pickle.dump(self, open(final_path, 'wb'))
             print("The model is stored at {}".format(final_path))
             return final_path
 
         elif extension == 'pkl':
             final_path = path_pref
-            pickle.dump(self.model, open(final_path, 'wb'))
+            pickle.dump(self, open(final_path, 'wb'))
             print("The model is stored at {}".format(final_path))
             return final_path
 
@@ -94,28 +98,10 @@ class Model:
         else:
             raise TypeError(f"{extension} file type must be .pkl or .h5")
 
-    def load(self, filepath):
-        """
-        param: (required) the filepath to the stored model. Supports .h5 or .pkl models.
-        returns: Model file
-
-        function loads the serialized model from .pkl or .h5 format to usable format.
-        """
-        path_components = filepath.split('.')
-        if len(path_components)<=2:
-            extension = path_components[1]
-        else:
-            extension = path_components[2]
-        
-        if extension == 'pkl':
-            self.model = pickle.load(open(filepath, 'rb'))
-        elif extension == 'h5':
-            self.model = tf.keras.models.load_model(filepath)
-        return self.model
 
     def stats(self):
         """
-        function print/log/display all the metric associated with problem type for the selected trained model.
+        Function to print/log/display all the metrics associated with problem type for the selected trained model. Usally used to check the effectiveness of training, or to assess the model fit. 
         """
         print ("{:<10} {:<10}".format('METRIC', 'VALUE'))
  
@@ -123,3 +109,37 @@ class Model:
         for key, value in self.metrics.items():
             print ("{:<10} {:<10}".format(key, value))
 
+    def spill(self,filepath=None,doc=None):
+        """
+        param1: string : Filepath and format of generated file to store. either .py or .ipynb
+        param2: boolean :  Whether generate code along with documentation.
+
+        Function generates source code for the AutoAI Procedure
+        """
+        data=self.yamldata
+        ftype = "py" if (filepath in ["",None]) else codegen_type(filepath)
+        CGpath= f"CodeGen.{ftype}" if (filepath in ["",None]) else filepath
+        if ftype=="py" and doc in [None,False]:
+            pycoder(data,CGpath,doc=False)
+        elif ftype=="py" and doc==True:
+            pycoder(data,CGpath,doc=True)
+        else:
+            raise TypeError("file type must be .py or .ipynb")
+
+    def generate_yaml(self,path=None):
+        """
+        param1: string : File path to store .yaml file,if not specified store in current directory with `Process.yaml`
+        
+        Function generated and create YAML configuration file for the complete AutoAI procedures.
+        """
+        if path!=None:
+            extension = os.path.splitext(path)[1]
+            filepath=path
+        else:
+            filepath = './Process.yaml'
+            extension=".yaml"
+        if extension in [".yaml",".yml"]:
+            with open(filepath, 'w') as file:
+                yaml.dump(self.yamldata, file,sort_keys=False)
+        else:
+            raise TypeError(f"{extension} file type must be .yml or .yaml")

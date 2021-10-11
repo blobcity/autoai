@@ -15,7 +15,8 @@
 import numpy as np
 import sklearn as sk
 import xgboost
-from sklearn import tree,ensemble,svm,linear_model,neighbors
+from sklearn.experimental import enable_hist_gradient_boosting
+from sklearn import tree,ensemble,svm,linear_model,neighbors,naive_bayes
 
 """
 This python file consist of Class variable models to store detail regarding different model to be utilized for classification problem
@@ -25,6 +26,7 @@ class classifier_config:
     Class variable model consist of a model type key with a list datatype value.
     where the list consist of model class object and dictionary of parameters specific to the model
     """
+    
     models={
         "svc":[
             svm.SVC,
@@ -83,7 +85,7 @@ class classifier_config:
         "gradientboosting":[
             ensemble.GradientBoostingClassifier,
             {
-                "criterion":{'str':['mse','friedman_mse']},
+                "criterion":{'str':['squared_error','friedman_mse']},
                 "n_estimators":{'int':[100,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
                 "max_depth":{'int':[3,50]},
@@ -123,9 +125,13 @@ class classifier_config:
         "xgboost":[
             xgboost.XGBClassifier,
             {
-                'max_depth': range (2, 10, 1),
-                'n_estimators': range(60, 220, 40),
-                'learning_rate': [0.1, 0.01, 0.05]
+                'use_label_encoder':{'bool':[False]},
+                'max_depth': {'int':[3,50]},
+                'n_estimators': {'int':[100,1000]},
+                'learning_rate': {'float':[1e-3,0.1]},
+                'reg_alpha': {'int':[1, 1.5]},
+                'reg_lambda': {'int':[1, 1.5]},
+                'booster':{'str':['gbtree', 'gblinear','dart']}
             }
         ],
         "radius":[
@@ -140,4 +146,53 @@ class classifier_config:
                 "outlier_label":{'str':['most_frequent']}
             }
         ]
+         "bernoullinb":[
+            naive_bayes.BernoulliNB,
+            {
+                "alpha":{'float':[1e-2,1.0]},
+                "fit_prior":{'bool':[True,False]}
+            }
+        ],
+        "histgradientboosting":[
+            ensemble.HistGradientBoostingClassifier,
+            {
+                "loss":{"str":['binary_crossentropy', 'categorical_crossentropy', 'auto']},
+                "learning_rate":{'float':[1e-3,0.1]},
+                "max_iter":{"int":[1000,5000]},
+                "max_depth":{"int":[3,50]},
+                "l2_regularization":{"float":[1e-3,0.1]},
+                "tol":{"float":[1e-7,0.1]},
+                "scoring":{"str":["accuracy", "precision", "loss"]},
+            }
+        ],
+        "adaboost":[
+            ensemble.AdaBoostClassifier,
+            {
+                "algorithm":{"str":['SAMME','SAMME.R']},
+                "n_estimators":{"int":[50,100]},
+                "learning_rate": {'float':[1e-3,0.1]},
+            }
+        ] ,
+        "Nearest Centroid":[
+            neighbors.NearestCentroid,
+            {
+                "metric":{'str':['l1', 'l2', 'manhattan', 'euclidean']},
+                "shrink_threshold":{'float':[1.0, 5.0]}
+            }
+        ],
+        "sgd":[
+            linear_model.SGDClassifier,
+            {
+                "loss":{"str":['squared_loss', 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive']},
+                "penalty":{'str':['l1','l2','elasticnet']},
+                "alpha":{'float':[1e-2,1.0]},
+                "l1_ratio":{'float':[1e-3,0.1]},
+                "tol":{"float":[1e-3,0.1]},
+                "learning_rate":{'str':['optimal','constant','invscaling','adaptive']},
+                "eta0":{'float':[0.0, 0.1]},
+                "power_t":{'float':[0.01, 0.5]},
+                "epsilon":{'float':[1e-8, 0.1]},
+            }
+        ],
     }
+
