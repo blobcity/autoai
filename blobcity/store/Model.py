@@ -16,6 +16,8 @@ import pickle
 import os
 import tensorflow as tf
 from blobcity.code_gen import codegen_type,pycoder
+from blobcity.config import classifier_config
+from sklearn.metrics import confusion_matrix
 import yaml
 """
 Python file consists of Class Model to initialize/store and retrive data associated to trained machine learning model.
@@ -143,3 +145,10 @@ class Model:
                 yaml.dump(self.yamldata, file,sort_keys=False)
         else:
             raise TypeError(f"{extension} file type must be .yml or .yaml")
+
+    def confusionMatrix(self, y_test, y_predict):
+        classifier_instance = classifier_config()
+        if self.model.__class__.__name__ in classifier_instance.models:
+            confusion_matrix(y_test, y_predict)
+        else:
+            print("Confusion matrix is available only for Classification problems")
