@@ -21,12 +21,10 @@
 import pickle
 import tensorflow as tf
 from blobcity.store import DictClass
-from blobcity.utils import getDataFrameType
-from blobcity.utils import dataCleaner
+from blobcity.utils import getDataFrameType,dataCleaner
 from blobcity.utils import AutoFeatureSelection as AFS
-from blobcity.utils import writeYml
 from blobcity.main.modelSelection import modelSearch
-
+from blobcity.code_gen import pycoder,codegen_type,yml_reader
 def train(file=None, df=None, target=None,features=None):
     """
     Performs a model search on the data proivded. A yaml file is generated once the best fit model configuration
@@ -42,7 +40,7 @@ def train(file=None, df=None, target=None,features=None):
         dataframe= getDataFrameType(file, dc)
     else: 
         dataframe = df
-        dc.addKeyValue('data_read',{"class":"df"})
+        dc.addKeyValue('data_read',{"type":"df","class":"df"})
         
     if(features==None):
         featureList=AFS.FeatureSelection(dataframe,target,dc)
@@ -51,10 +49,8 @@ def train(file=None, df=None, target=None,features=None):
         CleanedDF=dataCleaner(dataframe,features,target,dc)
     #model search space
     modelClass = modelSearch(CleanedDF,target,dc)
-
-    #YML generation
-    writeYml(dc.getdict())
     #return modelClass object
+    modelClass.yamldata=dc.getdict()
     dc.resetVar()
     return modelClass
 # Performs an automated model training. 
@@ -83,5 +79,20 @@ def load(modelFile):
             model = tf.keras.models.load_model(modelFile)
        
         return model
+
+def spill(filepath,yaml_path=None,doc=None):
+    """
+    param1:string : filepath and format of generated file to store. either .py or .ipynb
+    param2:string : filepath of already generated YAML file 
+    param3:boolean : whether generate code along with documentation
+    """
+    if yaml_path in [None,""] : raise TypeError("YAML file path can't be None")
+    data=yml_reader(yaml_path)
+    ftype = "py" if (filepath in ["",None]) else codegen_type(filepath)
+    CGpath= f"CodeGen.{ftype}" if (filepath in ["",None]) else filepath
+    if ftype=="py" and doc in [None,False]:
+        pycoder(data,CGpath,doc=False)
+    elif ftype=="py" and doc==True:
+        pycoder(data,CGpath,doc=True)
 
 
