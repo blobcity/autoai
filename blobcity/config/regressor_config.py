@@ -17,6 +17,8 @@ import numpy as np
 from sklearn.experimental import enable_hist_gradient_boosting
 from sklearn import tree,ensemble,svm,linear_model,neighbors
 from xgboost import XGBRegressor
+from catboost import CatBoostRegressor
+
 """
 This python file consist of Class variable models to store detail regarding different model to be utilized for Regression problem
 """
@@ -176,10 +178,10 @@ class regressor_config:
         "BayesianRidge":[
             linear_model.BayesianRidge,
             {
-                  "alpha_1":{'float':[1e-3,0.1]},
-                  "alpha_2":{'float':[1e-3,0.1]},
-                  "lambda_1":{'float':[1e-3,0.1]},
-                  "lambda_2":{'float':[1e-3,0.1]}
+                "alpha_1":{'float':[1e-3,0.1]},
+                "alpha_2":{'float':[1e-3,0.1]},
+                "lambda_1":{'float':[1e-3,0.1]},
+                "lambda_2":{'float':[1e-3,0.1]}
             }
         ], 
         "LassoLars":[
@@ -212,4 +214,12 @@ class regressor_config:
                 "booster":{'str':['gbtree', 'gblinear', 'dart']}
             }
         ]
+        "catboost":[
+            CatBoostRegressor,
+            {
+                "learning_rate": {'float':[1e-3,0.1]},
+                "l2_leaf_reg":{'float':[1e-3, 5.0]}
+                "bootstrap_type":{'str':['bayesian', 'bernoulli', 'mvs', 'poisson', 'no']}
+            }
+        ] ,
     }
