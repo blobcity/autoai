@@ -15,6 +15,8 @@
 import pickle
 import os
 import tensorflow as tf
+from blobcity.code_gen import codegen_type,pycoder
+import yaml
 """
 Python file consists of Class Model to initialize/store and retrive data associated to trained machine learning model.
 """
@@ -23,11 +25,13 @@ class Model:
     featureList=[]
     model=None
     metrics=dict()
+    yamldata=None
     def __init__(self):
         self.params=dict()
         self.featureList=[]
         self.model=None
         self.metrics=dict()
+        self.yamldata=None
         
 
     def predict(self,test):
@@ -105,3 +109,37 @@ class Model:
         for key, value in self.metrics.items():
             print ("{:<10} {:<10}".format(key, value))
 
+    def spill(self,filepath=None,doc=None):
+        """
+        param1: string : Filepath and format of generated file to store. either .py or .ipynb
+        param2: boolean :  Whether generate code along with documentation.
+
+        Function generates source code for the AutoAI Procedure
+        """
+        data=self.yamldata
+        ftype = "py" if (filepath in ["",None]) else codegen_type(filepath)
+        CGpath= f"CodeGen.{ftype}" if (filepath in ["",None]) else filepath
+        if ftype=="py" and doc in [None,False]:
+            pycoder(data,CGpath,doc=False)
+        elif ftype=="py" and doc==True:
+            pycoder(data,CGpath,doc=True)
+        else:
+            raise TypeError("file type must be .py or .ipynb")
+
+    def generate_yaml(self,path=None):
+        """
+        param1: string : File path to store .yaml file,if not specified store in current directory with `Process.yaml`
+        
+        Function generated and create YAML configuration file for the complete AutoAI procedures.
+        """
+        if path!=None:
+            extension = os.path.splitext(path)[1]
+            filepath=path
+        else:
+            filepath = './Process.yaml'
+            extension=".yaml"
+        if extension in [".yaml",".yml"]:
+            with open(filepath, 'w') as file:
+                yaml.dump(self.yamldata, file,sort_keys=False)
+        else:
+            raise TypeError(f"{extension} file type must be .yml or .yaml")

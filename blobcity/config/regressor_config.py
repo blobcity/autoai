@@ -152,6 +152,14 @@ class regressor_config:
                 "n_nonzero_coefs":{"int":[500,2000]},
                 "eps":{'float':[2e-16,1]},
             }
-        ]     
-        
+        ],     
+        "LassoRegressor":[
+            linear_model.Lasso,
+            {
+                "alpha":{'float':[0.0001, 0.001]},
+                "max_iter":{'int':[1000, 10000]},
+                "tol":{'float':[0.001, 0.01]},
+                "selection":{'str':['cyclic', 'random']}
+            }
+        ] 
     }
