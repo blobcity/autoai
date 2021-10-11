@@ -145,7 +145,7 @@ class regressor_config:
                 "loss":{'str':['linear', 'square', 'exponential']}
             }
         ],
-         "LassoRegressor":[
+        "LassoRegressor":[
             linear_model.Lasso,
             {
                 "alpha":{'float':[0.0001, 0.001]},
