@@ -145,8 +145,8 @@ class classifier_config:
                 "leaf_size":{'int':[10,50]},
                 "outlier_label":{'str':['most_frequent']}
             }
-        ]
-         "bernoullinb":[
+        ],
+        "bernoullinb":[
             naive_bayes.BernoulliNB,
             {
                 "alpha":{'float':[1e-2,1.0]},
