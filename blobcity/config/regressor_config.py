@@ -161,5 +161,14 @@ class regressor_config:
                 "tol":{'float':[0.001, 0.1]},
                 "selection":{'str':['cyclic', 'random']}
             }
-        ] 
+        ] ,
+          "bayesianRidge":[
+            linear_model.BayesianRidge,
+            {
+                  "alpha_1":{'float':[1e-3,0.1]},
+                  "alpha_2":{'float':[1e-3,0.1]},
+                  "lambda_1":{'float':[1e-3,0.1]},
+                  "lambda_2":{'float':[1e-3,0.1]},
+
+        }],
     }
