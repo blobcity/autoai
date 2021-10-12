@@ -16,6 +16,7 @@
 import numpy as np
 from sklearn.experimental import enable_hist_gradient_boosting
 from sklearn import tree,ensemble,svm,linear_model,neighbors
+from xgboost import XGBRegressor
 """
 This python file consist of Class variable models to store detail regarding different model to be utilized for Regression problem
 """
@@ -178,6 +179,15 @@ class regressor_config:
                 "fit_intercept":{'bool':[True,False]},
                 "max_iter":{'int':[1000,10000]},
                 "eps":{'float':[1e-6,0.1]}
+            }
+        ],
+        "XGBoost":[
+            XGBRegressor,
+            {
+                "n_estimators":{'int':[10, 5000]},
+                "max_depth":{'int':[3,50]},
+                "learning_rate":{'float':[1e-3,0.1]},
+                "verbosity":{'int':[0,3]}
             }
         ]
     }
