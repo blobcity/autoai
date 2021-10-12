@@ -161,14 +161,23 @@ class regressor_config:
                 "tol":{'float':[1e-3, 0.1]},
                 "selection":{'str':['cyclic', 'random']}
             }
-        ] ,
-          "BayesianRidge":[
+        ],
+         "BayesianRidge":[
             linear_model.BayesianRidge,
             {
                   "alpha_1":{'float':[1e-3,0.1]},
                   "alpha_2":{'float':[1e-3,0.1]},
                   "lambda_1":{'float':[1e-3,0.1]},
-                  "lambda_2":{'float':[1e-3,0.1]},
-
-        }],
+                  "lambda_2":{'float':[1e-3,0.1]}
+            }
+        ], 
+        "LassoLars":[
+            linear_model.LassoLars,
+            {
+                "alpha":{'float':[1e-4,0.1]},
+                "fit_intercept":{'bool':[True,False]},
+                "max_iter":{'int':[1000,10000]},
+                "eps":{'float':[1e-6,0.1]}
+            }
+        ]
     }

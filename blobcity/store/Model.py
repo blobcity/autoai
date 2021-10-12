@@ -136,3 +136,4 @@ class Model:
                 yaml.dump(self.yamldata, file,sort_keys=False)
         else:
             raise TypeError(f"{extension} file type must be .yml or .yaml")
+
