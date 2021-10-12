@@ -154,7 +154,6 @@ class regressor_config:
                 "selection":{'str':['cyclic', 'random']}
             }
         ], 
-        "lassolarsregressor":[
         "LassoLars":[
             linear_model.LassoLars,
             {
