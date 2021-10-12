@@ -194,5 +194,12 @@ class classifier_config:
                 "epsilon":{'float':[1e-8, 0.1]},
             }
         ],
+        "categoricalnb":[
+            naive_bayes.CategoricalNB,
+            {
+                "alpha":{'float':[1e-2,1.0]},
+                "fit_prior":{'bool':[True,False],
+            }
+        ],
     }
 
