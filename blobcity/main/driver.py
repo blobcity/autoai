@@ -24,7 +24,7 @@ from blobcity.store import DictClass
 from blobcity.utils import getDataFrameType,dataCleaner
 from blobcity.utils import AutoFeatureSelection as AFS
 from blobcity.main.modelSelection import modelSearch
-from blobcity.code_gen import pycoder,codegen_type,yml_reader
+from blobcity.code_gen import yml_reader,code_generator
 def train(file=None, df=None, target=None,features=None):
     """
     Performs a model search on the data proivded. A yaml file is generated once the best fit model configuration
@@ -85,14 +85,10 @@ def spill(filepath,yaml_path=None,doc=None):
     param1:string : filepath and format of generated file to store. either .py or .ipynb
     param2:string : filepath of already generated YAML file 
     param3:boolean : whether generate code along with documentation
+
+    Function calls generator functions to generate source code for the AutoAI Procedure
     """
     if yaml_path in [None,""] : raise TypeError("YAML file path can't be None")
     data=yml_reader(yaml_path)
-    ftype = "py" if (filepath in ["",None]) else codegen_type(filepath)
-    CGpath= f"CodeGen.{ftype}" if (filepath in ["",None]) else filepath
-    if ftype=="py" and doc in [None,False]:
-        pycoder(data,CGpath,doc=False)
-    elif ftype=="py" and doc==True:
-        pycoder(data,CGpath,doc=True)
-
+    code_generator(data,filepath,doc)
 
