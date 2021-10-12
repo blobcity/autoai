@@ -161,5 +161,14 @@ class regressor_config:
                 "tol":{'float':[1e-3, 0.1]},
                 "selection":{'str':['cyclic', 'random']}
             }
-        ] 
+        ], 
+        "LassoLars":[
+            linear_model.LassoLars,
+            {
+                "alpha":{'float':[1e-4,0.1]},
+                "fit_intercept":{'bool':[True,False]},
+                "max_iter":{'int':[1000,10000]},
+                "eps":{'float':[1e-6,0.1]}
+            }
+        ]
     }
