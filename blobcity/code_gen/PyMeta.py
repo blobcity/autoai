@@ -50,6 +50,8 @@ class PyComments:
             'KNeighborsRegressor':"KNeighborsRegressor model Descriptions\r\n",
             'Lasso':"Lasso model Descriptions\r\n",
             'Lars':"Lars model Descriptions\r\n",
+            'BayesianRidge':'BayesianRidge model Description\r\n',
+            'LassoLars':'LassoLars model Descriptions\r\n',
         },
     }
 
