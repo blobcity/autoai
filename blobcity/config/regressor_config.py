@@ -145,6 +145,14 @@ class regressor_config:
                 "loss":{'str':['linear', 'square', 'exponential']}
             }
         ],
+        "lars":[
+            linear_model.Lars,
+            {
+                "fit_intercept":{'bool':[True,False]},
+                "n_nonzero_coefs":{"int":[500,2000]},
+                "eps":{'float':[2e-16,1]},
+            }
+        ],     
         "LassoRegressor":[
             linear_model.Lasso,
             {
@@ -153,6 +161,5 @@ class regressor_config:
                 "tol":{'float':[0.001, 0.01]},
                 "selection":{'str':['cyclic', 'random']}
             }
-        ],
-        
+        ] 
     }
