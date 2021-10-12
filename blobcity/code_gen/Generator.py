@@ -192,3 +192,19 @@ def pycoder(yml_data,CGpath,doc):
     codes=modeler(yml_data,codes,key,doc)
     codes=model_metrics(key,codes,doc)
     write_pycode(CGpath,codes)
+
+def code_generator(data,filepath,doc=None):
+    """
+    param1: dictionary : AutoAI steps data
+    param2: string : filepath to write the code.
+    param3: boolean : Whether to includer documentation/meta description for the following section
+
+    """
+    ftype = "py" if (filepath in ["",None]) else codegen_type(filepath)
+    CGpath= f"CodeGen.{ftype}" if (filepath in ["",None]) else filepath
+    if ftype=="py" and doc in [None,False]:
+        pycoder(data,CGpath,doc=False)
+    elif ftype=="py" and doc==True:
+        pycoder(data,CGpath,doc)
+    else:
+        raise TypeError("file type must be .py or .ipynb")

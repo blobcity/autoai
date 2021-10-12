@@ -15,7 +15,7 @@
 import pickle
 import os
 import tensorflow as tf
-from blobcity.code_gen import codegen_type,pycoder
+from blobcity.code_gen import code_generator
 import yaml
 """
 Python file consists of Class Model to initialize/store and retrive data associated to trained machine learning model.
@@ -114,17 +114,10 @@ class Model:
         param1: string : Filepath and format of generated file to store. either .py or .ipynb
         param2: boolean :  Whether generate code along with documentation.
 
-        Function generates source code for the AutoAI Procedure
+        Function calls generator functions to generate source code for the AutoAI Procedure
         """
         data=self.yamldata
-        ftype = "py" if (filepath in ["",None]) else codegen_type(filepath)
-        CGpath= f"CodeGen.{ftype}" if (filepath in ["",None]) else filepath
-        if ftype=="py" and doc in [None,False]:
-            pycoder(data,CGpath,doc=False)
-        elif ftype=="py" and doc==True:
-            pycoder(data,CGpath,doc=True)
-        else:
-            raise TypeError("file type must be .py or .ipynb")
+        code_generator(data,filepath,doc)
 
     def generate_yaml(self,path=None):
         """
