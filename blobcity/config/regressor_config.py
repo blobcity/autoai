@@ -155,6 +155,7 @@ class regressor_config:
             }
         ], 
         "lassolarsregressor":[
+        "LassoLars":[
             linear_model.LassoLars,
             {
                 "alpha":{'float':[1e-4,0.1]},
