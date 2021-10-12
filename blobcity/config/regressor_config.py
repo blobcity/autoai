@@ -218,8 +218,11 @@ class regressor_config:
             CatBoostRegressor,
             {
                 "learning_rate": {'float':[1e-3,0.1]},
-                "l2_leaf_reg":{'float':[1e-3, 5.0]}
-                "bootstrap_type":{'str':['bayesian', 'bernoulli', 'mvs', 'poisson', 'no']}
+                "l2_leaf_reg":{'float':[1e-3, 5.0]},
+                "bootstrap_type":{'str':['bayesian', 'bernoulli', 'mvs', 'poisson', 'no']},
+                "loss_function":{'str':['RMSE']},
+                "max_iter":{'int':[1000, 10000]},
+                "max_depth":{'int':[3,50]},
             }
-        ] ,
+        ],
     }
