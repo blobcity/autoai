@@ -162,7 +162,7 @@ class regressor_config:
                 "selection":{'str':['cyclic', 'random']}
             }
         ] ,
-          "bayesianRidge":[
+          "BayesianRidge":[
             linear_model.BayesianRidge,
             {
                   "alpha_1":{'float':[1e-3,0.1]},
