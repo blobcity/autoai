@@ -130,7 +130,7 @@ class regressor_config:
                 "alpha":{'float':[1e-4,1.0]},
                 "fit_intercept":{'bool':[True,False]},
                 "max_iter":{'int':[500,2000]},
-                "tol":{"float":[1e-3,1]},
+                "tol":{"float":[1e-3,0.1]},
                 "shuffle":{'bool':[True,False]},
                 "epsilon":{"float":[1e-1,1.5]},
                 "learning_rate":{"str":['invscaling','constant','optimal','adaptive']},
@@ -141,18 +141,25 @@ class regressor_config:
             ensemble.AdaBoostRegressor,
             {
                 "n_estimators":{'int':[10, 5000]},
-                "learning_rate":{'float':[1e-3,2.1]},
+                "learning_rate":{'float':[1e-3,0.1]},
                 "loss":{'str':['linear', 'square', 'exponential']}
             }
         ],
-         "LassoRegressor":[
+        "lars":[
+            linear_model.Lars,
+            {
+                "fit_intercept":{'bool':[True,False]},
+                "n_nonzero_coefs":{"int":[500,2000]},
+                "eps":{'float':[2e-16,1]},
+            }
+        ],     
+        "LassoRegressor":[
             linear_model.Lasso,
             {
-                "alpha":{'float':[0.0001, 0.001]},
+                "alpha":{'float':[0.0001, 0.1]},
                 "max_iter":{'int':[1000, 10000]},
-                "tol":{'float':[0.001, 0.01]},
+                "tol":{'float':[0.001, 0.1]},
                 "selection":{'str':['cyclic', 'random']}
             }
-        ],
-        
+        ] 
     }
