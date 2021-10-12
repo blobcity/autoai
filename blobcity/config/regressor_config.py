@@ -202,7 +202,7 @@ class regressor_config:
                 "lambda_1":{'float':[1e-3,0.1]},
                 "lambda_2":{'float':[1e-3,0.1]},
                 "n_iter":{'int':[300,10000]},
-                 "tol":{'float':[1e-3, 0.1]},
+                "tol":{'float':[1e-3, 0.1]},
             }
         ],
         "XGBRegressor":[
@@ -214,13 +214,14 @@ class regressor_config:
                 "booster":{'str':['gbtree', 'gblinear', 'dart']}
             }
         ]
+        ], 
         "CatBoostRegressor":[
             CatBoostRegressor,
             {
                 "learning_rate": {'float':[1e-3,0.1]},
                 "l2_leaf_reg":{'float':[1e-3, 5.0]},
                 "bootstrap_type":{'str':['bayesian', 'bernoulli', 'mvs', 'poisson', 'no']},
-                "loss_function":{'str':['RMSE', 'Logloss', 'MultiRMSE', 'Poisson', 'YetiRank', 'StochasticFilter', 'Quantile']},
+                "loss_function":{'str': ["RMSE", "MultiRMSE", "MAE", "Poisson"]},
                 "max_iter":{'int':[1000, 10000]},
                 "max_depth":{'int':[3,50]},
                 "random_seed":{'int':[0,5,10]},
