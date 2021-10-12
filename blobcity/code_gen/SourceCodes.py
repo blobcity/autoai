@@ -100,6 +100,10 @@ class SourceCode:
             'LinearSVC':"from sklearn.svm import LinearSVC\r\n",
             'DecisionTreeClassifier':"from sklearn.tree import DecisionTreeClassifier\r\n",
             'KNeighborsClassifier':"from sklearn.neighbors import KNeighborsClassifier\r\n",
+            'CategoricalNB':"from sklearn.naive_bayes import CategoricalNB\r\n",
+            'NearestCentroid':'from sklearn.neighbors import NearestCentroid\r\n',
+            'RadiusNeighborsClassifier':'from sklearn.neighbors import RadiusNeighborsClassifier\r\n',
+            'XGBClassifier':'from xgboost import XGBClassifier\r\n',
         },
         'Regression':{
             'LinearRegression':"from sklearn.linear_model import LinearRegression\r\n",
@@ -115,5 +119,8 @@ class SourceCode:
             'LinearSVR':"from sklearn.svm import LinearSVR\r\n",
             'DecisionTreeRegressor':"from sklearn.tree import DecisionTreeRegressor\r\n",
             'KNeighborsRegressor':"from sklearn.neighbors import KNeighborsRegressor\r\n",
+            'Lasso':"from sklearn.linear_model import Lasso\r\n",
+            'Lars':"from sklearn.linear_model import Lars\r\n",
+            'XGBRegressor':'from xgboost import XGBRegressor\r\n',
         }
     }

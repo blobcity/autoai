@@ -47,7 +47,9 @@ class PyComments:
             'NuSVR':"NuSVR model Descriptions\r\n",
             'LinearSVR':"LinearSVR model Descriptions\r\n",
             'DecisionTreeRegressor':"DecisionTreeRegressor model Descriptions\r\n",
-            'KNeighborsRegressor':"KNeighborsRegressor model Descriptions\r\n"
+            'KNeighborsRegressor':"KNeighborsRegressor model Descriptions\r\n",
+            'Lasso':"Lasso model Descriptions\r\n",
+            'Lars':"Lars model Descriptions\r\n",
         },
     }
 
