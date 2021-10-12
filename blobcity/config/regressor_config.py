@@ -25,7 +25,7 @@ class regressor_config:
     where the list consist of model class object and dictionary of parameters specific to the model
     """
     models={
-        "svr":[
+        "SVR":[
             svm.SVR,
             {
                 "C":{"int":[1,3]},
@@ -34,7 +34,7 @@ class regressor_config:
                 "kernel":{"str":['rbf','poly','linear']}
             }  
         ],
-        "nusvr":[
+        "NuSVR":[
             svm.NuSVR,
             {
                 "nu":{'float':[0.1,1.0]},
@@ -43,7 +43,7 @@ class regressor_config:
                 "kernel":{"str":['rbf','poly','linear']}
             }
         ],
-        "linearsvr":[
+        "LinearSVR":[
             svm.LinearSVR,
             {
                 "C":{"int":[1,3]},
@@ -52,7 +52,7 @@ class regressor_config:
                 'tol':{'float':[1e-3,0.1]},
             }
         ],
-        "decisiontree":[
+        "DecisionTreeRegressor":[
             tree.DecisionTreeRegressor,
             {
                 "criterion":{'str':['squared_error', 'friedman_mse', 'absolute_error', 'poisson']},
@@ -61,7 +61,7 @@ class regressor_config:
                 "max_depth":{'int':[3,50]}
             }
         ],
-        "randomforest":[
+        "RandomForestRegressor":[
             ensemble.RandomForestRegressor,
             {
                 "criterion":{'str':['absolute_error','squared_error']},
@@ -70,7 +70,7 @@ class regressor_config:
                 "max_depth":{'int':[3,50]}
             }
         ],
-        "extratrees":[
+        "ExtraTreesRegressor":[
             ensemble.ExtraTreesRegressor,
             {
                 "criterion":{'str':['squared_error','absolute_error']},
@@ -79,7 +79,7 @@ class regressor_config:
                 "max_depth":{'int':[3,50]}
             }
         ],
-        "gradientboosting":[
+        "GradientBoostingRegressor":[
             ensemble.GradientBoostingRegressor,
             {
                 "criterion":{'str':['squared_error','friedman_mse']},
@@ -90,11 +90,11 @@ class regressor_config:
                 "learning_rate":{'float':[1e-3,0.1]}
             }
         ],
-        "linearreg":[
+        "LinearRegression":[
             linear_model.LinearRegression,
             {}
         ],
-        "ridge":[
+        "Ridge":[
             linear_model.Ridge,
             {
                 "alpha":{'float':[1e-3,0.1]},
@@ -103,7 +103,7 @@ class regressor_config:
                 'tol':{'float':[1e-3,0.1]},
             }
         ],
-        "knn":[
+        "KNeighborsRegressor":[
             neighbors.KNeighborsRegressor,
             {
                 "n_neighbors":{'int':[3,10]},
@@ -113,7 +113,7 @@ class regressor_config:
                 "leaf_size":{'int':[10,50]}
             }
         ],
-        "poissonregressor":[
+        "PoissonRegressor":[
             linear_model.PoissonRegressor,
             {
                 "alpha":{'float':[1e-3,0.1]},
@@ -122,7 +122,7 @@ class regressor_config:
                 'tol':{'float':[1e-3,0.1]},
             }
         ],
-        "sgdregressor":[
+        "SGDRegressor":[
             linear_model.SGDRegressor,
             {
                 "loss":{"str":['huber','epsilon_insensitive','squared_epsilon_insensitive','squared_loss']},
@@ -137,7 +137,7 @@ class regressor_config:
                 "early_stopping":{'bool':[True,False]}
             }
         ],        
-        "adaboostregressor":[
+        "AdaBoostRegressor":[
             ensemble.AdaBoostRegressor,
             {
                 "n_estimators":{'int':[10, 5000]},
@@ -145,20 +145,20 @@ class regressor_config:
                 "loss":{'str':['linear', 'square', 'exponential']}
             }
         ],
-        "lars":[
+        "Lars":[
             linear_model.Lars,
             {
                 "fit_intercept":{'bool':[True,False]},
                 "n_nonzero_coefs":{"int":[500,2000]},
-                "eps":{'float':[2e-16,1]},
+                "eps":{'float':[1e-6,1]},
             }
         ],     
-        "LassoRegressor":[
+        "Lasso":[
             linear_model.Lasso,
             {
-                "alpha":{'float':[0.0001, 0.1]},
+                "alpha":{'float':[1e-4, 0.1]},
                 "max_iter":{'int':[1000, 10000]},
-                "tol":{'float':[0.001, 0.1]},
+                "tol":{'float':[1e-3, 0.1]},
                 "selection":{'str':['cyclic', 'random']}
             }
         ] 
