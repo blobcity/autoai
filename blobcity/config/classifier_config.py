@@ -28,7 +28,7 @@ class classifier_config:
     """
     
     models={
-        "svc":[
+        "SVC":[
             svm.SVC,
             {
                 "C":{"int":[1,3]},
@@ -37,7 +37,7 @@ class classifier_config:
                 "kernel":{"str":['rbf','poly','linear','sigmoid']}
             }
         ],
-        "nusvc":[
+        "NuSVC":[
             svm.NuSVC, 
             {
                 "nu":{'float':[0.1,1.0]},
@@ -46,7 +46,7 @@ class classifier_config:
                 "kernel":{"str":['rbf','poly','linear','sigmoid']}
             }
         ],
-        "linearsvc":[
+        "LinearSVC":[
             svm.LinearSVC, 
             {
                 "C":{"int":[1,3]},
@@ -55,7 +55,7 @@ class classifier_config:
                 "penalty":{'str':['l2']}, 
             }
         ],
-        "decisiontree":[
+        "DecisionTreeClassifier":[
             tree.DecisionTreeClassifier,
             {
                 "criterion":{'str':['gini','entropy']},
@@ -64,7 +64,7 @@ class classifier_config:
                 "max_depth":{'int':[3,50]}
             }
         ],
-        "randomforest":[
+        "RandomForestClassifier":[
             ensemble.RandomForestClassifier,
             {
                 "criterion":{'str':['gini','entropy']},
@@ -73,7 +73,7 @@ class classifier_config:
                 "max_depth":{'int':[3,50]}
             }
         ],
-        "extratrees":[
+        "ExtraTreesClassifier":[
             ensemble.ExtraTreesClassifier,
             {
                 "criterion":{'str':['gini','entropy']},
@@ -82,7 +82,7 @@ class classifier_config:
                 "max_depth":{'int':[3,50]}
             }
         ],
-        "gradientboosting":[
+        "GradientBoostingClassifier":[
             ensemble.GradientBoostingClassifier,
             {
                 "criterion":{'str':['squared_error','friedman_mse']},
@@ -93,7 +93,7 @@ class classifier_config:
                 "learning_rate":{'float':[1e-3,0.1]}
             }
         ],
-        "logistic":[
+        "LogisticRegression":[
             linear_model.LogisticRegression,
             {
                 "penalty":{'str':['l1','l2','elasticnet']}, 
@@ -103,7 +103,7 @@ class classifier_config:
 
             }
         ],
-        "ridge":[
+        "RidgeClassifier":[
             linear_model.RidgeClassifier,
             {
                 "alpha":{'float':[1e-3,0.1]},
@@ -112,7 +112,7 @@ class classifier_config:
                 'tol':{'float':[1e-3,0.1]},
             }
         ],
-        "knn":[
+        "KNeighborsClassifier":[
             neighbors.KNeighborsClassifier,
             {
                 "n_neighbors":{'int':[3,10]},
@@ -122,7 +122,7 @@ class classifier_config:
                 "leaf_size":{'int':[10,50]}
             }
         ],
-        "xgboost":[
+        "XGBClassifier":[
             xgboost.XGBClassifier,
             {
                 'use_label_encoder':{'bool':[False]},
@@ -134,7 +134,7 @@ class classifier_config:
                 'booster':{'str':['gbtree', 'gblinear','dart']}
             }
         ],
-        "radius":[
+        "RadiusNeighborsClassifier":[
             neighbors.RadiusNeighborsClassifier,
             {
                 "radius":{'float':[1.0,10.0]},
@@ -146,14 +146,14 @@ class classifier_config:
                 "outlier_label":{'str':['most_frequent']}
             }
         ],
-        "bernoullinb":[
+        "BernoulliNB":[
             naive_bayes.BernoulliNB,
             {
                 "alpha":{'float':[1e-2,1.0]},
                 "fit_prior":{'bool':[True,False]}
             }
         ],
-        "histgradientboosting":[
+        "HistGradientBoostingClassifier":[
             ensemble.HistGradientBoostingClassifier,
             {
                 "loss":{"str":['binary_crossentropy', 'categorical_crossentropy', 'auto']},
@@ -165,7 +165,7 @@ class classifier_config:
                 "scoring":{"str":["accuracy", "precision", "loss"]},
             }
         ],
-        "adaboost":[
+        "AdaBoostClassifier":[
             ensemble.AdaBoostClassifier,
             {
                 "algorithm":{"str":['SAMME','SAMME.R']},
@@ -173,14 +173,14 @@ class classifier_config:
                 "learning_rate": {'float':[1e-3,0.1]},
             }
         ] ,
-        "Nearest Centroid":[
+        "NearestCentroid":[
             neighbors.NearestCentroid,
             {
                 "metric":{'str':['l1', 'l2', 'manhattan', 'euclidean']},
                 "shrink_threshold":{'float':[1.0, 5.0]}
             }
         ],
-        "sgd":[
+        "SGDClassifier":[
             linear_model.SGDClassifier,
             {
                 "loss":{"str":['squared_loss', 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive']},
@@ -194,5 +194,13 @@ class classifier_config:
                 "epsilon":{'float':[1e-8, 0.1]},
             }
         ],
+        "CategoricalNB":[
+            naive_bayes.CategoricalNB,
+            {
+                "alpha":{'float':[1e-2,1.0]},
+                "fit_prior":{'bool':[True,False]},
+            }
+        ]
+            
     }
 
