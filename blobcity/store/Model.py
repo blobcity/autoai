@@ -16,8 +16,6 @@ import pickle
 import os
 import tensorflow as tf
 from blobcity.code_gen import codegen_type,pycoder
-from blobcity.config import classifier_config
-from sklearn.metrics import confusion_matrix
 import yaml
 """
 Python file consists of Class Model to initialize/store and retrive data associated to trained machine learning model.
