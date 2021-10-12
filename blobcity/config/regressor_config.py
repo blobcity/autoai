@@ -179,5 +179,14 @@ class regressor_config:
                 "max_iter":{'int':[1000,10000]},
                 "eps":{'float':[1e-6,0.1]}
             }
+        ],
+        "XGBoost":[
+            XGBRegressor,
+            {
+                "n_estimators":{'int':[10, 5000]},
+                "max_depth":{'int':[3,50]},
+                "learning_rate":{'float':[1e-3,0.1]},
+                "booster":{'str':['gbtree', 'gblinear', 'dart']}
+            }
         ]
     }
