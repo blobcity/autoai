@@ -143,7 +143,6 @@ class regressor_config:
                 "alpha":{'float':[1e-4,1.0]},
                 "l1_ratio":{'float':[1e-4,1.0]},
                 "max_iter":{'int':[500,2000]},
-                "normalize":{'bool':[True,False]},
                 "tol":{'float':[1e-4,1.0]},
                 "selection":{'str':['cyclic', 'random']}
             }
