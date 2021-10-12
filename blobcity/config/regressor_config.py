@@ -161,5 +161,14 @@ class regressor_config:
                 "tol":{'float':[0.001, 0.1]},
                 "selection":{'str':['cyclic', 'random']}
             }
-        ] 
+        ] ,
+         "radiusNeighboursRegressor": [
+            neighbors.RadiusNeighborsRegressor, {
+                "radius": {'float': [0.1, 1.0]},
+                "weights":{'str':['uniform', 'distance']},
+                "algorithm": {'str':['auto', 'ball_tree', 'kd_tree', 'brute']},
+                "p": {"int": [2, 10]},
+                "leaf_size":{"int": [30, 50]}
+            }
+        ]
     }
