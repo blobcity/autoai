@@ -136,7 +136,18 @@ class regressor_config:
                 "learning_rate":{"str":['invscaling','constant','optimal','adaptive']},
                 "early_stopping":{'bool':[True,False]}
             }
-        ],        
+        ], 
+        "ElasticNet" :[
+            linear_model.ElasticNet,
+            {
+                "alpha":{'float':[1e-4,1.0]},
+                "l1_ratio":{'float':[1e-4,1.0]},
+                "max_iter":{'int':[500,2000]},
+                "normalize":{'bool':[True,False]},
+                "tol":{'float':[1e-4,1.0]},
+                "selection":{'str':['cyclic', 'random']}
+            }
+        ]   ,   
         "AdaBoostRegressor":[
             ensemble.AdaBoostRegressor,
             {
