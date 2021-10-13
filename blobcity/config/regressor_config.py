@@ -189,5 +189,19 @@ class regressor_config:
                 "max_iter":{'int':[1000,10000]},
                 "eps":{'float':[1e-6,0.1]}
             }
+        ],
+        "ARDRegressor":[
+            linear_model.ARDRegression,
+            {
+                "alpha_1":{'float':[1e-6,0.01]},
+                "alpha_2":{'float':[1e-6,1]},
+                "compute_score":{'bool':[True,False]},
+                "fit_intercept":{'bool':[True,False]},
+                "lambda_1":{'float':[1e-3,1]},
+                "lambda_2":{'float':[1e-3,1]},
+                "n_iter":{'int':[300,10000]},
+                 "tol":{'float':[1e-3, 1]},
+
+            }
         ]
     }
