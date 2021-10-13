@@ -33,6 +33,11 @@ class PyComments:
             'LinearSVC':"LinearSVC model Descriptions\r\n",
             'DecisionTreeClassifier':"DecisionTreeClassifier model Descriptions\r\n",
             'KNeighborsClassifier':"KNeighborsClassifier model Descriptions\r\n",
+            'RadiusNeighborsClassifier':"RadiusNeighborsClassifier model Descriptions\r\n",
+            'MultinomialNB':'MultinomialNB model Descriptions\r\n',
+            'CategoricalNB':'CategoricalNB model Descriptions\r\n',
+            'XGBClassifier':'XGBClassifier model Descriptions\r\n',
+            'NearestCentroid':'NearestCentroid model Descriptions\r\n'
         },
         'Regression':{
             'LinearRegression':"LinearRegression model Descriptions\r\n",
@@ -52,14 +57,16 @@ class PyComments:
             'Lars':"Lars model Descriptions\r\n",
             'BayesianRidge':'BayesianRidge model Description\r\n',
             'LassoLars':'LassoLars model Descriptions\r\n',
-        },
+            'XGBRegressor':'XGBRegressor model Descriptions\r\n',
+            'ARDRegressor':'ARDRegressor model Descriptions\r\n',
+        }
     }
 
     procedure={
-        'datafetch':"'''\nPandas is an open-source, BSD-licensed library providing high-performance,\n easy-to-use data manipulation and data analysis tools.\n'''\n",
-        'missing':"'''\nSince the majority of the machine learning models in the Sklearn library doesn't handle string category data and Null value,\nwe have to explicitly remove or replace null values.\nThe below snippet have functions, which removes the null value if any exists.\n'''\n",
-        'encoding':"'''\nConverting the string classes data in the datasets\nby encoding them to integer either using OneHotEncoding or LabelEncoding\n'''\n",
-        'datasplit':"'''\nThe train-test split is a procedure for evaluating the performance of an algorithm.\n The procedure involves taking a dataset and dividing it into two subsets.\nThe first subset is utilized to fit/train the model.\nThe second subset is used for prediction.\nThe main motive is to estimate the performance of the model on new data.\n'''\n",
-        'metrics':"'''\nPerformance metrics are a part of every machine learning pipeline. \nThey tell you if you're making progress, and put a number on it. All machine learning models,\nwhether it's linear regression, or a SOTA technique like BERT, need a metric to judge performance.\n'''\n",
-        'x&y':"'''\nIt is the process of reducing the number of input variables when developing a predictive model.\n Used to reduce the number of input variables to reduce the computational cost of modelling and,\n in some cases,to improve the performance of the model.\n'''\n"
+        'datafetch':"\n### Pandas is an open-source, BSD-licensed library providing high-performance,\n### easy-to-use data manipulation and data analysis tools.\n",
+        'missing':"\n### Since the majority of the machine learning models in the Sklearn library doesn't handle string category data and Null value,\n### we have to explicitly remove or replace null values.\n### The below snippet have functions, which removes the null value if any exists.\n",
+        'encoding':"\n### Converting the string classes data in the datasets\n### by encoding them to integer either using OneHotEncoding or LabelEncoding\n",
+        'datasplit':"\n### The train-test split is a procedure for evaluating the performance of an algorithm.\n### The procedure involves taking a dataset and dividing it into two subsets.\n### The first subset is utilized to fit/train the model.\n### The second subset is used for prediction.\n### The main motive is to estimate the performance of the model on new data.\n",
+        'metrics':"\n### Performance metrics are a part of every machine learning pipeline. \n### They tell you if you're making progress, and put a number on it. All machine learning models,\n### whether it's linear regression, or a SOTA technique like BERT, need a metric to judge performance.\n",
+        'x&y':"\n### It is the process of reducing the number of input variables when developing a predictive model.\n### Used to reduce the number of input variables to reduce the computational cost of modelling and,\n### in some cases,to improve the performance of the model.\n"
     }
