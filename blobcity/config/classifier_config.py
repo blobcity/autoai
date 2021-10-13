@@ -28,7 +28,7 @@ class classifier_config:
     """
     
     models={
-        "SVC":[
+      "SVC":[
             svm.SVC,
             {
                 "C":{"int":[1,3]},
@@ -193,14 +193,22 @@ class classifier_config:
                 "power_t":{'float':[0.01, 0.5]},
                 "epsilon":{'float':[1e-8, 0.1]},
             }
-        ],
+        ], 
         "CategoricalNB":[
             naive_bayes.CategoricalNB,
             {
                 "alpha":{'float':[1e-2,1.0]},
                 "fit_prior":{'bool':[True,False]},
             }
+        ],
+        "MultinomialNB":[
+             naive_bayes.MultinomialNB,
+            {
+                "alpha":{'float':[1e-2,1.0]},
+                "fit_prior":{'bool':[True,False]},
+            }
         ]
+
             
     }
 
