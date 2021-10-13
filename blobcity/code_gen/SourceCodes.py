@@ -122,5 +122,7 @@ class SourceCode:
             'Lasso':"from sklearn.linear_model import Lasso\r\n",
             'Lars':"from sklearn.linear_model import Lars\r\n",
             'XGBRegressor':'from xgboost import XGBRegressor\r\n',
+            'BayesianRidge':'from sklearn.linear_model import BayesianRidge\r\n',
+            'LassoLars':'from sklearn.linear_model import LassoLars\r\n',
         }
     }
