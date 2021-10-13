@@ -11,6 +11,11 @@ A framework to find, train and generate code for the best performing AI model. W
 pip install blobcity
 ```
 
+If not already installed, then you must also install Tensorflow. This is a required depency, but not installed by default. 
+```shell
+pip install tensorflow
+```
+
 ``` Python
 import blobcity as bc
 bc.train(file="data.csv", target="Y_column")
