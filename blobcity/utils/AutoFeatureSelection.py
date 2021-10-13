@@ -120,7 +120,7 @@ class AutoFeatureSelection:
         return: pandas.DataFrame
         """
         for key, value in resdic.items():
-            if value < 0.01: 
+            if value < 0.01 and key in dataframe.columns.to_list():  
                 keylist=[key2 for key2, value2 in impmain.items() if key in key2]
                 dataframe.drop(keylist,axis=1,inplace=True)
         return dataframe
