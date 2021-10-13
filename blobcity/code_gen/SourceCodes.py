@@ -126,5 +126,6 @@ class SourceCode:
             'XGBRegressor':'from xgboost import XGBRegressor\r\n',
             'BayesianRidge':'from sklearn.linear_model import BayesianRidge\r\n',
             'LassoLars':'from sklearn.linear_model import LassoLars\r\n',
+            'ARDRegressor':'from sklearn.linear_model import ARDRegressor\r\n'
         }
     }

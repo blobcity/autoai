@@ -58,6 +58,7 @@ class PyComments:
             'BayesianRidge':'BayesianRidge model Description\r\n',
             'LassoLars':'LassoLars model Descriptions\r\n',
             'XGBRegressor':'XGBRegressor model Descriptions\r\n',
+            'ARDRegressor':'ARDRegressor model Descriptions\r\n',
         }
     }
 
