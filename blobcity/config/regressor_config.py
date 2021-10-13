@@ -191,7 +191,19 @@ class regressor_config:
                 "eps":{'float':[1e-6,0.1]}
             }
         ],
-        "XGBoostRegressor":[
+        "ARDRegression":[
+            linear_model.ARDRegression,
+            {
+                "alpha_1":{'float':[1e-6,0.1]},
+                "alpha_2":{'float':[1e-6,0.1]},
+                "compute_score":{'bool':[True,False]},
+                "lambda_1":{'float':[1e-3,0.1]},
+                "lambda_2":{'float':[1e-3,0.1]},
+                "n_iter":{'int':[300,10000]},
+                 "tol":{'float':[1e-3, 0.1]},
+            }
+        ],
+        "XGBRegressor":[
             XGBRegressor,
             {
                 "n_estimators":{'int':[10, 5000]},
