@@ -31,11 +31,12 @@ class SourceCode:
     imports={
         'Classification':"# imports\r"+'import numpy as np\rimport pandas as pd\rimport matplotlib.pyplot as plt\r'+
                 'import seaborn as se\rimport warnings\rfrom sklearn.model_selection import train_test_split\r'+
-                'from sklearn.preprocessing import LabelEncoder\r'+
-                'from sklearn.metrics import classification_report,plot_confusion_matrix\r'+"warnings.filterwarnings('ignore')\r\n",
+                'from sklearn.preprocessing import LabelEncoder\r'+'from sklearn.metrics import classification_report,plot_confusion_matrix\r'
+                +"warnings.filterwarnings('ignore')\r\n",
         'Regression':"# imports\r"+'import numpy as np\rimport pandas as pd\rimport matplotlib.pyplot as plt\r'+
                 'import seaborn as se\rimport warnings\rfrom sklearn.model_selection import train_test_split\r'+
-                'from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error\r'+"warnings.filterwarnings('ignore')\r\n",
+                'from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error\r'
+                +"warnings.filterwarnings('ignore')\r\n",
     }
 
     columns={
@@ -104,6 +105,7 @@ class SourceCode:
             'NearestCentroid':'from sklearn.neighbors import NearestCentroid\r\n',
             'RadiusNeighborsClassifier':'from sklearn.neighbors import RadiusNeighborsClassifier\r\n',
             'XGBClassifier':'from xgboost import XGBClassifier\r\n',
+            'MultinomialNB':'from sklearn.naive_bayes import MultinomialNB'
         },
         'Regression':{
             'LinearRegression':"from sklearn.linear_model import LinearRegression\r\n",

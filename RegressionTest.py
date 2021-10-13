@@ -30,4 +30,6 @@ model.spill() #function to test code generation
 
 model.generate_yaml() #function to test yaml generation
 
-bc.spill("codefile.py","./Process.yaml",doc=False) #funciton to test yaml generation from specified yaml file
+bc.spill("codefile.ipynb","./Process.yaml") #funciton to test yaml generation from specified yaml file
+
+bc.spill("codefile.py","./Process.yaml") #funciton to test yaml generation from specified yaml file
