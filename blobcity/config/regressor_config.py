@@ -15,7 +15,7 @@
 
 import numpy as np
 from sklearn.experimental import enable_hist_gradient_boosting
-from sklearn import tree,ensemble,svm,linear_model,neighbors,GammaRegressor
+from sklearn import tree,ensemble,svm,linear_model,neighbors
 from xgboost import XGBRegressor
 """
 This python file consist of Class variable models to store detail regarding different model to be utilized for Regression problem
@@ -213,7 +213,7 @@ class regressor_config:
             }
         ],
         "GammaRegressor":[
-            GammaRegressor,
+            linear_model.GammaRegressor,
             {
                 "alpha":{'float':[1e-4,1.0]},
                 "fit_intercept":{'bool':[True,False]},
