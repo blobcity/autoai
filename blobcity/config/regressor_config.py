@@ -226,4 +226,12 @@ class regressor_config:
                 "verbose":{'bool':[False]},
             }
         ],
+        "GammaRegressor":[
+            linear_model.GammaRegressor,
+            {
+                "alpha":{'float':[1e-4,1.0]},
+                "max_iter":{'int':[1000,10000]},
+                "tol":{'float':[1e-3,0.1]},
+            }
+        ]
     }
