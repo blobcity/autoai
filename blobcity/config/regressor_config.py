@@ -18,6 +18,8 @@ from sklearn.experimental import enable_hist_gradient_boosting
 from sklearn import tree,ensemble,svm,linear_model,neighbors
 from xgboost import XGBRegressor
 from catboost import CatBoostRegressor
+from lightgbm import LGBMRegressor
+
 
 """
 This python file consist of Class variable models to store detail regarding different model to be utilized for Regression problem
@@ -232,6 +234,16 @@ class regressor_config:
                 "alpha":{'float':[1e-4,1.0]},
                 "max_iter":{'int':[1000,10000]},
                 "tol":{'float':[1e-3,0.1]},
+            }
+        ],
+        "LightGBMRegressor":[
+            LGBMRegressor,
+            {
+                "boosting_type":{'str':['gbdt', 'dart', 'goss','rf']},
+                "num_leaves":{'int':[31, 100]},
+                "learning_rate":{'float':[1e-3,0.1]},
+                "n_estimators":{'int':[100, 500]},
+                "min_child_weight":{'float':[1e-3,0.1]},
             }
         ]
     }
