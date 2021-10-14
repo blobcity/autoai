@@ -59,7 +59,8 @@ class PyComments:
             'LassoLars':'LassoLars model Descriptions\r\n',
             'XGBRegressor':'XGBRegressor model Descriptions\r\n',
             'ARDRegressor':'ARDRegressor model Descriptions\r\n',
-            'CatBoostRegressor':'CatBoostRegressor model Descriptions\r\n'
+            'CatBoostRegressor':'CatBoostRegressor model Descriptions\r\n',
+            'GammaRegressor':'GammaRegressor model Description\r\n'
         }
     }
 
