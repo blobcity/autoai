@@ -28,7 +28,7 @@ class classifier_config:
     """
     
     models={
-      "SVC":[
+        "SVC":[
             svm.SVC,
             {
                 "C":{"int":[1,3]},
@@ -100,7 +100,6 @@ class classifier_config:
                 'tol':{'float':[1e-3,0.1]},
                 "C":{"int":[1,3]},
                 "solver":{'str':['newton-cg','liblinear','lbfgs', 'sag', 'saga']},
-
             }
         ],
         "RidgeClassifier":[
@@ -202,13 +201,11 @@ class classifier_config:
             }
         ],
         "MultinomialNB":[
-             naive_bayes.MultinomialNB,
+            naive_bayes.MultinomialNB,
             {
                 "alpha":{'float':[1e-2,1.0]},
                 "fit_prior":{'bool':[True,False]},
             }
         ]
-
-            
     }
 
