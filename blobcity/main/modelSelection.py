@@ -12,15 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+import os
+import warnings
 import itertools
-from blobcity.config import classifier_config,regressor_config
-from sklearn.model_selection import cross_val_score
-from blobcity.config import tuner as Tuner
 from blobcity.store import Model
+from blobcity.config import tuner as Tuner
+from blobcity.config import classifier_config,regressor_config
+from sklearn.exceptions import ConvergenceWarning
+from sklearn.model_selection import cross_val_score
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=ConvergenceWarning)
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    os.environ["PYTHONWARNINGS"] = "ignore"
+
 """
 This python file consists of function to get best performing model for a given dataset.
 """
-
 def getKFold(X):
 
     """
