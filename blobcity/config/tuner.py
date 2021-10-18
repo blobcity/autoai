@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+
 import os
 import optuna
 import warnings
@@ -26,6 +28,39 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 """
 Python files consist of function to perform parameter tuning using optuna framework
 """
+
+#Early stopping class
+class EarlyStopper():
+    iter_stop = 10
+    iter_count = 0
+    best_score = None
+
+def early_stopping_opt(study, trial):
+    """
+    param1:optuna.study.Study 
+    param2:optuna trial
+    
+    The function decides whether to stop parameter tunning based on the accuracy of the current trial. 
+    Condition to stop trials: if accuracy is more than equal to 99%. 
+    The second condition is to check whether accuracy is between 90%-99% and 
+    whether the current best accuracy has not changed for the last ten trials.
+
+    """
+    if EarlyStopper.best_score == None: EarlyStopper.best_score = study.best_value
+    if study.best_value >= 0.99 : study.stop()
+    if study.best_value > EarlyStopper.best_score:
+        EarlyStopper.best_score = study.best_value
+        EarlyStopper.iter_count = 0
+    else:
+        if  study.best_value > 0.90 and study.best_value < 0.99:
+            if EarlyStopper.iter_count < EarlyStopper.iter_stop:
+                EarlyStopper.iter_count=EarlyStopper.iter_count+1  
+            else:
+                EarlyStopper.iter_count = 0
+                EarlyStopper.best_score = None
+                study.stop()
+    return
+
 def regression_metrics(y_true,y_pred):
     """
     param1: pandas.Series/pandas.DataFrame/numpy.darray
@@ -146,7 +181,7 @@ def tuneModel(dataframe,target,modelkey,modelList,ptype):
     getParamList(modelkey,modelList)
     try:
         study = optuna.create_study(direction="maximize")
-        study.optimize(objective,n_trials=10,n_jobs=-1)
+        study.optimize(objective,n_trials=50,n_jobs=-1,callbacks=[early_stopping_opt])
         metric_result=metricResults(modelName(**study.best_params),X,Y,ptype)
         model = modelName(**study.best_params).fit(X,Y)
         return (model,study.best_params,study.best_value,metric_result)
