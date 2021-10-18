@@ -130,7 +130,8 @@ class classifier_config:
                 'learning_rate': {'float':[1e-3,0.1]},
                 'reg_alpha': {'int':[1, 1.5]},
                 'reg_lambda': {'int':[1, 1.5]},
-                'booster':{'str':['gbtree', 'gblinear','dart']}
+                'booster':{'str':['gbtree', 'gblinear','dart']},
+                'verbosity':{'str':[0]}
             }
         ],
         "RadiusNeighborsClassifier":[
