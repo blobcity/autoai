@@ -60,7 +60,10 @@ class PyComments:
             'XGBRegressor':'XGBRegressor model Descriptions\r\n',
             'ARDRegressor':'ARDRegressor model Descriptions\r\n',
             'CatBoostRegressor':'CatBoostRegressor model Descriptions\r\n',
-            'GammaRegressor':'GammaRegressor model Description\r\n'
+            'GammaRegressor':'GammaRegressor model Description\r\n',
+            'LGBMRegressor':'LGBMRegressor model Descriptions\r\n',
+            'RadiusNeighborsRegressor':'RadiusNeighborsRegressor model Descriptions\r\n',
+            'PassiveAggressiveRegressor':'PassiveAggressiveRegressor model Descriptions\r\n'
         }
     }
 

@@ -244,6 +244,7 @@ class regressor_config:
                 "learning_rate":{'float':[1e-3,0.1]},
                 "n_estimators":{'int':[100, 500]},
                 "min_child_weight":{'float':[1e-3,0.1]},
+                'subsample_freq':{'int':[1,10]}
             }
         ],
         "RadiusNeighborsRegressor":[
@@ -264,6 +265,7 @@ class regressor_config:
                 "epsilon":{'float':[1e-3,1]},
                 "loss":{"str":['huber','epsilon_insensitive','squared_epsilon_insensitive','squared_loss']},
                 "tol":{'float':[1e-3,0.1]},
+                
             }
         ]
     }
