@@ -233,5 +233,18 @@ class regressor_config:
                 "max_iter":{'int':[1000,10000]},
                 "tol":{'float':[1e-3,0.1]},
             }
+        ],
+        "PassiveAggressiveRegressor":[
+            linear_model.PassiveAggressiveRegressor,
+            {
+                "fit_intercept":{'bool':[True,False]},
+                "max_iter":{'int':[1000,10000]},
+                "shuffle":{'bool':[True,False]},
+                "early_stopping":{'bool':[True,False]},
+                "epsilon":{'float':[1e-3,1]},
+                "loss":{"str":['huber','epsilon_insensitive','squared_epsilon_insensitive','squared_loss']},
+                "verbose":{'bool':[False]},
+                "tol":{'float':[1e-3,0.1]},
+            }
         ]
     }
