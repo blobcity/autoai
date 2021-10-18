@@ -236,7 +236,7 @@ class regressor_config:
                 "tol":{'float':[1e-3,0.1]},
             }
         ],
-        "LightGBMRegressor":[
+        "LGBMRegressor":[
             LGBMRegressor,
             {
                 "boosting_type":{'str':['gbdt', 'dart', 'goss','rf']},
@@ -244,6 +244,15 @@ class regressor_config:
                 "learning_rate":{'float':[1e-3,0.1]},
                 "n_estimators":{'int':[100, 500]},
                 "min_child_weight":{'float':[1e-3,0.1]},
+            }
+        ],
+        "PassiveAggressiveRegressor":[
+            linear_model.PassiveAggressiveRegressor,
+            {
+                "max_iter":{'int':[1000,10000]},
+                "epsilon":{'float':[1e-3,1]},
+                "loss":{"str":['huber','epsilon_insensitive','squared_epsilon_insensitive','squared_loss']},
+                "tol":{'float':[1e-3,0.1]},
             }
         ]
     }
