@@ -72,7 +72,8 @@ class regressor_config:
                 "criterion":{'str':['absolute_error','squared_error']},
                 "n_estimators":{'int':[100,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
-                "max_depth":{'int':[3,50]}
+                "max_depth":{'int':[3,50]},
+                'n_jobs':{'str':[-1]}
             }
         ],
         "ExtraTreesRegressor":[
@@ -81,7 +82,8 @@ class regressor_config:
                 "criterion":{'str':['squared_error','absolute_error']},
                 "n_estimators":{'int':[100,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
-                "max_depth":{'int':[3,50]}
+                "max_depth":{'int':[3,50]},
+                'n_jobs':{'str':[-1]}
             }
         ],
         "GradientBoostingRegressor":[
@@ -97,7 +99,9 @@ class regressor_config:
         ],
         "LinearRegression":[
             linear_model.LinearRegression,
-            {}
+            {
+                'n_jobs':{'str':[-1]}
+            }
         ],
         "Ridge":[
             linear_model.Ridge,
@@ -213,7 +217,8 @@ class regressor_config:
                 "n_estimators":{'int':[10, 5000]},
                 "max_depth":{'int':[3,50]},
                 "learning_rate":{'float':[1e-3,0.1]},
-                "booster":{'str':['gbtree', 'gblinear', 'dart']}
+                "booster":{'str':['gbtree', 'gblinear', 'dart']},
+                'n_jobs':{'str':[-1]}
             }
         ], 
         "CatBoostRegressor":[
@@ -264,8 +269,7 @@ class regressor_config:
                 "max_iter":{'int':[1000,10000]},
                 "epsilon":{'float':[1e-3,1]},
                 "loss":{"str":['huber','epsilon_insensitive','squared_epsilon_insensitive','squared_loss']},
-                "tol":{'float':[1e-3,0.1]},
-                
+                "tol":{'float':[1e-3,0.1]}                
             }
         ]
     }
