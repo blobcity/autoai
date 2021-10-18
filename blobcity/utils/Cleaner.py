@@ -183,4 +183,3 @@ def RemoveRowsWithHighNans(dataframe):
     dataframe = dataframe.dropna( axis=0, 
                     thresh=min_count)
     return dataframe
-    
