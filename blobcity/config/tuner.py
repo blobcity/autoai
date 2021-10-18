@@ -11,13 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import os
 import optuna
+import warnings
 from blobcity.main import modelSelection
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import cross_val_score
-from sklearn.metrics import r2_score,mean_squared_error,mean_absolute_error
-from sklearn.metrics import f1_score,precision_score,recall_score
+from sklearn.exceptions import ConvergenceWarning
+from sklearn.model_selection import train_test_split,cross_val_score
+from sklearn.metrics import r2_score,mean_squared_error,mean_absolute_error,f1_score,precision_score,recall_score
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=ConvergenceWarning)
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    os.environ["PYTHONWARNINGS"] = "ignore"
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 """
 Python files consist of function to perform parameter tuning using optuna framework
@@ -142,9 +146,9 @@ def tuneModel(dataframe,target,modelkey,modelList,ptype):
     getParamList(modelkey,modelList)
     try:
         study = optuna.create_study(direction="maximize")
-        study.optimize(objective, n_trials=5,n_jobs=-1)
+        study.optimize(objective,n_trials=10,n_jobs=-1)
         metric_result=metricResults(modelName(**study.best_params),X,Y,ptype)
         model = modelName(**study.best_params).fit(X,Y)
         return (model,study.best_params,study.best_value,metric_result)
     except Exception as e:
-        raise TypeError(f"{e}")
+        print(e)
