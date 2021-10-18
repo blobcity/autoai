@@ -16,6 +16,7 @@
 import os
 import warnings
 import itertools
+from tqdm import tqdm,tqdm_notebook
 from blobcity.store import Model
 from blobcity.config import tuner as Tuner
 from blobcity.config import classifier_config,regressor_config
@@ -83,7 +84,7 @@ def trainOnSample(dataframe,target,models,DictClass):
     df=dataframe.sample(frac=0.1,random_state=123)
     X,Y=df.drop(target,axis=1),df[target]
     k=getKFold(X)
-    modelScore={m:cvScore(models[m][0](),X,Y,k) for m in models }
+    modelScore={m:cvScore(models[m][0](),X,Y,k) for m in tqdm_notebook(models) }
     return dict(itertools.islice(sortScore(modelScore).items(), 5))
 
 def trainOnFull(dataframe,target,models,best,DictClass):
@@ -99,7 +100,7 @@ def trainOnFull(dataframe,target,models,best,DictClass):
     """
     X,Y=dataframe.drop(target,axis=1),dataframe[target]
     k=getKFold(X)
-    modelScore={m:cvScore(models[m][0](),X,Y,k) for m in best }
+    modelScore={m:cvScore(models[m][0](),X,Y,k) for m in tqdm_notebook(best) }
     return dict(itertools.islice(sortScore(modelScore).items(), 1))
 
 def modelSearch(dataframe,target,DictClass):

@@ -37,8 +37,10 @@ class AutoFeatureSelection:
         cor_matrix = X.corr()
         upper_tri = cor_matrix.where(np.triu(np.ones(cor_matrix.shape),k=1).astype(np.bool))
         to_drop = [column for column in upper_tri.columns if any(upper_tri[column] > 0.95)]
-        X = X.drop(to_drop, axis=1)
-        return X
+        if to_drop!=[]:
+            return X.drop(to_drop, axis=1)
+        else:
+            return X
 
     def dropConstantFeatures(X):
         """
@@ -52,8 +54,7 @@ class AutoFeatureSelection:
         cols=X.columns
         constant_filter = VarianceThreshold(threshold=0).fit(X)
         constcols=[col for col in cols if col not in cols[constant_filter.get_support()]]
-        if(constcols!=[]):
-            X.drop(constcols,axis=1,inplace=True)
+        if(constcols!=[]): X.drop(constcols,axis=1,inplace=True)
         return X
 
     def MainScore(resultscore,dc):
@@ -99,7 +100,7 @@ class AutoFeatureSelection:
         if the dataframe has less then equal to 2 features return orignal dataframe. else return a short listed dataframe on the basis of 
         categorical features.
         """
-        if(X.shape[1]<=3):
+        if(X.shape[1]<3):
             return X
         else:
             fit = SelectKBest(score_func=score_func, k=X.shape[1]).fit(X,Y)
