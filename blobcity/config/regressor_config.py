@@ -234,16 +234,23 @@ class regressor_config:
                 "tol":{'float':[1e-3,0.1]},
             }
         ],
+        "RadiusNeighborsRegressor":[
+            neighbors.RadiusNeighborsRegressor,
+            {
+                "radius":{'float':[1.0,10.0]},
+                "weights":{'str':['uniform','distance']},
+                "algorithm":{'str':['auto', 'ball_tree', 'kd_tree', 'brute']},
+                "leaf_size":{'int':[10,50]},
+                "p":{'int':[1,2]},
+                "metric":{'str':['euclidean', 'manhattan', 'chebyshev', 'minkowski']}
+            }
+        ],
         "PassiveAggressiveRegressor":[
             linear_model.PassiveAggressiveRegressor,
             {
-                "fit_intercept":{'bool':[True,False]},
                 "max_iter":{'int':[1000,10000]},
-                "shuffle":{'bool':[True,False]},
-                "early_stopping":{'bool':[True,False]},
                 "epsilon":{'float':[1e-3,1]},
                 "loss":{"str":['huber','epsilon_insensitive','squared_epsilon_insensitive','squared_loss']},
-                "verbose":{'bool':[False]},
                 "tol":{'float':[1e-3,0.1]},
             }
         ]
