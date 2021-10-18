@@ -37,6 +37,7 @@ def dataCleaner(df,features,target,DictionaryClass):
 
     working:
     First the function identifies the problem type that is either regression or classification using ProType Class and its function checkType.
+    For the Complete dataframe if any rows has more then 50% null values or missing values we will drop it.
     For the Complete dataframe if any columns has more then equal to 80% null missing values we will drop it to avoid any noise or sequed data imputation.
     Then check whether the dataframe has any null values. 
     if TRUE then : get all the columns names with null/missing values.
@@ -49,6 +50,7 @@ def dataCleaner(df,features,target,DictionaryClass):
     
     updateddf=df[features].copy(deep=True)
     updateddf[target]=df[target].copy(deep=True)
+    updateddf=RemoveRowsWithHighNans(updateddf)
     updateddf=RemoveHighNullValues(updateddf)
     updateddf=dropUniqueColumn(updateddf)
 
@@ -168,3 +170,16 @@ def objectTypes(X,DictionaryClass):
         DictionaryClass.ObjectList= gd['object'].to_list()  
     else:
         DictionaryClass.ObjectExist= False
+
+def RemoveRowsWithHighNans(dataframe):
+    """
+    param1: pandas.DataFrame
+    return: pandas.DataFrame
+
+    Function delete rows containing more than 50% NaN Values
+    """
+    percent = 50.0
+    min_count = int(((100-percent)/100)*dataframe.shape[1] + 1)
+    dataframe = dataframe.dropna( axis=0, 
+                    thresh=min_count)
+    return dataframe
