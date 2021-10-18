@@ -214,8 +214,6 @@ class classifier_config:
                 "alpha":{'float':[1e-4,1.0]},
                 "l1_ratio":{'float':[1e-2,1.0]},
                 "tol":{'float':[1e-3,0.1]},
-                "n_iter_no_change":{"int":[5,50]},
-
             }
         ]
     }

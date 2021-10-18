@@ -105,7 +105,8 @@ class SourceCode:
             'NearestCentroid':'from sklearn.neighbors import NearestCentroid\r\n',
             'RadiusNeighborsClassifier':'from sklearn.neighbors import RadiusNeighborsClassifier\r\n',
             'XGBClassifier':'from xgboost import XGBClassifier\r\n',
-            'MultinomialNB':'from sklearn.naive_bayes import MultinomialNB'
+            'MultinomialNB':'from sklearn.naive_bayes import MultinomialNB\r\n',
+            'Perceptron':'from sklearn.linear_model import Perceptron\r\n'
         },
         'Regression':{
             'LinearRegression':"from sklearn.linear_model import LinearRegression\r\n",

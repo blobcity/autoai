@@ -37,7 +37,8 @@ class PyComments:
             'MultinomialNB':'MultinomialNB model Descriptions\r\n',
             'CategoricalNB':'CategoricalNB model Descriptions\r\n',
             'XGBClassifier':'XGBClassifier model Descriptions\r\n',
-            'NearestCentroid':'NearestCentroid model Descriptions\r\n'
+            'NearestCentroid':'NearestCentroid model Descriptions\r\n',
+            'Perceptron':'Perceptron model Descriptions\r\n'
         },
         'Regression':{
             'LinearRegression':"LinearRegression model Descriptions\r\n",
