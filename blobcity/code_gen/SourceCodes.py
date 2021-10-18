@@ -129,5 +129,8 @@ class SourceCode:
             'ARDRegressor':'from sklearn.linear_model import ARDRegressor\r\n',
             'CatBoostRegressor':'from catboost import CatBoostRegressor\r\n',
             'GammaRegressor':'from sklearn.linear_model import GammaRegressor\r\n',
+            'LGBMRegressor':'from lightgbm import LGBMRegressor\r\n',
+            'RadiusNeighborsRegressor':'from sklearn.neighbors import RadiusNeighborsRegressor\r\n',
+            'PassiveAggressiveRegressor':'from sklearn.linear_model import PassiveAggressiveRegressor\r\n'
         }
     }
