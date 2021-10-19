@@ -271,5 +271,14 @@ class regressor_config:
                 "loss":{"str":['huber','epsilon_insensitive','squared_epsilon_insensitive','squared_loss']},
                 "tol":{'float':[1e-3,0.1]}                
             }
+        ],
+        "HistGradientBoostingRegressor":[
+            ensemble.HistGradientBoostingRegressor,
+            {
+                "loss":{'str':['least_squares', 'least_absolute_deviation', 'poisson']},
+                "learning_rate":{'float':[1e-3,0.1]},
+                "max_depth":{'int':[3,50]},
+                "tol":{'float':[1e-3,0.1]}
+            }
         ]
     }
