@@ -19,12 +19,16 @@
 # Should output progress, in an interactive manner while training is in progress
 
 import pickle
+import numpy as np
 import tensorflow as tf
+import pandas as pd
 from blobcity.store import DictClass
 from blobcity.utils import getDataFrameType,dataCleaner
 from blobcity.utils import AutoFeatureSelection as AFS
 from blobcity.main.modelSelection import modelSearch
 from blobcity.code_gen import yml_reader,code_generator
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.feature_selection import SelectKBest,f_regression,f_classif
 def train(file=None, df=None, target=None,features=None):
     """
     Performs a model search on the data proivded. A yaml file is generated once the best fit model configuration
@@ -51,6 +55,7 @@ def train(file=None, df=None, target=None,features=None):
     modelClass = modelSearch(CleanedDF,target,dc)
     #return modelClass object
     modelClass.yamldata=dc.getdict()
+    modelClass.feature_importance_=dc.feature_importance if(features==None) else calculate_feature_importance(CleanedDF.drop(target,axis=1),CleanedDF[target],dc)
     dc.resetVar()
     return modelClass
 # Performs an automated model training. 
@@ -91,4 +96,14 @@ def spill(filepath,yaml_path=None,doc=None):
     if yaml_path in [None,""] : raise TypeError("YAML file path can't be None")
     data=yml_reader(yaml_path)
     code_generator(data,filepath,doc)
+
+def calculate_feature_importance(X,Y,dc):
+    score_func=f_classif if(dc.getdict()['problem']["type"]=='Classification') else f_regression
+    fit = SelectKBest(score_func=score_func, k=X.shape[1]).fit(X,Y)
+    dfscores,dfcolumns = pd.DataFrame(fit.scores_),pd.DataFrame(X.columns)
+    df = pd.concat([dfcolumns,dfscores],axis=1)
+    df.columns = ['features','Score'] 
+    df['Score']=MinMaxScaler().fit_transform(np.array(df['Score']).reshape(-1,1))
+    imp=AFS.MainScore(dict(df.values),dc)
+    return imp
 

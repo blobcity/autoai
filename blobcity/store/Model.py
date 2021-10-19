@@ -14,7 +14,11 @@
 
 import pickle
 import os
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 import tensorflow as tf
+import matplotlib.pyplot as plt
 from blobcity.code_gen import code_generator
 import yaml
 """
@@ -26,12 +30,16 @@ class Model:
     model=None
     metrics=dict()
     yamldata=None
+    feature_importance_=dict()
+    plot_data=None
     def __init__(self):
         self.params=dict()
         self.featureList=[]
         self.model=None
         self.metrics=dict()
         self.yamldata=None
+        self.feature_importance_=dict()
+        self.plot_data=None
         
 
     def predict(self,test):
@@ -137,3 +145,12 @@ class Model:
         else:
             raise TypeError(f"{extension} file type must be .yml or .yaml")
 
+    def plot_feature_importance(self):
+        val=self.feature_importance_
+        if(val!=None):
+            plt.figure(figsize = (12, 6))
+            plt.bar(range(len(val)), list(val.values()), align='center')
+            plt.xticks(range(len(val)),list(val.keys()), rotation='vertical')
+            plt.show()
+        else:
+            print("Feature importance not available for manual features/column selections !") 

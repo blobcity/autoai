@@ -109,9 +109,9 @@ class AutoFeatureSelection:
             df.columns = ['features','Score'] 
             df['Score']=MinMaxScaler().fit_transform(np.array(df['Score']).reshape(-1,1))
             imp=AutoFeatureSelection.MainScore(dict(df.values),dc)
-            return AutoFeatureSelection.GetAbsoluteList(imp,X,dict(df.values))
+            return AutoFeatureSelection.GetAbsoluteList(imp,X,dict(df.values),dc)
     
-    def GetAbsoluteList(resdic,dataframe,impmain):
+    def GetAbsoluteList(resdic,dataframe,impmain,dc):
 
         """
         param1: Dictionary
@@ -120,11 +120,18 @@ class AutoFeatureSelection:
 
         return: pandas.DataFrame
         """
+        keylist=[]
+        imp_dict={}
         for key, value in resdic.items():
-            if value < 0.01 and key in dataframe.columns.to_list():  
-                keylist=[key2 for key2, value2 in impmain.items() if key in key2]
-                dataframe.drop(keylist,axis=1,inplace=True)
-        return dataframe
+            if value < 0.01: 
+                for key_2 in impmain.keys():
+                    if key in key_2:
+                        keylist.append(key_2)
+            else: imp_dict[key]=value
+            
+        result_df=dataframe.drop(keylist,axis=1)
+        dc.feature_importance=imp_dict
+        return result_df
 
     def FeatureSelection(dataframe,target,dc):
         """
@@ -144,9 +151,7 @@ class AutoFeatureSelection:
         and finally return List of features to utilize ahead for processing and model training.
         """
         df=dataCleaner(dataframe,dataframe.drop(target,axis=1).columns.to_list(),target,dc)
-        if(dc.getdict()['problem']["type"]=='Classification'):score_func=f_classif 
-        else: score_func=f_regression
-        
+        score_func=f_classif if(dc.getdict()['problem']["type"]=='Classification') else f_regression
         X=df.drop(target,axis=1)
         Y=df[target]
         
