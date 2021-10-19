@@ -98,12 +98,16 @@ def spill(filepath,yaml_path=None,doc=None):
     code_generator(data,filepath,doc)
 
 def calculate_feature_importance(X,Y,dc):
-    score_func=f_classif if(dc.getdict()['problem']["type"]=='Classification') else f_regression
-    fit = SelectKBest(score_func=score_func, k=X.shape[1]).fit(X,Y)
-    dfscores,dfcolumns = pd.DataFrame(fit.scores_),pd.DataFrame(X.columns)
-    df = pd.concat([dfcolumns,dfscores],axis=1)
-    df.columns = ['features','Score'] 
-    df['Score']=MinMaxScaler().fit_transform(np.array(df['Score']).reshape(-1,1))
-    imp=AFS.MainScore(dict(df.values),dc)
-    return imp
+    if X.shape[1]>2:
+        score_func=f_classif if(dc.getdict()['problem']["type"]=='Classification') else f_regression
+        fit = SelectKBest(score_func=score_func, k=X.shape[1]).fit(X,Y)
+        dfscores,dfcolumns = pd.DataFrame(fit.scores_),pd.DataFrame(X.columns)
+        df = pd.concat([dfcolumns,dfscores],axis=1)
+        df.columns = ['features','Score']
+        df['Score']=MinMaxScaler().fit_transform(np.array(df['Score']).reshape(-1,1))
+        imp=AFS.MainScore(dict(df.values),dc)
+        return imp
+    else:
+        print('Dataset has only {} features, required atleast 2 for feature importances'.format(X.shape[1]))
+        return None
 

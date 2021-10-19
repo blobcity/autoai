@@ -153,4 +153,4 @@ class Model:
             plt.xticks(range(len(val)),list(val.keys()), rotation='vertical')
             plt.show()
         else:
-            print("Feature importance not available for manual features/column selections !") 
+            print("Feature importance not available for dataset with less then 2 columns") 

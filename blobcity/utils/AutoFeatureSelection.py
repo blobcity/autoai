@@ -101,6 +101,7 @@ class AutoFeatureSelection:
         categorical features.
         """
         if(X.shape[1]<3):
+            dc.feature_importance=None
             return X
         else:
             fit = SelectKBest(score_func=score_func, k=X.shape[1]).fit(X,Y)
