@@ -104,4 +104,5 @@ The loaded model is an exact replica of the model, as at the time of saving the 
 - [ ] ipynb code generation, with exhaustive markdown documentation
 - [ ] Image classification
 - [ ] Opitical Character Recognition (english only)
+- [ ] Video tagging with YOLO
 
