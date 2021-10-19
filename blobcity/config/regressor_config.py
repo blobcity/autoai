@@ -269,7 +269,16 @@ class regressor_config:
                 "max_iter":{'int':[1000,10000]},
                 "epsilon":{'float':[1e-3,1]},
                 "loss":{"str":['huber','epsilon_insensitive','squared_epsilon_insensitive','squared_loss']},
-                "tol":{'float':[1e-3,0.1]}                
+                "tol":{'float':[1e-3,0.1]}
+            }
+        ],
+        "HuberRegressor":[
+            linear_model.HuberRegressor, 
+            {
+                "epsilon":{'float':[1,1.5]},
+                "max_iter":{'int':[100,10000]},
+                "alpha":{'float':[1e-4,0.1]},
+                "tol":{'float':[1e-3,0.1]} 
             }
         ]
     }
