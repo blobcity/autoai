@@ -16,11 +16,9 @@ import pickle
 import os
 import tensorflow as tf
 from blobcity.code_gen import code_generator
-import yaml
-import seaborn as sn
-import pandas as pd
-import matplotlib.pyplot as plt
+import yamlf
 from blobcity.config import classifier_config
+from sklearn.metrics import confusion_matrix
 """
 Python file consists of Class Model to initialize/store and retrive data associated to trained machine learning model.
 """
@@ -144,10 +142,7 @@ class Model:
     def confusion_Matrix(self, y_test, y_predict):
         classifier_instance = classifier_config()
         if self.model.__class__.__name__ in classifier_instance.models:
-            df_cm = pd.DataFrame(self, y_test, y_predict)
-            sn.set(font_scale=1.4) # for label size
-            sn.heatmap(df_cm, annot=True, annot_kws={"size": 16}) # font size
-            plt.show()
+            confusion_matrix(y_test, y_predict)
         else:
             print("Confusion matrix is available only for Classification problems")
 
