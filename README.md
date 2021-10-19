@@ -18,8 +18,8 @@ pip install tensorflow
 
 ``` Python
 import blobcity as bc
-bc.train(file="data.csv", target="Y_column")
-bc.spill("my_code.ipynb")
+model = bc.train(file="data.csv", target="Y_column")
+model.spill("my_code.py")
 ```
 `Y_column` is the name of the target column. The column must be present within the data provided. 
 
@@ -31,7 +31,7 @@ The `spill` function generates the model code with exhaustive documentation. Tra
 
 ## Use a Pandas Data Frame
 ``` Python
-bc.train(df=my_df, target="Y_column")
+model = bc.train(df=my_df, target="Y_column")
 ```
 
 If loading data from a Database or external system, create a DataFrame from your data source, and pass it directly to the `train` function.
