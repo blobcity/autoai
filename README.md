@@ -95,3 +95,13 @@ model = bc.load('./my_model.pkl')
 ```
 
 The loaded model is an exact replica of the model, as at the time of saving the model. The training state along with other training parameters are persisted and reloaded.
+
+# Features and Roadmap
+- [x] Classification and Regression on numeric data
+- [x] Automatic feature selection
+- [x] py code generation
+- [x] ipynb code generation
+- [ ] ipynb code generation, with exhaustive markdown documentation
+- [ ] Image classification
+- [ ] Opitical Character Recognition (english only)
+
