@@ -22,10 +22,12 @@ class DictClass:
     YAML=dict()
     ObjectExist= False
     ObjectList=None
+    feature_importance=dict()
     def __int__(self):
         self.ObjectExist=False
         self.ObjectList=None
         self.YAML={}
+        self.feature_importance=dict()
     def addKeyValue(self, key,value):
         """
         param1:Class reference/Class object 
@@ -80,4 +82,5 @@ class DictClass:
         self.ObjectExist=False
         self.ObjectList=None
         self.YAML={}
+        self.feature_importance={}
     

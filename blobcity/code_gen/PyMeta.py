@@ -64,7 +64,9 @@ class PyComments:
             'GammaRegressor':'GammaRegressor model Description\r\n',
             'LGBMRegressor':'LGBMRegressor model Descriptions\r\n',
             'RadiusNeighborsRegressor':'RadiusNeighborsRegressor model Descriptions\r\n',
-            'PassiveAggressiveRegressor':'PassiveAggressiveRegressor model Descriptions\r\n'
+            'PassiveAggressiveRegressor':'PassiveAggressiveRegressor model Descriptions\r\n',
+            'HuberRegressor':'HuberRegressor model Descriptions\r\n',
+            'ElasticNet':'ElasticNet model Descriptions\r\n'
         }
     }
 
