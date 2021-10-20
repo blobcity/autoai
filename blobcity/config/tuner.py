@@ -97,7 +97,7 @@ def classification_metrics(y_true,y_pred):
     result['recall']=recall_score(y_true, y_pred,average="weighted")
     return result
 
-def metricResults(model,X,Y,ptype):
+def metricResults(y_true,y_pred,ptype):
     """
     param1: model object (keras/sklearn/xgboost/catboost/lightgbm)
     param2: pandas.DataFrame
@@ -110,13 +110,10 @@ def metricResults(model,X,Y,ptype):
     on training set. based on problem type call appropriate metric function either regression_metrics() or classification_metrics()
     return the resulting output(Dictionary).
     """
-    X_train,X_test,y_train,y_test=train_test_split(X,Y,test_size=0.2,random_state=123)
-    model=model.fit(X_train,y_train)
-    y_pred=model.predict(X_test)
-    results = classification_metrics(y_test,y_pred) if ptype =="Classification" else regression_metrics(y_test,y_pred)
+    results = classification_metrics(y_true,y_pred) if ptype =="Classification" else regression_metrics(y_true,y_pred)
     return results
 
-def getParamList(modelkey,modelList):
+def get_param_list(modelkey,modelList):
     """
     param1: dictionary
     param2: dictionary
@@ -127,7 +124,7 @@ def getParamList(modelkey,modelList):
     Best1=list(modelkey.keys())[0]
     modelName,parameter=modelList[Best1][0],modelList[Best1][1]
 
-def getParams(trial):
+def get_params(trial):
     """
     param1: optuna.trial
     return: dictionary
@@ -154,13 +151,13 @@ def objective(trial):
     function trains model of randomized tuning parameter and return cross_validation score on specified kfold counts.
     the accuracy is average over the specified kfold counts.
     """
-    params=getParams(trial)
+    params=get_params(trial)
     model=modelName(**params)
     score = cross_val_score(model, X, Y, n_jobs=-1, cv=cv)
     accuracy = score.mean()
     return accuracy    
 
-def tuneModel(dataframe,target,modelkey,modelList,ptype):
+def tune_model(dataframe,target,modelkey,modelList,ptype):
     """
     param1: pandas.DataFrame
     param2: string 
@@ -178,12 +175,12 @@ def tuneModel(dataframe,target,modelkey,modelList,ptype):
     global cv
     X,Y=dataframe.drop(target,axis=1),dataframe[target]
     cv=modelSelection.getKFold(X)
-    getParamList(modelkey,modelList)
+    get_param_list(modelkey,modelList)
     try:
         study = optuna.create_study(direction="maximize")
         study.optimize(objective,n_trials=50,n_jobs=-1,callbacks=[early_stopping_opt])
-        metric_result=metricResults(modelName(**study.best_params),X,Y,ptype)
         model = modelName(**study.best_params).fit(X,Y)
+        metric_result=metricResults(Y,model.predict(X),ptype)
         return (model,study.best_params,study.best_value,metric_result)
     except Exception as e:
         print(e)

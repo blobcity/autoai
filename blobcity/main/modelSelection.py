@@ -16,6 +16,7 @@
 import os
 import warnings
 import itertools
+from math import isnan
 from tqdm import tqdm,tqdm_notebook
 from blobcity.store import Model
 from blobcity.config import tuner as Tuner
@@ -46,7 +47,7 @@ def getKFold(X):
     elif rows>5000 : k=10
     return k
 
-def cvScore(model,X,Y,k):
+def cv_score(model,X,Y,k):
 
     """
     param1: sklearn/xgboost/lightgbm/catboost model 
@@ -60,16 +61,17 @@ def cvScore(model,X,Y,k):
     accuracy = cross_val_score(model, X, Y, cv = k,n_jobs=-1)
     return accuracy.mean()
 
-def sortScore(modelScore):
+def sort_score(modelScore):
     """
     param1: Dictionary
     return: Dictionary
 
     Function returns a sorted dictionary on the basis of values.
     """
-    return dict(sorted(modelScore.items(), key=lambda item: item[1],reverse=True))
+    sorted_dict=dict(sorted(modelScore.items(), key=lambda item: item[1],reverse=True))
+    return sorted_dict
 
-def trainOnSample(dataframe,target,models,DictClass):
+def train_on_sample_data(dataframe,target,models,DictClass):
     """
     param1: pandas.DataFrame
     param2: string
@@ -78,16 +80,19 @@ def trainOnSample(dataframe,target,models,DictClass):
     return: Dictionary
 
     Function returns top 5 models with best accuracy in a dictionary.
-    The models where accuracy is calculate on 10% sample data from the dataset.
+    The models where accuracy is calculate on sampled data from the dataset.
     Accuracy is calculated using average cross validation score on specified kfold counts.
     """
-    df=dataframe.sample(frac=0.1,random_state=123)
+    rows=dataframe.shape[0]
+    sample_rate=round((500+(((rows-500)*0.2)))/rows,1)
+    df=dataframe.sample(frac=sample_rate,random_state=123)
     X,Y=df.drop(target,axis=1),df[target]
     k=getKFold(X)
-    modelScore={m:cvScore(models[m][0](),X,Y,k) for m in tqdm_notebook(models) }
-    return dict(itertools.islice(sortScore(modelScore).items(), 5))
+    modelScore={m:cv_score(models[m][0](),X,Y,k) for m in tqdm_notebook(models)}
+    clean_dict = {k: modelScore[k] for k in modelScore if not isnan(modelScore[k])}
+    return dict(itertools.islice(sort_score(clean_dict).items(), 5))
 
-def trainOnFull(dataframe,target,models,best,DictClass):
+def train_on_full_data(dataframe,target,models,best,DictClass):
     """
     param1: pandas.DataFrame
     param2: string
@@ -100,10 +105,11 @@ def trainOnFull(dataframe,target,models,best,DictClass):
     """
     X,Y=dataframe.drop(target,axis=1),dataframe[target]
     k=getKFold(X)
-    modelScore={m:cvScore(models[m][0](),X,Y,k) for m in tqdm_notebook(best) }
-    return dict(itertools.islice(sortScore(modelScore).items(), 1))
+    modelScore={m:cv_score(models[m][0](),X,Y,k) for m in tqdm_notebook(best)}
+    clean_dict = {k: modelScore[k] for k in modelScore if not isnan(modelScore[k])}
+    return dict(itertools.islice(sort_score(clean_dict).items(), 1))
 
-def modelSearch(dataframe,target,DictClass):
+def model_search(dataframe,target,DictClass):
     """
     param1: pandas.DataFrame
     param2: string
@@ -122,10 +128,10 @@ def modelSearch(dataframe,target,DictClass):
     ptype=DictClass.getdict()['problem']["type"]
     modelsList=classifier_config().models if ptype=="Classification" else regressor_config().models
     if dataframe.shape[0]>500:
-        best=trainOnFull(dataframe,target,modelsList,trainOnSample(dataframe,target,modelsList,DictClass),DictClass)
+        best=train_on_full_data(dataframe,target,modelsList,train_on_sample_data(dataframe,target,modelsList,DictClass),DictClass)
     else:
-        best=trainOnFull(dataframe,target,modelsList,modelsList,DictClass)
-    modelResult = Tuner.tuneModel(dataframe,target,best,modelsList,ptype)
+        best=train_on_full_data(dataframe,target,modelsList,modelsList,DictClass)
+    modelResult = Tuner.tune_model(dataframe,target,best,modelsList,ptype)
     modelData=Model()
     modelData.featureList=dataframe.drop(target,axis=1).columns.to_list()
     modelData.model,modelData.params,acc,modelData.metrics = modelResult

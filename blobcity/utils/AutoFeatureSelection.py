@@ -57,7 +57,7 @@ class AutoFeatureSelection:
         if(constcols!=[]): X.drop(constcols,axis=1,inplace=True)
         return X
 
-    def MainScore(resultscore,dc):
+    def MainScore(resultscore,dict_class):
 
         """
         param1: dictionary - feature importance scores 
@@ -71,8 +71,8 @@ class AutoFeatureSelection:
         else return passed feature score.
         """
         #average on categorical features
-        if(dc.ObjectExist):
-            objList=dc.ObjectList
+        if(dict_class.ObjectExist):
+            objList=dict_class.ObjectList
             for i in objList:
                 resultscore[i]=mean(list(dict(filter(lambda item: i in item[0], resultscore.items())).values()))
             #resulting dictionary  
@@ -83,7 +83,7 @@ class AutoFeatureSelection:
         else: return resultscore
 
     #feature importance calculator
-    def get_feature_importance(X,Y,score_func,dc):
+    def get_feature_importance(X,Y,score_func,dict_class):
         """
         param1: pandas DataFrame X Features
         param2: pandas Series/Dataframe target dataset
@@ -101,7 +101,7 @@ class AutoFeatureSelection:
         categorical features.
         """
         if(X.shape[1]<3):
-            dc.feature_importance=None
+            dict_class.feature_importance=None
             return X
         else:
             fit = SelectKBest(score_func=score_func, k=X.shape[1]).fit(X,Y)
@@ -109,10 +109,10 @@ class AutoFeatureSelection:
             df = pd.concat([dfcolumns,dfscores],axis=1)
             df.columns = ['features','Score'] 
             df['Score']=MinMaxScaler().fit_transform(np.array(df['Score']).reshape(-1,1))
-            imp=AutoFeatureSelection.MainScore(dict(df.values),dc)
-            return AutoFeatureSelection.GetAbsoluteList(imp,X,dict(df.values),dc)
+            main_score=AutoFeatureSelection.MainScore(dict(df.values),dict_class)
+            return AutoFeatureSelection.GetAbsoluteList(main_score,X,dict(df.values),dict_class)
     
-    def GetAbsoluteList(resdic,dataframe,impmain,dc):
+    def GetAbsoluteList(resdic,dataframe,impmain,dict_class):
 
         """
         param1: Dictionary
@@ -131,10 +131,10 @@ class AutoFeatureSelection:
             else: imp_dict[key]=value
             
         result_df=dataframe.drop(keylist,axis=1)
-        dc.feature_importance=imp_dict
+        dict_class.feature_importance=imp_dict
         return result_df
 
-    def FeatureSelection(dataframe,target,dc):
+    def FeatureSelection(dataframe,target,dict_class):
         """
         param1: pandas DataFrame
         param2: target column name
@@ -151,19 +151,19 @@ class AutoFeatureSelection:
             3. Droping Columns on basis of Feature Importance Criteria.
         and finally return List of features to utilize ahead for processing and model training.
         """
-        df=dataCleaner(dataframe,dataframe.drop(target,axis=1).columns.to_list(),target,dc)
-        score_func=f_classif if(dc.getdict()['problem']["type"]=='Classification') else f_regression
+        df=dataCleaner(dataframe,dataframe.drop(target,axis=1).columns.to_list(),target,dict_class)
+        score_func=f_classif if(dict_class.getdict()['problem']["type"]=='Classification') else f_regression
         X=df.drop(target,axis=1)
         Y=df[target]
         
         X=AutoFeatureSelection.dropConstantFeatures(X)
         X=AutoFeatureSelection.dropHighCorrelationFeatures(X)
-        X=AutoFeatureSelection.get_feature_importance(X,Y,score_func,dc)
-        featureList=AutoFeatureSelection.getOriginalFeatures(X.columns.to_list(),dc)
-        dc.addKeyValue('features',{'X_values':featureList,'Y_values':target})
+        X=AutoFeatureSelection.get_feature_importance(X,Y,score_func,dict_class)
+        featureList=AutoFeatureSelection.getOriginalFeatures(X.columns.to_list(),dict_class)
+        dict_class.addKeyValue('features',{'X_values':featureList,'Y_values':target})
         return featureList
 
-    def getOriginalFeatures(featureList,dc):
+    def getOriginalFeatures(featureList,dict_class):
         """
         param1: List
         param2: Class object
@@ -174,11 +174,11 @@ class AutoFeatureSelection:
         if exists shorts/filters list of feature on the basis of feature importance list.
         and return filtered List of features
         """
-        if(dc.ObjectExist):
+        if(dict_class.ObjectExist):
             res,res2= [],[]#List
             for val in featureList: #filter for String categorical field existence.
-                if not any(ele+"_" in val for ele in dc.ObjectList): res.append(val)
-            res=res+dc.ObjectList
+                if not any(ele+"_" in val for ele in dict_class.ObjectList): res.append(val)
+            res=res+dict_class.ObjectList
             for v in res:# filter for Selected String categorical
                 if not any (v in ele for ele in featureList): res2.append(v)
             # filter to consider the features
