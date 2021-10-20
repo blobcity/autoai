@@ -222,19 +222,6 @@ class classifier_config:
                 "tol":{'float':[1e-3,0.1]},
                 'n_jobs':{'str':[-1]}
             }
-        ],
-        "PassiveRegressor":[
-            linear_model.PassiveAggressiveClassifier,
-            {
-                "fit_intercept":{'bool':[True,False]},
-                "max_iter":{'int':[1000,5000]},
-                "tol":{'float':[1e-3,0.1]},
-                "loss":{"str":['huber','epsilon_insensitive','squared_epsilon_insensitive','squared_loss']},
-                'n_jobs':{'str':[-1]},
-                "shuffle":{'bool':[True,False]},
-                "verbose":{'bool':[False]},
-                "early_stopping":{'bool':[True,False]}
-            }
         ]
     }
 
