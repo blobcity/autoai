@@ -111,9 +111,7 @@ class Model:
         """
         Function to print/log/display all the metrics associated with problem type for the selected trained model. Usally used to check the effectiveness of training, or to assess the model fit. 
         """
-        print ("{:<10} {:<10}".format('METRIC', 'VALUE'))
- 
-        # print each data item.
+        print ("\nMetrics on trained data:\n{:<10} {:<10}".format('METRIC', 'VALUE'))
         for key, value in self.metrics.items():
             print ("{:<10} {:<10}".format(key, value))
 
@@ -148,9 +146,10 @@ class Model:
     def plot_feature_importance(self):
         val=self.feature_importance_
         if(val!=None):
+            val=dict(sorted(val.items(), key=lambda item: item[1],reverse=False))
             plt.figure(figsize = (12, 6))
-            plt.bar(range(len(val)), list(val.values()), align='center')
-            plt.xticks(range(len(val)),list(val.keys()), rotation='vertical')
+            plt.barh(range(len(val)), list(val.values()), align='center')
+            plt.yticks(range(len(val)),list(val.keys()))
             plt.show()
         else:
             print("Feature importance not available for dataset with less then 2 columns") 
