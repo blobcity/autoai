@@ -20,7 +20,7 @@ import blobcity as bc
 import pandas as pd
 file_path,target="https://raw.githubusercontent.com/Thilakraj1998/Datasets_general/main/CarPrice.csv",'Price'
 features=['Present_Price', 'Kms_Driven', 'Fuel_Type', 'Seller_Type', 'Transmission']
-file_path,target="F:\electrodemo\OptunaPro\Datasets\pricex.csv",'MCP'
+
 model=bc.train(file=file_path,target=target,features=None) # function to test AutoAI Process
 
 model.stats() # function to test metrics analysis
