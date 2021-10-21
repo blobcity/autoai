@@ -289,7 +289,7 @@ class regressor_config:
             {
                 "loss":{'str':['least_squares', 'least_absolute_deviation', 'poisson']},
                 "learning_rate":{'float':[1e-3,0.1]},
-                "max_depth":{'int':[3,50]},
+                "max_depth":{'int':[3,30]},
                 "tol":{'float':[1e-3,0.1]}
             }
         ]

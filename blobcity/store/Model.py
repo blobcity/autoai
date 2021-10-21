@@ -158,6 +158,10 @@ class Model:
             print("Feature importance not available for dataset with less then 2 columns") 
 
     def get_prediction_data(self):
+        """
+        return: array/2D array/Dictionary/pandas.Dataframe
+        Function returns predicted and actual target data.
+        """
         problem=self.yamldata['problem']["type"]
         if problem=='Classification':
             return self.plot_data
@@ -166,8 +170,14 @@ class Model:
 
             
     def plot_prediction(self,n_rows=100):
+        """
+        param1:int : signed and unsigned integer for plot number of records for regression problem.
+
+        Function plots either confusion matrix or regression plot(line plot comparing true and predicted values) based on problem type.
+        """
         problem=self.yamldata['problem']["type"]
         if problem=='Classification':
+            #plot confusion matrix
             cf_matrix=self.plot_data
             group_counts = ['{0:0.0f}'.format(value) for value in cf_matrix.flatten()]
             group_percentages = ["{0:.2%}".format(value) for value in cf_matrix.flatten()/np.sum(cf_matrix)]
@@ -176,15 +186,11 @@ class Model:
             sns.heatmap(cf_matrix, annot=labels, fmt='', cmap='Blues')
             plt.show()
         elif problem=="Regression":
+            #plot for regression problem
             if  abs(n_rows)<= len(self.plot_data[0]):
                 n=len(self.plot_data[0]) if len(self.plot_data[0])<abs(n_rows) else n_rows
-                if n < 0:
-                    true=self.plot_data[0][n:]
-                    predict=self.plot_data[1][n:]
-                else:
-                    true=self.plot_data[0][0:n]
-                    predict=self.plot_data[1][0:n]
-
+                if n < 0: true,predict=self.plot_data[0][n:],self.plot_data[1][n:]
+                else:true,predict=self.plot_data[0][0:n],self.plot_data[1][0:n]
                 plt.figure(figsize=(14,10))
                 plt.plot(range(abs(n)),true, color = "green")
                 plt.plot(range(abs(n)),predict, color = "red")
