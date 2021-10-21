@@ -18,8 +18,8 @@ import optuna
 import warnings
 from blobcity.main import modelSelection
 from sklearn.exceptions import ConvergenceWarning
-from sklearn.model_selection import train_test_split,cross_val_score
-from sklearn.metrics import r2_score,mean_squared_error,mean_absolute_error,f1_score,precision_score,recall_score
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import r2_score,mean_squared_error,mean_absolute_error,f1_score,precision_score,recall_score,confusion_matrix
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
     warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -155,7 +155,23 @@ def objective(trial):
     model=modelName(**params)
     score = cross_val_score(model, X, Y, n_jobs=-1, cv=cv)
     accuracy = score.mean()
-    return accuracy    
+    return accuracy   
+
+def prediction_data(y_true,y_pred,ptype):
+    """
+    param1:pandas.Series/numpy.darray
+    param2:pandas.Series/numpy.darray
+    param3:string
+
+    return:array/2D array
+
+    """
+    if ptype=='Classification':
+        cm=confusion_matrix(y_true,y_pred)
+        return cm
+    else:
+        data_pred=[y_true.values,y_pred]
+        return data_pred    
 
 def tune_model(dataframe,target,modelkey,modelList,ptype):
     """
@@ -181,6 +197,8 @@ def tune_model(dataframe,target,modelkey,modelList,ptype):
         study.optimize(objective,n_trials=50,n_jobs=-1,callbacks=[early_stopping_opt])
         model = modelName(**study.best_params).fit(X,Y)
         metric_result=metricResults(Y,model.predict(X),ptype)
-        return (model,study.best_params,study.best_value,metric_result)
+        plots=prediction_data(Y,model.predict(X),ptype)
+        return (model,study.best_params,study.best_value,metric_result,plots)
+        #return (model,study.best_params,study.best_value,metric_result)
     except Exception as e:
         print(e)

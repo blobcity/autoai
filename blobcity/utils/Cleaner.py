@@ -52,8 +52,7 @@ def dataCleaner(df,features,target,DictionaryClass):
     updateddf[target]=df[target].copy(deep=True)
     updateddf=RemoveRowsWithHighNans(updateddf)
     updateddf=RemoveHighNullValues(updateddf)
-    updateddf=dropUniqueColumn(updateddf)
-
+    updateddf=dropUniqueColumn(updateddf,target)
     if updateddf.isnull().values.any(): 
         cols=updateddf.columns[updateddf.isnull().any()].tolist()
         for i in cols:
@@ -68,7 +67,7 @@ def dataCleaner(df,features,target,DictionaryClass):
 
     return EncoderResult
 
-def dropUniqueColumn(X_values):
+def dropUniqueColumn(X_values,target):
     """
         param1: pandas.DataFrame 
         return : pandas.DataFrame
@@ -79,7 +78,7 @@ def dropUniqueColumn(X_values):
     """    
     row_counts = len(X_values)
     for i in X_values.columns.to_list():
-        if len(X_values[i].unique())==row_counts:
+        if len(X_values[i].unique())==row_counts and i!=target:
             X_values.drop(i, axis=1, inplace=True)
     return X_values
 

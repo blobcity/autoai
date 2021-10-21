@@ -89,7 +89,7 @@ class regressor_config:
         "GradientBoostingRegressor":[
             ensemble.GradientBoostingRegressor,
             {
-                "criterion":{'str':['squared_error','friedman_mse']},
+                "criterion":{'str':['mse','friedman_mse']},
                 "n_estimators":{'int':[100,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
                 "max_depth":{'int':[3,50]},
@@ -214,11 +214,14 @@ class regressor_config:
         "XGBRegressor":[
             XGBRegressor,
             {
-                "n_estimators":{'int':[10, 5000]},
-                "max_depth":{'int':[3,50]},
+                "n_estimators":{'int':[500, 5000]},
+                "max_depth":{'int':[3,16]},
                 "learning_rate":{'float':[1e-3,0.1]},
                 "booster":{'str':['gbtree', 'gblinear', 'dart']},
-                'n_jobs':{'str':[-1]}
+                'reg_alpha': {'float':[1e-3,0.1]},
+                'reg_lambda': {'float':[1e-3,0.1]},
+                'n_jobs':{'str':[-1]},
+                'verbosity':{'str':[0]},
             }
         ], 
         "CatBoostRegressor":[
@@ -228,7 +231,7 @@ class regressor_config:
                 "l2_leaf_reg":{'float':[1e-3, 1.0]},
                 "bootstrap_type":{'str':['Bayesian', 'Bernoulli', 'MVS', 'No']},
                 "loss_function":{'str': ["RMSE", "MultiRMSE", "MAE", "Poisson"]},
-                "iterations":{'int':[500, 1000]},
+                "iterations":{'int':[500, 5000]},
                 "max_depth":{'int':[3,16]},
                 "verbose":{'bool':[False]},
             }
@@ -280,5 +283,5 @@ class regressor_config:
                 "alpha":{'float':[1e-4,0.1]},
                 "tol":{'float':[1e-3,0.1]} 
             }
-        ]
+        ],
     }

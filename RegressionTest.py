@@ -34,3 +34,7 @@ bc.spill("codefile.ipynb","./Process.yaml") #funciton to test yaml generation fr
 bc.spill("codefile.py","./Process.yaml") #funciton to test yaml generation from specified yaml file
 
 model.plot_feature_importance()# function to plot feature_importance calculate using selectKbest functionality
+
+print(model.get_prediction_data())# function to get prediction plot data.
+
+model.plot_prediction(100) # function to plot true vs predicted values
