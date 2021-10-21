@@ -37,4 +37,4 @@ model.plot_feature_importance()# function to plot feature_importance calculate u
 
 print(model.get_prediction_data())# function to get prediction plot data.
 
-model.plot_prediction(100) # function to plot true vs predicted values
+model.plot_prediction() # function to plot true vs predicted values
