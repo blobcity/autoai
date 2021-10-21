@@ -131,8 +131,8 @@ class classifier_config:
                 'max_depth': {'int':[3,50]},
                 'n_estimators': {'int':[100,1000]},
                 'learning_rate': {'float':[1e-3,0.1]},
-                'reg_alpha': {'int':[1, 1.5]},
-                'reg_lambda': {'int':[1, 1.5]},
+                'reg_alpha': {'float':[1e-3,0.1]},
+                'reg_lambda': {'float':[1e-3,0.1]},
                 'booster':{'str':['gbtree', 'gblinear','dart']},
                 'verbosity':{'str':[0]},
                 'n_jobs':{'str':[-1]}

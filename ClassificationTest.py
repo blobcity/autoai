@@ -21,7 +21,7 @@ import pandas as pd
 file_path,target="https://raw.githubusercontent.com/Thilakraj1998/Datasets_general/main/BreastCancer1.csv",'diagnosis'
 features=['radius_mean','texture_mean','smoothness_mean','compactness_mean','concavity_mean']
 
-model=bc.train(file=file_path,target=target,features=features) # function to test AutoAI Process
+model=bc.train(file=file_path,target=target,features=None) # function to test AutoAI Process
 
 model.stats() # function to test metrics analysis
 
@@ -34,3 +34,5 @@ bc.spill("codefile.ipynb","./Process.yaml") #funciton to test yaml generation fr
 bc.spill("codefile.py","./Process.yaml") #funciton to test yaml generation from specified yaml file
 
 model.plot_feature_importance()# function to plot feature_importance calculate using selectKbest functionality
+
+model.plot_prediction() #function to plot confusion matrix
