@@ -39,7 +39,7 @@ class ProType:
             return dict({'type':'Classification'})
         else:
             target_length=data.nunique(dropna=False)
-            if data.dtype in ['int64','float64','int32','float32','int16','float16'] and target_length<=50:
+            if data.dtype in ['int64','float64','int32','float32','int16','float16'] and target_length<=20:
                 return dict({'type':'Classification'})
             else:
                 return dict({'type':'Regression'})

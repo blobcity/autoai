@@ -14,7 +14,11 @@
 
 import pickle
 import os
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 import tensorflow as tf
+import matplotlib.pyplot as plt
 from blobcity.code_gen import code_generator
 import yaml
 """
@@ -26,12 +30,16 @@ class Model:
     model=None
     metrics=dict()
     yamldata=None
+    feature_importance_=dict()
+    plot_data=None
     def __init__(self):
         self.params=dict()
         self.featureList=[]
         self.model=None
         self.metrics=dict()
         self.yamldata=None
+        self.feature_importance_=dict()
+        self.plot_data=None
         
 
     def predict(self,test):
@@ -103,9 +111,7 @@ class Model:
         """
         Function to print/log/display all the metrics associated with problem type for the selected trained model. Usally used to check the effectiveness of training, or to assess the model fit. 
         """
-        print ("{:<10} {:<10}".format('METRIC', 'VALUE'))
- 
-        # print each data item.
+        print ("\nMetrics on trained data:\n{:<10} {:<10}".format('METRIC', 'VALUE'))
         for key, value in self.metrics.items():
             print ("{:<10} {:<10}".format(key, value))
 
@@ -137,3 +143,58 @@ class Model:
         else:
             raise TypeError(f"{extension} file type must be .yml or .yaml")
 
+    def plot_feature_importance(self):
+        """
+        Function to plot feature importance calculated during auto feature selection.
+        """
+        val=self.feature_importance_
+        if(val!=None):
+            val=dict(sorted(val.items(), key=lambda item: item[1],reverse=False))
+            plt.figure(figsize = (12, 6))
+            plt.barh(range(len(val)), list(val.values()), align='center')
+            plt.yticks(range(len(val)),list(val.keys()))
+            plt.show()
+        else:
+            print("Feature importance not available for dataset with less then 2 columns") 
+
+    def get_prediction_data(self):
+        problem=self.yamldata['problem']["type"]
+        if problem=='Classification':
+            return self.plot_data
+        elif problem=="Regression":
+            return {'true':self.plot_data[0],'predicted':self.plot_data[1]}
+
+            
+    def plot_prediction(self,n_rows=100):
+        problem=self.yamldata['problem']["type"]
+        if problem=='Classification':
+            cf_matrix=self.plot_data
+            group_counts = ['{0:0.0f}'.format(value) for value in cf_matrix.flatten()]
+            group_percentages = ["{0:.2%}".format(value) for value in cf_matrix.flatten()/np.sum(cf_matrix)]
+            labels = [f'{v1}\n\n{v2}' for v1, v2 in zip(group_counts,group_percentages)]
+            labels = np.asarray(labels).reshape(cf_matrix.shape[0],cf_matrix.shape[0])
+            sns.heatmap(cf_matrix, annot=labels, fmt='', cmap='Blues')
+            plt.show()
+        elif problem=="Regression":
+            if  abs(n_rows)<= len(self.plot_data[0]):
+                n=len(self.plot_data[0]) if len(self.plot_data[0])<abs(n_rows) else n_rows
+                if n < 0:
+                    true=self.plot_data[0][n:]
+                    predict=self.plot_data[1][n:]
+                else:
+                    true=self.plot_data[0][0:n]
+                    predict=self.plot_data[1][0:n]
+
+                plt.figure(figsize=(14,10))
+                plt.plot(range(abs(n)),true, color = "green")
+                plt.plot(range(abs(n)),predict, color = "red")
+                plt.legend(["Actual","prediction"]) 
+                plt.xlabel("Record number")
+                plt.ylabel(self.yamldata['features']['Y_values'])
+                plt.show()
+            else:
+                raise ValueError("entered row counts {} more than actual row counts {}".format(abs(len(self.plot_data[0])-abs(n_rows)),len(self.plot_data[0])))
+            
+			
+
+    

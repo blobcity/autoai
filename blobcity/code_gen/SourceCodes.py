@@ -132,6 +132,8 @@ class SourceCode:
             'GammaRegressor':'from sklearn.linear_model import GammaRegressor\r\n',
             'LGBMRegressor':'from lightgbm import LGBMRegressor\r\n',
             'RadiusNeighborsRegressor':'from sklearn.neighbors import RadiusNeighborsRegressor\r\n',
-            'PassiveAggressiveRegressor':'from sklearn.linear_model import PassiveAggressiveRegressor\r\n'
+            'PassiveAggressiveRegressor':'from sklearn.linear_model import PassiveAggressiveRegressor\r\n',
+            'HuberRegressor':'from sklearn.linear_model import HuberRegressor\r\n',
+            'ElasticNet':'from sklearn.linear_model import ElasticNet'
         }
     }
