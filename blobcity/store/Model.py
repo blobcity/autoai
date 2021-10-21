@@ -169,7 +169,7 @@ class Model:
             return {'true':self.plot_data[0],'predicted':self.plot_data[1]}
 
             
-    def plot_prediction(self,n_rows=100):
+    def plot_prediction(self,n_rows=1000):
         """
         param1:int : signed and unsigned integer for plot number of records for regression problem.
 
@@ -193,7 +193,7 @@ class Model:
                 else:true,predict=self.plot_data[0][0:n],self.plot_data[1][0:n]
                 plt.figure(figsize=(14,10))
                 plt.plot(range(abs(n)),true, color = "green")
-                plt.plot(range(abs(n)),predict, color = "red")
+                plt.plot(range(abs(n)),predict,linestyle='--',color = "red")
                 plt.legend(["Actual","prediction"]) 
                 plt.xlabel("Record number")
                 plt.ylabel(self.yamldata['features']['Y_values'])
