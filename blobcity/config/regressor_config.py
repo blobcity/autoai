@@ -89,7 +89,7 @@ class regressor_config:
         "GradientBoostingRegressor":[
             ensemble.GradientBoostingRegressor,
             {
-                "criterion":{'str':['mse','friedman_mse']},
+                "criterion":{'str':['squared_error','friedman_mse']},
                 "n_estimators":{'int':[100,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
                 "max_depth":{'int':[3,50]},
