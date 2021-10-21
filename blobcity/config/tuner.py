@@ -165,6 +165,7 @@ def prediction_data(y_true,y_pred,ptype):
 
     return:array/2D array
 
+    Function generate data for ploting appropriate graph/diagram on the basis of problem type.
     """
     if ptype=='Classification':
         cm=confusion_matrix(y_true,y_pred)

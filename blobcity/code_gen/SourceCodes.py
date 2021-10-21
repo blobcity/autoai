@@ -134,6 +134,6 @@ class SourceCode:
             'RadiusNeighborsRegressor':'from sklearn.neighbors import RadiusNeighborsRegressor\r\n',
             'PassiveAggressiveRegressor':'from sklearn.linear_model import PassiveAggressiveRegressor\r\n',
             'HuberRegressor':'from sklearn.linear_model import HuberRegressor\r\n',
-            'ElasticNet':'from sklearn.linear_model import ElasticNet'
+            'ElasticNet':'from sklearn.linear_model import ElasticNet\r\n',
         }
     }
