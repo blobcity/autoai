@@ -171,7 +171,7 @@ class Model:
             
     def plot_prediction(self,n_rows=1000):
         """
-        param1:int : signed and unsigned integer for plot number of records for regression problem.
+        param1: integer : signed and unsigned integer for plot number of records for regression problem.
 
         Function plots either confusion matrix or regression plot(line plot comparing true and predicted values) based on problem type.
         """
@@ -187,20 +187,22 @@ class Model:
             plt.show()
         elif problem=="Regression":
             #plot for regression problem
-            if  abs(n_rows)<= len(self.plot_data[0]):
-                n=len(self.plot_data[0]) if len(self.plot_data[0])<abs(n_rows) else n_rows
-                if n < 0: true,predict=self.plot_data[0][n:],self.plot_data[1][n:]
-                else:true,predict=self.plot_data[0][0:n],self.plot_data[1][0:n]
-                plt.figure(figsize=(14,10))
-                plt.plot(range(abs(n)),true, color = "green")
-                plt.plot(range(abs(n)),predict,linestyle='--',color = "red")
-                plt.legend(["Actual","prediction"]) 
-                plt.xlabel("Record number")
-                plt.ylabel(self.yamldata['features']['Y_values'])
-                plt.show()
+            if  abs(n_rows)!=0:
+                if abs(n_rows)<=len(self.plot_data[0]) or abs(n_rows)==1000:
+                    n=len(self.plot_data[0]) if len(self.plot_data[0])<abs(n_rows) else n_rows
+                    if n < 0: true,predict=self.plot_data[0][n:],self.plot_data[1][n:]
+                    else:true,predict=self.plot_data[0][0:n],self.plot_data[1][0:n]
+                    plt.figure(figsize=(14,10))
+                    plt.plot(range(abs(n)),true, color = "green")
+                    plt.plot(range(abs(n)),predict,linestyle='--',color = "red")
+                    plt.legend(["Actual","prediction"]) 
+                    plt.xlabel("Record number")
+                    plt.ylabel(self.yamldata['features']['Y_values'])
+                    plt.show()
+                elif abs(n_rows)>len(self.plot_data[0]):
+                    raise ValueError("entered row counts {} more than actual row counts {}".format(abs(len(self.plot_data[0])-abs(n_rows)),len(self.plot_data[0])))
             else:
-                raise ValueError("entered row counts {} more than actual row counts {}".format(abs(len(self.plot_data[0])-abs(n_rows)),len(self.plot_data[0])))
-            
+                raise ValueError("Number of rows can't be Zero")
 			
 
     
