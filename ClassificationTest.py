@@ -25,13 +25,13 @@ model=bc.train(file=file_path,target=target,features=None) # function to test Au
 
 model.stats() # function to test metrics analysis
 
-model.spill() #function to test code generation 
+model.spill("./aicodegen.py") #function to test code generation 
 
 model.generate_yaml() #function to test yaml generation
 
 bc.spill("codefile.ipynb","./Process.yaml") #funciton to test yaml generation from specified yaml file
 
-bc.spill("codefile.py","./Process.yaml") #funciton to test yaml generation from specified yaml file
+bc.spill("codefile.py","./Process.yaml",doc=True) #funciton to test yaml generation from specified yaml file
 
 model.plot_feature_importance()# function to plot feature_importance calculate using selectKbest functionality
 
