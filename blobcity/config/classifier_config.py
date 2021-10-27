@@ -128,14 +128,13 @@ class classifier_config:
             xgboost.XGBClassifier,
             {
                 'use_label_encoder':{'bool':[False]},
-                'max_depth': {'int':[3,50]},
+                'max_depth': {'int':[3,20]},
                 'n_estimators': {'int':[100,1000]},
                 'learning_rate': {'float':[1e-3,0.1]},
                 'reg_alpha': {'float':[1e-3,0.1]},
                 'reg_lambda': {'float':[1e-3,0.1]},
                 'booster':{'str':['gbtree', 'gblinear','dart']},
                 'verbosity':{'str':[0]},
-                'n_jobs':{'str':[-1]}
             }
         ],
         "RadiusNeighborsClassifier":[

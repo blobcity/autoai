@@ -17,7 +17,6 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import tensorflow as tf
 import matplotlib.pyplot as plt
 from blobcity.code_gen import code_generator
 import yaml
@@ -41,7 +40,6 @@ class Model:
         self.feature_importance_=dict()
         self.plot_data=None
         
-
     def predict(self,test):
         """
         param1: self
@@ -50,7 +48,12 @@ class Model:
 
         Function returns List/Array for predicted value from the trained model.
         """
-        result=self.model.predict(test)
+        if self.model.__class__.__name__ not in ['XGBClassifier','XGBRegressor']:
+            result=self.model.predict(test)
+        else:
+            import pandas as pd
+            test_df=pd.DataFrame(test, columns=self.featureList)
+            result=self.model.predict(test_df)
         return result
 
     def parameters(self):
@@ -69,42 +72,46 @@ class Model:
         """
         return self.featureList
 
-    def save(self, path_pref='./'):
+    def save(self, model_path=None):
         """
-        param: Path Prefix or Entire Path. Supported formats are .pkl and .h5. Default is .pkl
-        returns: Final filepath of stored serialized file
-
+        param: Entire Path for model pickle file, Supported formats is .pkl.
+        
         Function saves the model and its weights serially and returns the filepath where it is saved.
         """
-        path_components = path_pref.split('.')
-        if len(path_components)<=2:
-            extension = path_components[1]
-        else:
-            extension = path_components[2]
+        if model_path not in [None,""]:
+            path_components = model_path.split('.')
+            if len(path_components)<=2:
+                extension = path_components[1]
+            else:
+                extension = path_components[2]
 
-        if extension == '/':
-            final_path = os.path.join(path_pref, 'autoaimodel.pkl')
-            pickle.dump(self, open(final_path, 'wb'))
-            print("The model is stored at {}".format(final_path))
-            return final_path
-
-        elif extension == 'pkl':
-            final_path = path_pref
-            pickle.dump(self, open(final_path, 'wb'))
-            print("The model is stored at {}".format(final_path))
-            return final_path
-
-        elif extension == 'h5':
-            final_path = path_pref
-            try:
-                self.model.save(final_path)
+            if extension == '/':
+                final_path = os.path.join(model_path, 'autoaimodel.pkl')
+                pickle.dump(self, open(final_path, 'wb'))
                 print("The model is stored at {}".format(final_path))
-                return final_path
-            except:
-                raise TypeError("Your model is not a Keras model of type .h5. Try .pkl extension.")
-
+            elif extension == 'pkl':
+                final_path = model_path
+                pickle.dump(self, open(final_path, 'wb'))
+                print("The model is stored at {}".format(final_path))
+             
+                """ 
+            elif extension == 'h5' or self.yamldata['model']['type'] in ['TF','tf']:
+                model_path = model_path if model_path!="./" else os.path.join(model_path, 'autoaimodel.h5')
+                class_path = model_path if model_path!="./" else os.path.join(model_path, 'autoaimodel.pkl')
+                try:
+                    tfmodel_temp=self.model
+                    self.model.save(model_path)
+                    self.model=None
+                    pickle.dump(self, open(class_path, 'wb'))
+                    self.model=tfmodel_temp
+                    print("The model is stored at {}".format(model_path))
+                    return model_path
+                except:
+                    raise TypeError("Your model is not a Keras model of type .h5. Try .pkl extension.") """  
+            else:
+                raise TypeError(f"{extension} file type must be .pkl")
         else:
-            raise TypeError(f"{extension} file type must be .pkl or .h5")
+            raise ValueError("model_path cant be None or empty string")
 
 
     def stats(self):
@@ -122,8 +129,11 @@ class Model:
 
         Function calls generator functions to generate source code for the AutoAI Procedure
         """
-        data=self.yamldata
-        code_generator(data,filepath,doc)
+        if filepath not in [None,""]:
+            data=self.yamldata
+            code_generator(data,filepath,doc)
+        else:
+            raise ValueError("filepath can't be None or empty string")
 
     def generate_yaml(self,path=None):
         """

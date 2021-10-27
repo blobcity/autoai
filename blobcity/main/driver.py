@@ -20,7 +20,6 @@
 
 import pickle
 import numpy as np
-import tensorflow as tf
 import pandas as pd
 from blobcity.store import DictClass
 from blobcity.utils import getDataFrameType,dataCleaner
@@ -29,8 +28,17 @@ from blobcity.main.modelSelection import model_search
 from blobcity.code_gen import yml_reader,code_generator
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.feature_selection import SelectKBest,f_regression,f_classif
-def train(file=None, df=None, target=None,features=None):
+def train(file=None, df=None, target=None,features=None,accuracy_criteria=0.99):
     """
+    param1: string: dataset file path 
+
+    param2: (optional) pandas.DataFrame object
+
+    param3: string: target/dependent column name.
+
+    param4: float: range[0.1,1.0] 
+
+    return: Model Class Object
     Performs a model search on the data proivded. A yaml file is generated once the best fit model configuration
     is discovered. The yaml file is later used for generating source code. 
 
@@ -52,7 +60,8 @@ def train(file=None, df=None, target=None,features=None):
     else:
         CleanedDF=dataCleaner(dataframe,features,target,dict_class)
     #model search space
-    modelClass = model_search(CleanedDF,target,dict_class)
+    accuracy_criteria= accuracy_criteria if accuracy_criteria<=1.0 else (accuracy_criteria/100)
+    modelClass = model_search(CleanedDF,target,dict_class,use_neural=False,accuracy_criteria=accuracy_criteria)
     #return modelClass object
     modelClass.yamldata=dict_class.getdict()
     modelClass.feature_importance_=dict_class.feature_importance if(features==None) else calculate_feature_importance(CleanedDF.drop(target,axis=1),CleanedDF[target],dict_class)
@@ -65,24 +74,28 @@ def train(file=None, df=None, target=None,features=None):
 # This can be combination of yml and other related artifacts of a trained model
 # Need to see if a h5 file of TensorFlow, and a pickel file for other models can be combined into say a .bcm file for storage
 # .bcm would be a custom format, standing for a BlobCity Model
-def load(modelFile):
+def load(modelFile,h5_path=None):
         """
-        param: (required) the filepath to the stored model. Supports .h5 or .pkl models.
+        param1: string: (required) the filepath to the stored model. Supports .pkl models.
+        param2: string: the filepath to the stored h5 file, provide only if saved h5 file.
         returns: Model file
 
         function loads the serialized model from .pkl or .h5 format to usable format.
         """
         path_components = modelFile.split('.')
-        if len(path_components)<=2:
-            extension = path_components[1]
-        else:
-            extension = path_components[2]
-        
-        if extension == 'pkl':
+        extension = path_components[1] if len(path_components)<=2 else path_components[2]
+         
+        if extension == 'pkl' and h5_path in [None,""]:
             model = pickle.load(open(modelFile, 'rb'))
-        elif extension == 'h5':
-            model = tf.keras.models.load_model(modelFile)
-       
+
+        """ elif os.path.splitext(h5_path)[1] == '.h5' and h5_path!=None:
+            print("pkl path: {}, h5 path : {}".format(os.path.splitext(modelFile),os.path.splitext(h5_path)))
+            if os.path.splitext(h5_path)[0] == os.path.splitext(modelFile)[0]:
+                tfmodel = tf.keras.models.load_model(h5_path)
+                model=pickle.load(open(modelFile, 'rb'))
+                model.model=tfmodel
+            else:
+                raise ValueError("file name for pickle and h5 file should be same") """
         return model
 
 def spill(filepath,yaml_path=None,doc=None):
