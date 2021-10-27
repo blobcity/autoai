@@ -16,13 +16,15 @@
 import os
 import warnings
 import itertools
+import numpy as np
+import pandas as pd
 from math import isnan
-from tqdm import tqdm,tqdm_notebook
+from tqdm import tqdm_notebook
 from blobcity.store import Model
 from blobcity.config import tuner as Tuner
-from blobcity.config import classifier_config,regressor_config
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.model_selection import cross_val_score
+from blobcity.config import classifier_config,regressor_config
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
     warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -58,7 +60,8 @@ def cv_score(model,X,Y,k):
 
     function gets above mentioned argument and uses cross_val_score to calculate average accuracy on specified kfolds
     """
-    accuracy = cross_val_score(model, X, Y, cv = k,n_jobs=-1)
+    n_jobs = 1 if model.__class__.__name__ in ['XGBClassifier','XGBRegressor'] else -1
+    accuracy = cross_val_score(model, X, Y, cv = k,n_jobs=n_jobs)
     return accuracy.mean()
 
 def sort_score(modelScore):
@@ -88,7 +91,14 @@ def train_on_sample_data(dataframe,target,models,DictClass):
     df=dataframe.sample(frac=sample_rate,random_state=123)
     X,Y=df.drop(target,axis=1),df[target]
     k=getKFold(X)
-    modelScore={m:cv_score(models[m][0](),X,Y,k) for m in tqdm_notebook(models)}
+    modelScore={}
+    with tqdm_notebook(total=len(models),desc="Model Search (stage 1 of 3) :", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+        for m in models:
+            if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0)
+            elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
+            else: model=models[m][0]()
+            modelScore[m]=cv_score(model,X,Y,k)
+            pbar.update(1)
     clean_dict = {k: modelScore[k] for k in modelScore if not isnan(modelScore[k])}
     return dict(itertools.islice(sort_score(clean_dict).items(), 5))
 
@@ -105,11 +115,18 @@ def train_on_full_data(dataframe,target,models,best,DictClass):
     """
     X,Y=dataframe.drop(target,axis=1),dataframe[target]
     k=getKFold(X)
-    modelScore={m:cv_score(models[m][0](),X,Y,k) for m in tqdm_notebook(best)}
+    modelScore={}
+    with tqdm_notebook(total=len(best),desc="Model Search (stage 2 of 3) :", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
+        for m in best:
+            if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0)
+            elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
+            else: model=models[m][0]()
+            modelScore[m]=cv_score(model,X,Y,k)
+            pbar.update(1)
     clean_dict = {k: modelScore[k] for k in modelScore if not isnan(modelScore[k])}
     return dict(itertools.islice(sort_score(clean_dict).items(), 1))
 
-def model_search(dataframe,target,DictClass):
+def model_search(dataframe,target,DictClass,use_neural=False,accuracy_criteria=0.99):
     """
     param1: pandas.DataFrame
     param2: string
@@ -131,7 +148,7 @@ def model_search(dataframe,target,DictClass):
         best=train_on_full_data(dataframe,target,modelsList,train_on_sample_data(dataframe,target,modelsList,DictClass),DictClass)
     else:
         best=train_on_full_data(dataframe,target,modelsList,modelsList,DictClass)
-    modelResult = Tuner.tune_model(dataframe,target,best,modelsList,ptype)
+    modelResult = Tuner.tune_model(dataframe,target,best,modelsList,ptype,accuracy=accuracy_criteria)
     modelData=Model()
     modelData.featureList=dataframe.drop(target,axis=1).columns.to_list()
     modelData.model,modelData.params,acc,modelData.metrics,modelData.plot_data = modelResult

@@ -19,6 +19,7 @@ import warnings
 from blobcity.main import modelSelection
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.model_selection import cross_val_score
+from blobcity.utils import Progress
 from sklearn.metrics import r2_score,mean_squared_error,mean_absolute_error,f1_score,precision_score,recall_score,confusion_matrix
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
@@ -28,12 +29,12 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 """
 Python files consist of function to perform parameter tuning using optuna framework
 """
-
 #Early stopping class
 class EarlyStopper():
     iter_stop = 10
     iter_count = 0
     best_score = None
+    criterion = 0.99
 
 def early_stopping_opt(study, trial):
     """
@@ -47,7 +48,7 @@ def early_stopping_opt(study, trial):
 
     """
     if EarlyStopper.best_score == None: EarlyStopper.best_score = study.best_value
-    if study.best_value >= 0.99 : study.stop()
+    if study.best_value >= EarlyStopper.criterion : study.stop()
     if study.best_value > EarlyStopper.best_score:
         EarlyStopper.best_score = study.best_value
         EarlyStopper.iter_count = 0
@@ -59,6 +60,7 @@ def early_stopping_opt(study, trial):
                 EarlyStopper.iter_count = 0
                 EarlyStopper.best_score = None
                 study.stop()
+                
     return
 
 def regression_metrics(y_true,y_pred):
@@ -153,8 +155,11 @@ def objective(trial):
     """
     params=get_params(trial)
     model=modelName(**params)
-    score = cross_val_score(model, X, Y, n_jobs=-1, cv=cv)
+    n_jobs= 1 if model.__class__.__name__ in ['XGBClassifier','XGBRegressor'] else -1
+    score = cross_val_score(model, X, Y, n_jobs=n_jobs, cv=cv)
     accuracy = score.mean()
+    prog.trials=prog.trials-1
+    prog.update_progressbar(1)
     return accuracy   
 
 def prediction_data(y_true,y_pred,ptype):
@@ -172,9 +177,9 @@ def prediction_data(y_true,y_pred,ptype):
         return cm
     else:
         data_pred=[y_true.values,y_pred]
-        return data_pred    
+        return data_pred        
 
-def tune_model(dataframe,target,modelkey,modelList,ptype):
+def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy):
     """
     param1: pandas.DataFrame
     param2: string 
@@ -190,16 +195,22 @@ def tune_model(dataframe,target,modelkey,modelList,ptype):
     global X
     global Y
     global cv
+    global prog
     X,Y=dataframe.drop(target,axis=1),dataframe[target]
     cv=modelSelection.getKFold(X)
     get_param_list(modelkey,modelList)
+    EarlyStopper.criterion=accuracy
     try:
+        prog=Progress()
+        n_jobs= 1 if modelName in ['XGBClassifier','XGBRegressor'] else -1
+        prog.create_progressbar(50)
         study = optuna.create_study(direction="maximize")
-        study.optimize(objective,n_trials=50,n_jobs=-1,callbacks=[early_stopping_opt])
+        study.optimize(objective,n_trials=50,n_jobs=n_jobs,callbacks=[early_stopping_opt])
         model = modelName(**study.best_params).fit(X,Y)
         metric_result=metricResults(Y,model.predict(X),ptype)
         plots=prediction_data(Y,model.predict(X),ptype)
+        prog.update_progressbar(prog.trials)
+        prog.close_progressbar()
         return (model,study.best_params,study.best_value,metric_result,plots)
-        #return (model,study.best_params,study.best_value,metric_result)
     except Exception as e:
         print(e)

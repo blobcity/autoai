@@ -21,6 +21,7 @@ import yaml
 import os
 import nbformat as nbf
 from blobcity.code_gen.PyMeta import PyComments
+from blobcity.code_gen.IpynbMeta import IpynbComments
 from blobcity.code_gen.SourceCodes import SourceCode
 def yml_reader(ymlpath):
     """
@@ -69,14 +70,19 @@ def write_ipynbcode(CGpath,nbs):
     with open(CGpath, 'w') as f:
         nbf.write(nbs, f)
 
-def initialize(key):
+def initialize(key,codes="",nb=None):
     """
     param1: string 
     return: string
     The function initializes code string including problem type comment and generic import statements associated with the problem type.
     """
-    codes=SourceCode.problem[key]+SourceCode.imports[key]
-    return codes
+    if nb!=None:
+        nb['cells'].append(nbf.v4.new_markdown_cell(SourceCode.problem[key]))
+        nb['cells'].append(nbf.v4.new_code_cell(SourceCode.imports[key]))
+        return nb
+    else:
+        codes=SourceCode.problem[key]+SourceCode.imports[key]
+        return codes
 
 def data_read(ymlData,codes="",nb=None,with_doc=False):
     """
@@ -88,7 +94,7 @@ def data_read(ymlData,codes="",nb=None,with_doc=False):
     The function adds code syntax related to data fetching using the panda's library.
     """
     if with_doc and nb!=None:
-        nb['cells'].append(nbf.v4.new_markdown_cell(PyComments.procedure['datafetch'].replace("###","")))
+        nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['datafetch']))
     elif with_doc and codes!="":
         codes=codes+PyComments.procedure['datafetch']
     rtype=ymlData['data_read']['type']
@@ -109,7 +115,7 @@ def features_selection(yml_data,codes="",nb=None,with_doc=False):
     The function adds code syntax related to feature selection using dataframe indexing.
     """
     if with_doc and nb!=None:
-        nb['cells'].append(nbf.v4.new_markdown_cell(PyComments.procedure['x&y'].replace("###","")))
+        nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['x&y']))
     elif with_doc and nb==None:
         codes=codes+PyComments.procedure['x&y']
     
@@ -136,7 +142,7 @@ def cleaning(yml_data,codes="",nb=None,with_doc=False):
     if 'cleaning' in yml_data.keys():
         if 'missingValues' in yml_data['cleaning'].keys():
             if with_doc and nb!=None:
-                nb['cells'].append(nbf.v4.new_markdown_cell(PyComments.procedure['missing'].replace("###","")))
+                nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['missing']))
             elif with_doc and codes!="":
                 codes=codes+PyComments.procedure['missing']
 
@@ -147,7 +153,7 @@ def cleaning(yml_data,codes="",nb=None,with_doc=False):
 
         if 'encode' in yml_data['cleaning'].keys():
             if with_doc and nb!=None:
-                nb['cells'].append(nbf.v4.new_markdown_cell(PyComments.procedure['encoding'].replace("###","")))
+                nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['encoding']))
             elif with_doc and codes!="":
                 codes=codes+PyComments.procedure['encoding']
 
@@ -166,6 +172,21 @@ def cleaning(yml_data,codes="",nb=None,with_doc=False):
     else:
         return nb if nb!=None else codes
 
+def add_corr_matrix(codes="",nb=None,with_doc=False):
+    """
+    param1:string:
+    param2:notebook object:
+    param3:boolean:
+    return: string/notebook object
+    """
+    if with_doc: 
+        if nb!=None: nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['cor_matrix']))
+        else:codes=codes+PyComments.procedure['cor_matrix']
+    if nb!=None and codes=="":
+        nb['cells'].append(nbf.v4.new_code_cell(SourceCode.cor_matrix))
+        return nb
+    else:
+        return codes+SourceCode.cor_matrix
 
 def splits(codes="",nb=None,with_doc=False):
 
@@ -176,7 +197,7 @@ def splits(codes="",nb=None,with_doc=False):
     return: string/notebook object
     """
     if with_doc: 
-        if nb!=None: nb['cells'].append(nbf.v4.new_markdown_cell(PyComments.procedure['datasplit'].replace("###","")))
+        if nb!=None: nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['datasplit']))
         else:codes=codes+PyComments.procedure['datasplit']
     if nb!=None and codes=="":
         nb['cells'].append(nbf.v4.new_code_cell(SourceCode.splits))
@@ -199,12 +220,11 @@ def modeler(yml_data,key,with_doc,codes="",nb=None):
     imports,metaDesc=SourceCode.models[key][yml_data['model']['type']],PyComments.models[key][yml_data['model']['type']]
     
     if nb!=None:
-        nb['cells'][0]['source']=nb['cells'][0]['source']+imports
+        nb['cells'][1]['source']=nb['cells'][1]['source']+imports
         if with_doc:
-            nb['cells'].append(nbf.v4.new_markdown_cell(metaDesc.replace("###","")))
-        
-        nb['cells'].append(nbf.v4.new_code_cell(param))
-        nb['cells'].append(nbf.v4.new_code_cell(model))
+            nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.models[key][yml_data['model']['type']]))
+            
+        nb['cells'].append(nbf.v4.new_code_cell(param+model))
         return nb
     elif codes!="":
         idx = codes.index("warnings.filterwarnings('ignore')")
@@ -224,7 +244,7 @@ def model_metrics(key,codes="",nb=None,with_doc=False):
     on problem type, either classification or regression.
     """
     if with_doc: 
-        if nb!=None: nb['cells'].append(nbf.v4.new_markdown_cell(PyComments.procedure['metrics'].replace("###","")))
+        if nb!=None: nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['metrics']))
         else: codes=codes+PyComments.procedure['metrics']
     if nb!=None and codes=="":
         nb['cells'].append(nbf.v4.new_code_cell(SourceCode.metric[key]))
@@ -243,9 +263,11 @@ def pycoder(yml_data,CGpath,doc=False):
     the code is written into the file using the write_pycode function.
     """
     key=yml_data['problem']['type']
-    codes=data_read(yml_data,codes=initialize(key),with_doc=doc)
+    codes=initialize(key,codes="")
+    codes=data_read(yml_data,codes=codes,with_doc=doc)
     codes=features_selection(yml_data,codes=codes,with_doc=doc)
     codes=cleaning(yml_data,codes=codes,with_doc=doc)
+    codes=add_corr_matrix(codes=codes,with_doc=doc)
     codes=splits(codes=codes,with_doc=doc)
     codes=modeler(yml_data,key,doc,codes=codes)
     codes=model_metrics(key,codes=codes,with_doc=doc)
@@ -263,10 +285,11 @@ def ipynbcoder(yml_data,CGpath,doc=True):
     """
     nb = nbf.v4.new_notebook()
     key=yml_data['problem']['type']
-    nb['cells'].append(nbf.v4.new_code_cell(initialize(key)))
+    nb=initialize(key,nb=nb)
     nb=data_read(yml_data,nb=nb,with_doc=doc)
     nb=features_selection(yml_data,nb=nb,with_doc=doc) 
     nb=cleaning(yml_data,nb=nb,with_doc=doc)
+    nb=add_corr_matrix(nb=nb,with_doc=doc)
     nb=splits(nb=nb,with_doc=doc)
     nb=modeler(yml_data,key,doc,nb=nb) 
     nb=model_metrics(key,nb=nb,with_doc=doc)

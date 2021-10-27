@@ -220,7 +220,6 @@ class regressor_config:
                 "booster":{'str':['gbtree', 'gblinear', 'dart']},
                 'reg_alpha': {'float':[1e-3,0.1]},
                 'reg_lambda': {'float':[1e-3,0.1]},
-                'n_jobs':{'str':[-1]},
                 'verbosity':{'str':[0]},
             }
         ], 
