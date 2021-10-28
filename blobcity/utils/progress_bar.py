@@ -26,6 +26,10 @@ class Progress():
         self.pbar=None
 
     def isnotebook(self):
+        """
+        return: boolean
+        Function to identify type of python utilized either ipython or Python
+        """
         try:
             from IPython import get_ipython
             shell = get_ipython().__class__.__name__
