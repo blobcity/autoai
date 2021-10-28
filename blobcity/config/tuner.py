@@ -48,7 +48,9 @@ def early_stopping_opt(study, trial):
 
     """
     if EarlyStopper.best_score == None: EarlyStopper.best_score = study.best_value
-    if study.best_value >= EarlyStopper.criterion : study.stop()
+    if study.best_value >= EarlyStopper.criterion : 
+        study.stop()
+        print("early stop")
     if study.best_value > EarlyStopper.best_score:
         EarlyStopper.best_score = study.best_value
         EarlyStopper.iter_count = 0
@@ -202,7 +204,7 @@ def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy):
     EarlyStopper.criterion=accuracy
     try:
         prog=Progress()
-        n_jobs= 1 if modelName in ['XGBClassifier','XGBRegressor'] else -1
+        n_jobs= 1 if modelName().__class__.__name__ in ['XGBClassifier','XGBRegressor'] else -1
         prog.create_progressbar(50)
         study = optuna.create_study(direction="maximize")
         study.optimize(objective,n_trials=50,n_jobs=n_jobs,callbacks=[early_stopping_opt])
