@@ -93,7 +93,7 @@ def train_on_sample_data(dataframe,target,models,DictClass,prog):
     X,Y=df.drop(target,axis=1),df[target]
     k=getKFold(X)
     modelScore={}
-    prog.create_progressbar(len(models),"Model Search (Stage 1 of 3) :")
+    prog.create_progressbar(len(models),"Quick Search (Stage 1 of 3) :")
     for m in models:
         if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0)
         elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
@@ -120,7 +120,7 @@ def train_on_full_data(dataframe,target,models,best,DictClass,prog):
     X,Y=dataframe.drop(target,axis=1),dataframe[target]
     k=getKFold(X)
     modelScore={}
-    prog.create_progressbar(len(best),"Model Search (Stage 2 of 3) :")
+    prog.create_progressbar(len(best),"Deep Search (Stage 2 of 3) :")
     for m in best:
         if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0)
         elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
