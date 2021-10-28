@@ -48,9 +48,7 @@ def early_stopping_opt(study, trial):
 
     """
     if EarlyStopper.best_score == None: EarlyStopper.best_score = study.best_value
-    if study.best_value >= EarlyStopper.criterion : 
-        study.stop()
-        print("early stop")
+    if study.best_value >= EarlyStopper.criterion : study.stop()
     if study.best_value > EarlyStopper.best_score:
         EarlyStopper.best_score = study.best_value
         EarlyStopper.iter_count = 0
