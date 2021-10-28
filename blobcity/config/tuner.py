@@ -203,7 +203,7 @@ def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy):
     try:
         prog=Progress()
         n_jobs= 1 if modelName().__class__.__name__ in ['XGBClassifier','XGBRegressor'] else -1
-        prog.create_progressbar(50)
+        prog.create_progressbar(50,"Model Tuning (Stage 3 of 3) :")
         study = optuna.create_study(direction="maximize")
         study.optimize(objective,n_trials=50,n_jobs=n_jobs,callbacks=[early_stopping_opt])
         model = modelName(**study.best_params).fit(X,Y)

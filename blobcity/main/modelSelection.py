@@ -21,6 +21,7 @@ import pandas as pd
 from math import isnan
 from tqdm import tqdm_notebook
 from blobcity.store import Model
+from blobcity.utils import Progress 
 from blobcity.config import tuner as Tuner
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.model_selection import cross_val_score
@@ -74,7 +75,7 @@ def sort_score(modelScore):
     sorted_dict=dict(sorted(modelScore.items(), key=lambda item: item[1],reverse=True))
     return sorted_dict
 
-def train_on_sample_data(dataframe,target,models,DictClass):
+def train_on_sample_data(dataframe,target,models,DictClass,prog):
     """
     param1: pandas.DataFrame
     param2: string
@@ -92,17 +93,20 @@ def train_on_sample_data(dataframe,target,models,DictClass):
     X,Y=df.drop(target,axis=1),df[target]
     k=getKFold(X)
     modelScore={}
-    with tqdm_notebook(total=len(models),desc="Model Search (stage 1 of 3) :", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-        for m in models:
-            if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0)
-            elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
-            else: model=models[m][0]()
-            modelScore[m]=cv_score(model,X,Y,k)
-            pbar.update(1)
+    prog.create_progressbar(len(models),"Model Search (Stage 1 of 3) :")
+    for m in models:
+        if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0)
+        elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
+        else: model=models[m][0]()
+        modelScore[m]=cv_score(model,X,Y,k)
+        prog.trials=prog.trials-1
+        prog.update_progressbar(1)
+    prog.update_progressbar(prog.trials)
+    prog.close_progressbar()
     clean_dict = {k: modelScore[k] for k in modelScore if not isnan(modelScore[k])}
     return dict(itertools.islice(sort_score(clean_dict).items(), 5))
 
-def train_on_full_data(dataframe,target,models,best,DictClass):
+def train_on_full_data(dataframe,target,models,best,DictClass,prog):
     """
     param1: pandas.DataFrame
     param2: string
@@ -116,13 +120,16 @@ def train_on_full_data(dataframe,target,models,best,DictClass):
     X,Y=dataframe.drop(target,axis=1),dataframe[target]
     k=getKFold(X)
     modelScore={}
-    with tqdm_notebook(total=len(best),desc="Model Search (stage 2 of 3) :", bar_format="{l_bar}{bar} [ time left: {remaining} ]") as pbar:
-        for m in best:
-            if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0)
-            elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
-            else: model=models[m][0]()
-            modelScore[m]=cv_score(model,X,Y,k)
-            pbar.update(1)
+    prog.create_progressbar(len(best),"Model Search (Stage 2 of 3) :")
+    for m in best:
+        if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0)
+        elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
+        else: model=models[m][0]()
+        modelScore[m]=cv_score(model,X,Y,k)
+        prog.trials=prog.trials-1
+        prog.update_progressbar(1)
+    prog.update_progressbar(prog.trials)
+    prog.close_progressbar()
     clean_dict = {k: modelScore[k] for k in modelScore if not isnan(modelScore[k])}
     return dict(itertools.islice(sort_score(clean_dict).items(), 1))
 
@@ -142,12 +149,13 @@ def model_search(dataframe,target,DictClass,use_neural=False,accuracy_criteria=0
     Then update YAML dictionary with appropriate model details such has selected type and parameters.
     Function finally return a model class object.
     """
+    prog=Progress()
     ptype=DictClass.getdict()['problem']["type"]
     modelsList=classifier_config().models if ptype=="Classification" else regressor_config().models
     if dataframe.shape[0]>500:
-        best=train_on_full_data(dataframe,target,modelsList,train_on_sample_data(dataframe,target,modelsList,DictClass),DictClass)
+        best=train_on_full_data(dataframe,target,modelsList,train_on_sample_data(dataframe,target,modelsList,DictClass,prog),DictClass,prog)
     else:
-        best=train_on_full_data(dataframe,target,modelsList,modelsList,DictClass)
+        best=train_on_full_data(dataframe,target,modelsList,modelsList,DictClass,prog)
     modelResult = Tuner.tune_model(dataframe,target,best,modelsList,ptype,accuracy=accuracy_criteria)
     modelData=Model()
     modelData.featureList=dataframe.drop(target,axis=1).columns.to_list()
