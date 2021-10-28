@@ -19,9 +19,8 @@ import itertools
 import numpy as np
 import pandas as pd
 from math import isnan
-from tqdm import tqdm_notebook
 from blobcity.store import Model
-from blobcity.utils import Progress 
+from blobcity.utils import Progress
 from blobcity.config import tuner as Tuner
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.model_selection import cross_val_score
@@ -30,7 +29,6 @@ with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     os.environ["PYTHONWARNINGS"] = "ignore"
-
 """
 This python file consists of function to get best performing model for a given dataset.
 """
@@ -93,7 +91,7 @@ def train_on_sample_data(dataframe,target,models,DictClass,prog):
     X,Y=df.drop(target,axis=1),df[target]
     k=getKFold(X)
     modelScore={}
-    prog.create_progressbar(len(models),"Model Search (Stage 1 of 3) :")
+    prog.create_progressbar(len(models),"Quick Search (Stage 1 of 3) :")
     for m in models:
         if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0)
         elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
@@ -120,7 +118,7 @@ def train_on_full_data(dataframe,target,models,best,DictClass,prog):
     X,Y=dataframe.drop(target,axis=1),dataframe[target]
     k=getKFold(X)
     modelScore={}
-    prog.create_progressbar(len(best),"Model Search (Stage 2 of 3) :")
+    prog.create_progressbar(len(best),"Deep Search (Stage 2 of 3) :")
     for m in best:
         if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0)
         elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
