@@ -13,10 +13,6 @@
 # limitations under the License.
 
 
-# Takes data frame, and target only. 
-# Should do automatic feature selection
-# Should return a trained model
-# Should output progress, in an interactive manner while training is in progress
 
 import pickle
 import numpy as np
@@ -62,18 +58,11 @@ def train(file=None, df=None, target=None,features=None,accuracy_criteria=0.99):
     #model search space
     accuracy_criteria= accuracy_criteria if accuracy_criteria<=1.0 else (accuracy_criteria/100)
     modelClass = model_search(CleanedDF,target,dict_class,use_neural=False,accuracy_criteria=accuracy_criteria)
-    #return modelClass object
     modelClass.yamldata=dict_class.getdict()
     modelClass.feature_importance_=dict_class.feature_importance if(features==None) else calculate_feature_importance(CleanedDF.drop(target,axis=1),CleanedDF[target],dict_class)
     dict_class.resetVar()
     return modelClass
-# Performs an automated model training. 
 
-
-# Reads a BlobCity published model file, and loads it into memory.
-# This can be combination of yml and other related artifacts of a trained model
-# Need to see if a h5 file of TensorFlow, and a pickel file for other models can be combined into say a .bcm file for storage
-# .bcm would be a custom format, standing for a BlobCity Model
 def load(modelFile,h5_path=None):
         """
         param1: string: (required) the filepath to the stored model. Supports .pkl models.

@@ -19,9 +19,8 @@ import itertools
 import numpy as np
 import pandas as pd
 from math import isnan
-from tqdm import tqdm_notebook
 from blobcity.store import Model
-from blobcity.utils import Progress 
+from blobcity.utils import Progress
 from blobcity.config import tuner as Tuner
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.model_selection import cross_val_score
@@ -30,7 +29,6 @@ with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     os.environ["PYTHONWARNINGS"] = "ignore"
-
 """
 This python file consists of function to get best performing model for a given dataset.
 """
