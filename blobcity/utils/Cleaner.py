@@ -37,6 +37,7 @@ def dataCleaner(df,features,target,DictionaryClass):
 
     working:
     First the function identifies the problem type that is either regression or classification using ProType Class and its function checkType.
+    For the Complete dataframe if any rows has more then 50% null values or missing values we will drop it.
     For the Complete dataframe if any columns has more then equal to 80% null missing values we will drop it to avoid any noise or sequed data imputation.
     Then check whether the dataframe has any null values. 
     if TRUE then : get all the columns names with null/missing values.
@@ -49,9 +50,9 @@ def dataCleaner(df,features,target,DictionaryClass):
     
     updateddf=df[features].copy(deep=True)
     updateddf[target]=df[target].copy(deep=True)
+    updateddf=RemoveRowsWithHighNans(updateddf)
     updateddf=RemoveHighNullValues(updateddf)
-    updateddf=dropUniqueColumn(updateddf)
-
+    updateddf=dropUniqueColumn(updateddf,target)
     if updateddf.isnull().values.any(): 
         cols=updateddf.columns[updateddf.isnull().any()].tolist()
         for i in cols:
@@ -66,7 +67,7 @@ def dataCleaner(df,features,target,DictionaryClass):
 
     return EncoderResult
 
-def dropUniqueColumn(X_values):
+def dropUniqueColumn(X_values,target):
     """
         param1: pandas.DataFrame 
         return : pandas.DataFrame
@@ -77,7 +78,7 @@ def dropUniqueColumn(X_values):
     """    
     row_counts = len(X_values)
     for i in X_values.columns.to_list():
-        if len(X_values[i].unique())==row_counts:
+        if len(X_values[i].unique())==row_counts and i!=target:
             X_values.drop(i, axis=1, inplace=True)
     return X_values
 
@@ -168,3 +169,16 @@ def objectTypes(X,DictionaryClass):
         DictionaryClass.ObjectList= gd['object'].to_list()  
     else:
         DictionaryClass.ObjectExist= False
+
+def RemoveRowsWithHighNans(dataframe):
+    """
+    param1: pandas.DataFrame
+    return: pandas.DataFrame
+
+    Function delete rows containing more than 50% NaN Values
+    """
+    percent = 50.0
+    min_count = int(((100-percent)/100)*dataframe.shape[1] + 1)
+    dataframe = dataframe.dropna( axis=0, 
+                    thresh=min_count)
+    return dataframe

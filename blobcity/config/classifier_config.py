@@ -71,7 +71,8 @@ class classifier_config:
                 "criterion":{'str':['gini','entropy']},
                 "n_estimators":{'int':[100,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
-                "max_depth":{'int':[3,50]}
+                "max_depth":{'int':[3,50]},
+                'n_jobs':{'str':[-1]}
             }
         ],
         "ExtraTreesClassifier":[
@@ -80,7 +81,8 @@ class classifier_config:
                 "criterion":{'str':['gini','entropy']},
                 "n_estimators":{'int':[100,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
-                "max_depth":{'int':[3,50]}
+                "max_depth":{'int':[3,50]},
+                'n_jobs':{'str':[-1]}
             }
         ],
         "GradientBoostingClassifier":[
@@ -101,7 +103,7 @@ class classifier_config:
                 'tol':{'float':[1e-3,0.1]},
                 "C":{"int":[1,3]},
                 "solver":{'str':['newton-cg','liblinear','lbfgs', 'sag', 'saga']},
-
+                'n_jobs':{'str':[-1]}
             }
         ],
         "RidgeClassifier":[
@@ -127,12 +129,13 @@ class classifier_config:
             xgboost.XGBClassifier,
             {
                 'use_label_encoder':{'bool':[False]},
-                'max_depth': {'int':[3,50]},
+                'max_depth': {'int':[3,20]},
                 'n_estimators': {'int':[100,1000]},
                 'learning_rate': {'float':[1e-3,0.1]},
-                'reg_alpha': {'int':[1, 1.5]},
-                'reg_lambda': {'int':[1, 1.5]},
-                'booster':{'str':['gbtree', 'gblinear','dart']}
+                'reg_alpha': {'float':[1e-3,0.1]},
+                'reg_lambda': {'float':[1e-3,0.1]},
+                'booster':{'str':['gbtree', 'gblinear','dart']},
+                'verbosity':{'str':[0]},
             }
         ],
         "RadiusNeighborsClassifier":[
@@ -193,6 +196,7 @@ class classifier_config:
                 "eta0":{'float':[0.0, 0.1]},
                 "power_t":{'float':[0.01, 0.5]},
                 "epsilon":{'float':[1e-8, 0.1]},
+                'n_jobs':{'str':[-1]}
             }
         ],
         "CategoricalNB":[
@@ -202,6 +206,23 @@ class classifier_config:
                 "fit_prior":{'bool':[True,False]},
             }
         ],
+        "MultinomialNB":[
+            naive_bayes.MultinomialNB,
+            {
+                "alpha":{'float':[1e-2,1.0]},
+                "fit_prior":{'bool':[True,False]},
+            }
+        ],
+        "Perceptron":[
+            linear_model.Perceptron,
+            {
+                "penalty":{"str":['l1','l2','elasticnet']},
+                "alpha":{'float':[1e-4,1.0]},
+                "l1_ratio":{'float':[1e-2,1.0]},
+                "tol":{'float':[1e-3,0.1]},
+                'n_jobs':{'str':[-1]}
+            }
+        ],
         "lgbm":[
             lgbm.LGBMClassifier,
             {
@@ -209,6 +230,7 @@ class classifier_config:
                 "max_depth":{'int':[3,50]}
             }
         ]
+
 
     }
 

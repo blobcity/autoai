@@ -35,10 +35,11 @@ class ProType:
          2. else check if it is integer or float type with less then equal to 100 classes then return Classification 
             else return Regression as the ProblemType
         """
-        if(data.dtype in ['object']): return dict({'type':'Classification'})
+        if(data.dtype in ['object']): 
+            return dict({'type':'Classification'})
         else:
-            target_length =len(np.unique(data))
-            if data.dtype in ['int64','float64','int32','float32','int16','float16'] and target_length<=10: 
+            target_length=data.nunique(dropna=False)
+            if data.dtype in ['int64','float64','int32','float32','int16','float16'] and target_length<=20:
                 return dict({'type':'Classification'})
-            else: 
+            else:
                 return dict({'type':'Regression'})
