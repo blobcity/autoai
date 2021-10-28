@@ -227,7 +227,11 @@ class classifier_config:
             lgbm.LGBMClassifier,
             {
                 "n_estimators":{'int':[100,1000]},
-                "max_depth":{'int':[3,50]}
+                "learning_rate":{'float':[1e-3,0.1]},
+                "reg_alpha":{'float':[1e-3,0.1]},
+                "reg_lambda":{'float':[1e-3,0.1]},
+                "max_depth":{'int':[3,50]},
+                'n_jobs':{'str':[-1]}
             }
         ]
 
