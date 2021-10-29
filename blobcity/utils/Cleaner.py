@@ -25,7 +25,7 @@ from blobcity.utils.ProblemType import ProType
 import warnings
 warnings.filterwarnings("ignore")
 
-def dataCleaner(df,features,target,DictionaryClass):
+def dataCleaner(df,features,target,DictionaryClass=None):
     """
     Funciton to check null occurances and handles other functions.
 
@@ -46,10 +46,9 @@ def dataCleaner(df,features,target,DictionaryClass):
     """
     problemtype=ProType()
     missingdict=dict()
-    DictionaryClass.addKeyValue('problem',problemtype.checkType(df[target]))
-    
+    if DictionaryClass!=None:DictionaryClass.addKeyValue('problem',problemtype.checkType(df[target]))
     updateddf=df[features].copy(deep=True)
-    updateddf[target]=df[target].copy(deep=True)
+    if target in df.columns.to_list(): updateddf[target]=df[target].copy(deep=True)
     updateddf=RemoveRowsWithHighNans(updateddf)
     updateddf=RemoveHighNullValues(updateddf)
     updateddf=dropUniqueColumn(updateddf,target)
@@ -57,13 +56,12 @@ def dataCleaner(df,features,target,DictionaryClass):
         cols=updateddf.columns[updateddf.isnull().any()].tolist()
         for i in cols:
             Cleaner(updateddf,i,missingdict)
-        DictionaryClass.addKeyValue('cleaning',{'missingValues':missingdict})
+        if DictionaryClass!=None:DictionaryClass.addKeyValue('cleaning',{'missingValues':missingdict})
 
     X_values,Y_value=updateddf.drop(target,axis=1),updateddf[target]
-
-    EncoderResult=Encoder(DictionaryClass,X_values,Y_value,target)
-
-    DictionaryClass.addKeyValue('features',{'X_values':X_values.columns.to_list(),'Y_values':target})
+    if target in updateddf.columns.to_list():EncoderResult=Encoder(DictionaryClass,X_values,Y_value,target)
+    else:EncoderResult=Encoder(DictionaryClass,X_values,None,target)
+    if DictionaryClass!=None:DictionaryClass.addKeyValue('features',{'X_values':X_values.columns.to_list(),'Y_values':target})
 
     return EncoderResult
 
@@ -89,7 +87,7 @@ def RemoveHighNullValues(dataframe):
 
     Function drops any feature with more then 80% of Null Values and return the Dataframe
     """
-    thresh = len(dataframe) * .2
+    thresh = len(dataframe) * .5
     dataframe.dropna(thresh = thresh, axis = 1, inplace = True)
     return dataframe
 
@@ -116,7 +114,7 @@ def Cleaner(df,i,missingdict):
         df[i].fillna(df[i].mode()[0],inplace=True)
         missingdict[i]="mode"
 
-def Encoder(DictionaryClass,X,Y,target):
+def Encoder(DictionaryClass,X,Y=None,target=""):
     """
     Function to Encode categorical data from the feature set and target sets.
     
@@ -140,12 +138,16 @@ def Encoder(DictionaryClass,X,Y,target):
             objectTypes(X,DictionaryClass)
             X=pd.get_dummies(X)
             encode['X']='OneHotEncode' 
-        if(Y.dtype=="object" ):
-            encode['Y']='LabelEncoder' 
-            Y=LabelEncoder().fit_transform(Y)
         dataframe=X.copy(deep=True)
+        if(Y.dtype=="object"):
+            encode['Y']='LabelEncoder' 
+            original_labels=np.sort(pd.unique(Y), axis=-1, kind='mergesort')
+            Y=LabelEncoder().fit_transform(Y)
+            encoded_label=[xi for xi in range(len(original_labels))]
+            encodes={encoded_label[i]:original_labels[i] for i in range(len(original_labels))}
+            if DictionaryClass!=None:DictionaryClass.original_label=encodes
         dataframe[target]=Y
-        DictionaryClass.UpdateNestedKeyValue('cleaning','encode',encode)
+        if DictionaryClass!=None:DictionaryClass.UpdateNestedKeyValue('cleaning','encode',encode)
         return dataframe
     else:
         dataframe=X.copy(deep=True)
@@ -165,10 +167,11 @@ def objectTypes(X,DictionaryClass):
     g = X.columns.to_series().groupby(X.dtypes).groups
     gd={k.name: v for k, v in g.items()}
     if 'object' in gd.keys():
-        DictionaryClass.ObjectExist=True
-        DictionaryClass.ObjectList= gd['object'].to_list()  
+        if DictionaryClass!=None:
+            DictionaryClass.ObjectExist=True
+            DictionaryClass.ObjectList= gd['object'].to_list()  
     else:
-        DictionaryClass.ObjectExist= False
+        if DictionaryClass!=None:DictionaryClass.ObjectExist= False
 
 def RemoveRowsWithHighNans(dataframe):
     """

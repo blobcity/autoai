@@ -59,7 +59,7 @@ def cv_score(model,X,Y,k):
 
     function gets above mentioned argument and uses cross_val_score to calculate average accuracy on specified kfolds
     """
-    n_jobs = 1 if model.__class__.__name__ in ['XGBClassifier','XGBRegressor'] else -1
+    n_jobs = 1 if model.__class__.__name__ in ['XGBClassifier','XGBRegressor','LGBMRegressor','LGBMClassifier','CatBoostRegressor','CatBoostClassifier'] else -1
     accuracy = cross_val_score(model, X, Y, cv = k,n_jobs=n_jobs)
     return accuracy.mean()
 
@@ -156,6 +156,7 @@ def model_search(dataframe,target,DictClass,use_neural=False,accuracy_criteria=0
         best=train_on_full_data(dataframe,target,modelsList,modelsList,DictClass,prog)
     modelResult = Tuner.tune_model(dataframe,target,best,modelsList,ptype,accuracy=accuracy_criteria)
     modelData=Model()
+    if ptype=="Classification":modelData.target_encode=DictClass.get_encoded_label()
     modelData.featureList=dataframe.drop(target,axis=1).columns.to_list()
     modelData.model,modelData.params,acc,modelData.metrics,modelData.plot_data = modelResult
     DictClass.addKeyValue('model',{'type': modelData.model.__class__.__name__})

@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pickle
 import os
+import pickle
 import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from blobcity.code_gen import code_generator
@@ -30,6 +30,7 @@ class Model:
     metrics=dict()
     yamldata=None
     feature_importance_=dict()
+    target_encode=dict()
     plot_data=None
     def __init__(self):
         self.params=dict()
@@ -39,22 +40,60 @@ class Model:
         self.yamldata=None
         self.feature_importance_=dict()
         self.plot_data=None
+        self.target_encode=dict()
+    
+    def __quick_clean(self,test_dataframe):
+        """
+        """
+        cols=test_dataframe.columns.to_list()
+        for i in cols:
+            if(isinstance(test_dataframe[i], pd.Series) and (test_dataframe[i].dtype in ["float64","int64","float","int"])):
+                if(len(np.unique(test_dataframe[i]))<=3):
+                    test_dataframe[i].fillna(test_dataframe[i].mode()[0],inplace=True)
+                else:
+                    test_dataframe[i].fillna(test_dataframe[i].mean(),inplace=True)
+            elif(isinstance(test_dataframe[i], pd.Series)):
+                test_dataframe[i].fillna(test_dataframe[i].mode()[0],inplace=True)
+        if "object" in test_dataframe.dtypes.to_list():
+            test_dataframe=pd.get_dummies(test_dataframe)
+        return test_dataframe
         
-    def predict(self,test):
+    def predict(self,test,return_type="list",path=""):
         """
         param1: self
-        param2: 2D Array
-        return: List/Array
+        param2: pd.DataFrame
+        param3: string : either list or pd.DataFrame to return 
+        param4: string : file to store output pd.DataFrame
+        return: List/pd.DataFrame
 
         Function returns List/Array for predicted value from the trained model.
         """
+        if isinstance(test,pd.DataFrame):
+            test=Model().__quick_clean(test[self.yamldata['features']['X_values']])
+
         if self.model.__class__.__name__ not in ['XGBClassifier','XGBRegressor']:
             result=self.model.predict(test)
         else:
-            import pandas as pd
-            test_df=pd.DataFrame(test, columns=self.featureList)
-            result=self.model.predict(test_df)
-        return result
+            if type(test)=="list":
+                test_df=pd.DataFrame(test, columns=self.featureList)
+                result=self.model.predict(test_df)  
+            else:
+                result=self.model.predict(test) 
+            
+        if self.yamldata['problem']["type"]=='Classification':
+            main_result=[]
+            for i in range(len(result)):
+                for k in self.target_encode.keys():
+                    if k == result[i]:
+                        main_result.append(self.target_encode[k])
+            result= main_result 
+        
+        result_dataframe=test.copy(deep=True)
+        result_dataframe['prediction']=result
+        
+        if path!="":result_dataframe.to_csv(path)
+        if return_type=="list": return result
+        elif return_type=="df" and isinstance(test,pd.DataFrame):return result_dataframe
 
     def parameters(self):
         """
@@ -185,15 +224,16 @@ class Model:
 
         Function plots either confusion matrix or regression plot(line plot comparing true and predicted values) based on problem type.
         """
+        
         problem=self.yamldata['problem']["type"]
         if problem=='Classification':
-            #plot confusion matrix
+            targets=self.target_encode.values()
             cf_matrix=self.plot_data
             group_counts = ['{0:0.0f}'.format(value) for value in cf_matrix.flatten()]
             group_percentages = ["{0:.2%}".format(value) for value in cf_matrix.flatten()/np.sum(cf_matrix)]
             labels = [f'{v1}\n\n{v2}' for v1, v2 in zip(group_counts,group_percentages)]
             labels = np.asarray(labels).reshape(cf_matrix.shape[0],cf_matrix.shape[0])
-            sns.heatmap(cf_matrix, annot=labels, fmt='', cmap='Blues')
+            sns.heatmap(cf_matrix, annot=labels, fmt='',xticklabels=targets,yticklabels=targets,cmap='Blues')
             plt.show()
         elif problem=="Regression":
             #plot for regression problem
