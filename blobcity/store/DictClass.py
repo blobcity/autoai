@@ -23,11 +23,20 @@ class DictClass:
     ObjectExist= False
     ObjectList=None
     feature_importance=dict()
+    original_label=dict()
     def __int__(self):
         self.ObjectExist=False
         self.ObjectList=None
         self.YAML={}
         self.feature_importance=dict()
+        self.original_label=dict()
+
+    def get_encoded_label(self):
+        """
+        return: Dictionary
+        Function returns dictionary of encoded label to orignal label mapping
+        """
+        return self.original_label
     def addKeyValue(self, key,value):
         """
         param1:Class reference/Class object 
@@ -83,4 +92,5 @@ class DictClass:
         self.ObjectList=None
         self.YAML={}
         self.feature_importance={}
+        self.original_label=dict()
     
