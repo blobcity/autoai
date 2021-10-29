@@ -52,9 +52,9 @@ class Progress():
         """
         self.trials=n_counters
         if Progress().isnotebook():
-            self.pbar=tqdm_notebook(total=n_counters, desc=desc, bar_format="{l_bar}{bar} [ time left: {remaining} ]")
+            self.pbar=tqdm_notebook(total=n_counters,desc=desc, bar_format="{l_bar}{bar} [elapsed: {elapsed}< remaining:{remaining}]")
         else:
-            self.pbar=tqdm(total=n_counters, desc=desc, bar_format="{l_bar}{bar} [ time left: {remaining} ]")
+            self.pbar=tqdm(total=n_counters, desc=desc, bar_format="{l_bar}{bar} [elapsed: {elapsed}< remaining:{remaining}]")
     
     def update_progressbar(self,i):
         """

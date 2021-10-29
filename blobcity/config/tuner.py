@@ -155,7 +155,7 @@ def objective(trial):
     """
     params=get_params(trial)
     model=modelName(**params)
-    n_jobs= 1 if model.__class__.__name__ in ['XGBClassifier','XGBRegressor'] else -1
+    n_jobs= 1 if model.__class__.__name__ in ['XGBClassifier','XGBRegressor','LGBMRegressor','LGBMClassifier','CatBoostRegressor','CatBoostClassifier'] else -1
     score = cross_val_score(model, X, Y, n_jobs=n_jobs, cv=cv)
     accuracy = score.mean()
     prog.trials=prog.trials-1
@@ -200,12 +200,13 @@ def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy):
     cv=modelSelection.getKFold(X)
     get_param_list(modelkey,modelList)
     EarlyStopper.criterion=accuracy
+    n_trials=50
     try:
         prog=Progress()
-        n_jobs= 1 if modelName().__class__.__name__ in ['XGBClassifier','XGBRegressor'] else -1
-        prog.create_progressbar(50,"Model Tuning (Stage 3 of 3) :")
+        n_jobs= 1 if modelName().__class__.__name__ in ['XGBClassifier','XGBRegressor','LGBMRegressor','LGBMClassifier','CatBoostRegressor','CatBoostClassifier'] else -1
+        prog.create_progressbar(n_trials,"Model Tuning (Stage 3 of 3) :")
         study = optuna.create_study(direction="maximize")
-        study.optimize(objective,n_trials=50,n_jobs=n_jobs,callbacks=[early_stopping_opt])
+        study.optimize(objective,n_trials=n_trials,n_jobs=n_jobs,callbacks=[early_stopping_opt])
         model = modelName(**study.best_params).fit(X,Y)
         metric_result=metricResults(Y,model.predict(X),ptype)
         plots=prediction_data(Y,model.predict(X),ptype)

@@ -223,35 +223,12 @@ class regressor_config:
                 'verbosity':{'str':[0]},
             }
         ], 
-        "CatBoostRegressor":[
-            CatBoostRegressor,
-            {
-                "learning_rate": {'float':[1e-3,0.1]},
-                "l2_leaf_reg":{'float':[1e-3, 1.0]},
-                "bootstrap_type":{'str':['Bayesian', 'Bernoulli', 'MVS', 'No']},
-                "loss_function":{'str': ["RMSE", "MultiRMSE", "MAE", "Poisson"]},
-                "iterations":{'int':[500, 5000]},
-                "max_depth":{'int':[3,16]},
-                "verbose":{'bool':[False]},
-            }
-        ],
         "GammaRegressor":[
             linear_model.GammaRegressor,
             {
                 "alpha":{'float':[1e-4,1.0]},
                 "max_iter":{'int':[1000,10000]},
                 "tol":{'float':[1e-3,0.1]},
-            }
-        ],
-        "LGBMRegressor":[
-            LGBMRegressor,
-            {
-                "boosting_type":{'str':['gbdt', 'dart', 'goss','rf']},
-                "num_leaves":{'int':[31, 100]},
-                "learning_rate":{'float':[1e-3,0.1]},
-                "n_estimators":{'int':[100, 500]},
-                "min_child_weight":{'float':[1e-3,0.1]},
-                'subsample_freq':{'int':[1,10]}
             }
         ],
         "RadiusNeighborsRegressor":[
@@ -263,6 +240,30 @@ class regressor_config:
                 "leaf_size":{'int':[10,50]},
                 "p":{'int':[1,2]},
                 "metric":{'str':['euclidean', 'manhattan', 'chebyshev', 'minkowski']}
+            }
+        ],
+        "LGBMRegressor":[
+            LGBMRegressor,
+            {
+                "boosting_type":{'str':['gbdt', 'dart','rf']},
+                "num_leaves":{'int':[5, 30]},
+                "learning_rate":{'float':[1e-4,1e-2]},
+                "max_depth":{'int':[3,16]},
+                "n_estimators":{'int':[100, 1000]},
+                'bagging_fraction':{'float':[0.1,0.9]},
+                'subsample_freq':{'int':[5,10]},
+                'verbose':{'bool':[-1]},
+            }
+        ],
+        "CatBoostRegressor":[
+            CatBoostRegressor,
+            {
+                "learning_rate": {'float':[1e-3,1e-2]},
+                "l2_leaf_reg":{'float':[1e-3, 1.0]},
+                "loss_function":{'str': ["RMSE", "MultiRMSE"]},
+                "iterations":{'int':[200, 1000]},
+                "max_depth":{'int':[3,16]},
+                "verbose":{'bool':[False]},
             }
         ],
         "PassiveAggressiveRegressor":[
