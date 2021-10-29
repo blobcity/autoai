@@ -221,6 +221,13 @@ class classifier_config:
                 "tol":{'float':[1e-3,0.1]},
                 'n_jobs':{'str':[-1]}
             }
+        ],
+        "OrthogonalMatchingPursuit":[
+            linear_model.OrthogonalMatchingPursuit,
+            {
+                "tol":{"float":[1e-3,0.1]},
+                "fit_intercept":{'bool':[True,False]}
+            }
         ]
     }
 
