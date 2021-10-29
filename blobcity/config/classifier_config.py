@@ -231,7 +231,7 @@ class classifier_config:
                 "reg_alpha":{'float':[1e-3,0.1]},
                 "reg_lambda":{'float':[1e-3,0.1]},
                 "max_depth":{'int':[3,50]},
-                'n_jobs':{'str':[-1]}
+                'n_jobs':{'str':[-1]},
                 "boosting_type":{'str':['gbdt','dart','goss','rf']}
             }
         ]
