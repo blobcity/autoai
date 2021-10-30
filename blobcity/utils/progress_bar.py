@@ -14,7 +14,7 @@
 
 
 
-from tqdm import tqdm_notebook
+from tqdm import tqdm_notebook,tqdm
 """
 Class to handle custom progress bar for model tuning process
 """
@@ -25,14 +25,37 @@ class Progress():
         self.trials=0
         self.pbar=None
 
-    def create_progressbar(self,n_counters):
+    def isnotebook(self):
+        """
+        return: boolean
+        Function to identify type of python utilized either ipython or Python
+        """
+        try:
+            from IPython import get_ipython
+            shell = get_ipython().__class__.__name__
+            
+            if shell == 'ZMQInteractiveShell':
+                return True  
+            elif get_ipython().__class__.__module__ == "google.colab._shell":
+                return True
+            elif shell == 'TerminalInteractiveShell':
+                return False  
+            else:
+                return False 
+        except NameError:
+            return False 
+
+    def create_progressbar(self,n_counters,desc=""):
         """
         param1: integer : number of iteration in progress bar
         Function initializes a tqdm_notebook progress bar.
         """
         self.trials=n_counters
-        self.pbar=tqdm_notebook(total=n_counters, desc="Model Tuning (Stage 3 of 3):", bar_format="{l_bar}{bar} [ time left: {remaining} ]")
-
+        if Progress().isnotebook():
+            self.pbar=tqdm_notebook(total=n_counters,desc=desc, bar_format="{l_bar}{bar} [elapsed: {elapsed}< remaining:{remaining}]")
+        else:
+            self.pbar=tqdm(total=n_counters, desc=desc, bar_format="{l_bar}{bar} [elapsed: {elapsed}< remaining:{remaining}]")
+    
     def update_progressbar(self,i):
         """
         param1: integer
