@@ -291,5 +291,12 @@ class regressor_config:
                 "max_depth":{'int':[3,30]},
                 "tol":{'float':[1e-3,0.1]}
             }
+        ],
+        "OrthogonalMatchingPursuit":[
+            linear_model.OrthogonalMatchingPursuit,
+            {
+                "tol":{"float":[1e-3,0.1]},
+                "fit_intercept":{'bool':[True,False]}
+            }
         ]
     }
