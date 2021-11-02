@@ -3,6 +3,14 @@
 [![PyPI version](https://badge.fury.io/py/blobcity.svg)](https://badge.fury.io/py/blobcity)
 [![Downloads](https://pepy.tech/badge/blobcity/month)](https://pepy.tech/project/blobcity)
 [![GitHub](https://img.shields.io/badge/issue_tracking-github-blue.svg)](https://github.com/blobcity/autoai/issues)
+[![Python](https://shields.io/pypi/pyversions/blobcity)](https://pypi.org/project/blobcity/)
+[![Wheel](https://shields.io/pypi/wheel/blobcity)](https://pypi.org/project/blobcity/)
+[![License](https://shields.io/pypi/l/blobcity)](https://pypi.org/project/blobcity/)
+
+[![GitHub Stars](https://shields.io/github/stars/blobcity?style=social)](https://github.com/blobcity)
+[![Twitter](https://shields.io/twitter/follow/blobcity?label=Follow)](https://twitter.com/blobcity)
+
+
 
 # BlobCity AutoAI
 A framework to find, train and generate code for the best performing AI model. Works on Classification and Regression problems. The framework is currently designed for tabular data, and is being extended to support images, videos and natural language. 
