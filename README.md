@@ -9,7 +9,7 @@
 [![Contributors](https://shields.io/github/contributors/blobcity/autoai)](https://github.com/blobcity/autoai)
 [![Commit Activity](https://shields.io/github/commit-activity/m/blobcity/autoai)](https://github.com/blobcity/autoai)
 [![Last Commit](https://shields.io/github/last-commit/blobcity/autoai)](https://github.com/blobcity/autoai)
-[![Slack](https://shields.io/badge/join-slack-orange)](https://pix.blobcity.com/E2Bepr4w)
+[![Slack](https://shields.io/badge/join%20discussion-on%20slack-orange)](https://pix.blobcity.com/E2Bepr4w)
 
 [![GitHub Stars](https://shields.io/github/stars/blobcity?style=social)](https://github.com/blobcity)
 [![Twitter](https://shields.io/twitter/follow/blobcity?label=Follow)](https://twitter.com/blobcity)
