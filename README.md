@@ -100,6 +100,14 @@ model = bc.load('./my_model.pkl')
 
 You can save a trained model, and load it in the future to generate predictions. 
 
+# Accelerated Training
+Leverage BlobCity AI Cloud for fast training on large datasets. Reasonable cloud infrastructure included for free.
+
+[![BlobCity AI Cloud](https://shields.io/badge/Run%20On-BlobCity-orange)](https://pix.blobcity.com/pgMuJMLv)
+[![CPU](https://shields.io/badge/CPU-Free-blue)](https://pix.blobcity.com/pgMuJMLv)
+[![GPU](https://shields.io/badge/GPU-%2475%2Fmonth-green)](https://pix.blobcity.com/pgMuJMLv)
+
+
 # Features and Roadmap
 - [x] Numercial data Classification and Regression
 - [x] Automatic feature selection
