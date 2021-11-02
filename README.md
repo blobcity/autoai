@@ -16,7 +16,7 @@
 
 
 # BlobCity AutoAI
-A framework to find, train and generate code for the best performing AI model. Works on Classification and Regression problems on numerical data. This is a beta release product and being actively developed. Please report any issues you encounter.
+A framework to find, train and generate code for the best performing AI model. Works on Classification and Regression problems on numerical data. This is a beta release. The framework is being actively worked upon. Please report any issues you encounter.
 
 [![Issues](https://shields.io/github/issues/blobcity/autoai)](https://github.com/blobcity/autoai/issues)
 
