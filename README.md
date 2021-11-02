@@ -1,5 +1,8 @@
 <a href="https://pix.blobcity.com/I1Nk23FY"><img src="https://blobcity.com/assets/img/blobcity-logo.svg" style="width: 40%"/></a>
 
+[![Downloads](https://pepy.tech/badge/blobcity/month)](https://pepy.tech/project/blobcity)
+[![GitHub](https://img.shields.io/badge/issue_tracking-github-blue.svg)](https://github.com/blobcity/autoai/issues)
+
 # BlobCity AutoAI
 A framework to find, train and generate code for the best performing AI model. Works on Classification and Regression problems. The framework is currently designed for tabular data, and is being extended to support images, videos and natural language. 
 
