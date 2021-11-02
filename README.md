@@ -2,7 +2,7 @@
 
 [![PyPI version](https://badge.fury.io/py/blobcity.svg)](https://badge.fury.io/py/blobcity)
 [![Downloads](https://pepy.tech/badge/blobcity/month)](https://pepy.tech/project/blobcity)
-[![GitHub](https://img.shields.io/badge/issue_tracking-github-blue.svg)](https://github.com/blobcity/autoai/issues)
+[![Vulnerabilities](https://shields.io/snyk/vulnerabilities/github/blobcity/autoai)](https://github.com/blobcity/autoai)
 [![Python](https://shields.io/pypi/pyversions/blobcity)](https://pypi.org/project/blobcity/)
 [![License](https://shields.io/pypi/l/blobcity)](https://pypi.org/project/blobcity/)
 
