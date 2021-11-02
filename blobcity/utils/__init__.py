@@ -1,4 +1,4 @@
-from .FileType import getDataFrameType
+from .FileType import get_dataframe_type,write_dataframe
 from .AutoFeatureSelection import *
 from .ProblemType import *
 from .Cleaner import *

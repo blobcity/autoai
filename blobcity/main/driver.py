@@ -18,7 +18,7 @@ import pickle
 import numpy as np
 import pandas as pd
 from blobcity.store import DictClass
-from blobcity.utils import getDataFrameType,dataCleaner
+from blobcity.utils import get_dataframe_type,dataCleaner
 from blobcity.utils import AutoFeatureSelection as AFS
 from blobcity.main.modelSelection import model_search
 from blobcity.code_gen import yml_reader,code_generator
@@ -45,7 +45,7 @@ def train(file=None, df=None, target=None,features=None,accuracy_criteria=0.99):
     dict_class.resetVar()
     #data read
     if file!=None:
-        dataframe= getDataFrameType(file, dict_class)
+        dataframe= get_dataframe_type(file, dict_class)
     else: 
         dataframe = df
         dict_class.addKeyValue('data_read',{"type":"df","class":"df"})
@@ -72,7 +72,7 @@ def load(modelFile,h5_path=None):
         function loads the serialized model from .pkl or .h5 format to usable format.
         """
         path_components = modelFile.split('.')
-        extension = path_components[1] if len(path_components)<=2 else path_components[2]
+        extension = path_components[1] if len(path_components)<=2 else path_components[-1]
          
         if extension == 'pkl' and h5_path in [None,""]:
             model = pickle.load(open(modelFile, 'rb'))
