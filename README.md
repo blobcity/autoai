@@ -7,16 +7,17 @@
 [![Wheel](https://shields.io/pypi/wheel/blobcity)](https://pypi.org/project/blobcity/)
 [![License](https://shields.io/pypi/l/blobcity)](https://pypi.org/project/blobcity/)
 
+[![Contributors](https://shields.io/github/contributors/blobcity/autoai)](https://github.com/blobcity/autoai)
+[![Commit Activity](https://shields.io/github/commit-activity/m/blobcity/autoai)](https://github.com/blobcity/autoai)
+[![Last Commit](https://shields.io/github/last-commit/blobcity/autoai)](https://github.com/blobcity/autoai)
+[![Slack](https://shields.io/badge/join-slack-orange)](https://pix.blobcity.com/E2Bepr4w)
+
 [![GitHub Stars](https://shields.io/github/stars/blobcity?style=social)](https://github.com/blobcity)
 [![Twitter](https://shields.io/twitter/follow/blobcity?label=Follow)](https://twitter.com/blobcity)
 
 
-
 # BlobCity AutoAI
 A framework to find, train and generate code for the best performing AI model. Works on Classification and Regression problems. The framework is currently designed for tabular data, and is being extended to support images, videos and natural language. 
-
-[![Join BlobCity Community on Slack](https://cdn.blobcity.com/assets/slack_logo-24.png)](https://pix.blobcity.com/E2Bepr4w)
-
 
 # Getting Started
 ``` shell
