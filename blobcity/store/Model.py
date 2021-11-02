@@ -225,13 +225,16 @@ class Model:
         
         problem=self.yamldata['problem']["type"]
         if problem=='Classification':
-            targets=self.target_encode.values()
+            if self.target_encode!={}: targets=self.target_encode.values()
             cf_matrix=self.plot_data
             group_counts = ['{0:0.0f}'.format(value) for value in cf_matrix.flatten()]
             group_percentages = ["{0:.2%}".format(value) for value in cf_matrix.flatten()/np.sum(cf_matrix)]
             labels = [f'{v1}\n\n{v2}' for v1, v2 in zip(group_counts,group_percentages)]
             labels = np.asarray(labels).reshape(cf_matrix.shape[0],cf_matrix.shape[0])
-            sns.heatmap(cf_matrix, annot=labels, fmt='',xticklabels=targets,yticklabels=targets,cmap='Blues')
+            if self.target_encode!={}:
+                sns.heatmap(cf_matrix, annot=labels, fmt='',xticklabels=targets,yticklabels=targets,cmap='Blues')
+            else: 
+                sns.heatmap(cf_matrix, annot=labels, fmt='',cmap='Blues')
             plt.show()
         elif problem=="Regression":
             #plot for regression problem
