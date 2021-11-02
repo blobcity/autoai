@@ -1,5 +1,6 @@
 <a href="https://pix.blobcity.com/I1Nk23FY"><img src="https://blobcity.com/assets/img/blobcity-logo.svg" style="width: 40%"/></a>
 
+[![PyPI version](https://badge.fury.io/py/blobcity.svg)](https://badge.fury.io/py/blobcity)
 [![Downloads](https://pepy.tech/badge/blobcity/month)](https://pepy.tech/project/blobcity)
 [![GitHub](https://img.shields.io/badge/issue_tracking-github-blue.svg)](https://github.com/blobcity/autoai/issues)
 
