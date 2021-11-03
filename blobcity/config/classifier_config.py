@@ -223,19 +223,20 @@ class classifier_config:
                 'n_jobs':{'str':[-1]}
             }
         ],
-        "lgbm":[
+        "LGBMClassifier":[
             lgbm.LGBMClassifier,
             {
                 "n_estimators":{'int':[100,1000]},
-                "learning_rate":{'float':[1e-3,0.1]},
+                "learning_rate":{'float':[1e-3,1e-2]},
                 "reg_alpha":{'float':[1e-3,0.1]},
                 "reg_lambda":{'float':[1e-3,0.1]},
-                "max_depth":{'int':[3,50]},
-                'n_jobs':{'str':[-1]},
-                "boosting_type":{'str':['gbdt','dart','goss','rf']}
+                "max_depth":{'int':[3,16]},
+                "num_leaves":{'int':[5,1000]},
+                'bagging_fraction':{'float':[0.1,0.9]},
+                'subsample_freq':{'int':[5,10]},
+                'verbose':{'bool':[-1]},
+                "boosting_type":{'str':['gbdt','dart','rf']}
             }
         ]
-
-
     }
 

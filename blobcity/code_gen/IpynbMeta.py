@@ -19,7 +19,11 @@ This python file consists of class  PyComments,  which has dictionary models and
 class IpynbComments:
     models={
         'Classification':{
-            'TF':'Neural Network Model Description',
+            'LGBMClassifier':"""### Model \n Light GBM is a fast, distributed, high-performance gradient boosting framework based on decision tree algorithm, used for ranking, classification and many other machine learning tasks.
+
+Since it is based on decision tree algorithms, it splits the tree leaf wise with the best fit whereas other boosting algorithms split the tree depth wise or level wise rather than leaf-wise. So when growing on the same leaf in Light GBM, the leaf-wise algorithm can reduce more loss than the level-wise algorithm and hence results in much better accuracy which can rarely be achieved by any of the existing boosting algorithms. 
+
+Refer [API](https://lightgbm.readthedocs.io/en/latest/Python-API.html) for more.""",
             'LogisticRegression':"""### Model
 **Logistic regression :**\n
 
