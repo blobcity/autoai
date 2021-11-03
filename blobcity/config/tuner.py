@@ -18,8 +18,9 @@ import optuna
 import warnings
 from blobcity.main import modelSelection
 from sklearn.exceptions import ConvergenceWarning
-from sklearn.model_selection import train_test_split,cross_val_score
-from sklearn.metrics import r2_score,mean_squared_error,mean_absolute_error,f1_score,precision_score,recall_score
+from sklearn.model_selection import cross_val_score
+from blobcity.utils import Progress
+from sklearn.metrics import r2_score,mean_squared_error,mean_absolute_error,f1_score,precision_score,recall_score,confusion_matrix
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
     warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -28,12 +29,12 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 """
 Python files consist of function to perform parameter tuning using optuna framework
 """
-
 #Early stopping class
 class EarlyStopper():
     iter_stop = 10
     iter_count = 0
     best_score = None
+    criterion = 0.99
 
 def early_stopping_opt(study, trial):
     """
@@ -47,7 +48,7 @@ def early_stopping_opt(study, trial):
 
     """
     if EarlyStopper.best_score == None: EarlyStopper.best_score = study.best_value
-    if study.best_value >= 0.99 : study.stop()
+    if study.best_value >= EarlyStopper.criterion : study.stop()
     if study.best_value > EarlyStopper.best_score:
         EarlyStopper.best_score = study.best_value
         EarlyStopper.iter_count = 0
@@ -59,6 +60,7 @@ def early_stopping_opt(study, trial):
                 EarlyStopper.iter_count = 0
                 EarlyStopper.best_score = None
                 study.stop()
+                
     return
 
 def regression_metrics(y_true,y_pred):
@@ -153,11 +155,31 @@ def objective(trial):
     """
     params=get_params(trial)
     model=modelName(**params)
-    score = cross_val_score(model, X, Y, n_jobs=-1, cv=cv)
+    n_jobs= 1 if model.__class__.__name__ in ['XGBClassifier','XGBRegressor','LGBMRegressor','LGBMClassifier','CatBoostRegressor','CatBoostClassifier'] else -1
+    score = cross_val_score(model, X, Y, n_jobs=n_jobs, cv=cv)
     accuracy = score.mean()
-    return accuracy    
+    prog.trials=prog.trials-1
+    prog.update_progressbar(1)
+    return accuracy   
 
-def tune_model(dataframe,target,modelkey,modelList,ptype):
+def prediction_data(y_true,y_pred,ptype):
+    """
+    param1:pandas.Series/numpy.darray
+    param2:pandas.Series/numpy.darray
+    param3:string
+
+    return:array/2D array
+
+    Function generate data for ploting appropriate graph/diagram on the basis of problem type.
+    """
+    if ptype=='Classification':
+        cm=confusion_matrix(y_true,y_pred)
+        return cm
+    else:
+        data_pred=[y_true.values,y_pred]
+        return data_pred        
+
+def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy):
     """
     param1: pandas.DataFrame
     param2: string 
@@ -173,14 +195,23 @@ def tune_model(dataframe,target,modelkey,modelList,ptype):
     global X
     global Y
     global cv
+    global prog
     X,Y=dataframe.drop(target,axis=1),dataframe[target]
     cv=modelSelection.getKFold(X)
     get_param_list(modelkey,modelList)
+    EarlyStopper.criterion=accuracy
+    n_trials=50
     try:
+        prog=Progress()
+        n_jobs= 1 if modelName().__class__.__name__ in ['XGBClassifier','XGBRegressor','LGBMRegressor','LGBMClassifier','CatBoostRegressor','CatBoostClassifier'] else -1
+        prog.create_progressbar(n_trials,"Tuning {} (Stage 3 of 3) :".format(modelName().__class__.__name__))
         study = optuna.create_study(direction="maximize")
-        study.optimize(objective,n_trials=50,n_jobs=-1,callbacks=[early_stopping_opt])
+        study.optimize(objective,n_trials=n_trials,n_jobs=n_jobs,callbacks=[early_stopping_opt])
         model = modelName(**study.best_params).fit(X,Y)
         metric_result=metricResults(Y,model.predict(X),ptype)
-        return (model,study.best_params,study.best_value,metric_result)
+        plots=prediction_data(Y,model.predict(X),ptype)
+        prog.update_progressbar(prog.trials)
+        prog.close_progressbar()
+        return (model,study.best_params,study.best_value,metric_result,plots)
     except Exception as e:
         print(e)

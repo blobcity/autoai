@@ -61,10 +61,10 @@ class SourceCode:
         'encode':{
             'X':"# Handling AlphaNumeric Features\r"+"X=pd.get_dummies(X)\r\n",
             'Y':"# Handling Target Encoding\r"+'def EncodeY(Y):\r'+
-                "\tun_EncodedT=np.sort(pd.unique(Y), axis=-1, kind='mergesort')\r"+
+                "\tactual_target=np.sort(pd.unique(Y), axis=-1, kind='mergesort')\r"+
                 '\tY=LabelEncoder().fit_transform(Y)\r'+
-                "\tEncodedT=[xi for xi in range(len(un_EncodedT))]\r"+
-                "\tprint('Encoded Target: {} to {}'.format(un_EncodedT,EncodedT))\r"+
+                "\tencoded_target=[xi for xi in range(len(actual_target))]\r"+
+                "\tprint('Encoded Target: {} to {}'.format(actual_target,encoded_target))\r"+
                 "\treturn Y\r"+
                 "Y=EncodeY(Y)\r\n"
         }
@@ -78,7 +78,7 @@ class SourceCode:
     models_init="# Model Initialization\r"+"model=MODELNAME(**param)\rmodel.fit(X_train,Y_train)\r\n"
     
     metric={
-        'Classification':"# Confusion Matrix\rplot_confusion_matrix(model,X_test,Y_test)\r\n"+\
+        'Classification':"# Confusion Matrix\rplot_confusion_matrix(model,X_test,Y_test,cmap=plt.cm.Blues)\r\n"+\
         '# Classification Report\rprint(classification_report(Y_test,model.predict(X_test)))\r\n',
         
         'Regression':"# Metrics\r\ny_pred=model.predict(X_test)\rprint('R2 Score: {:.2f}'.format(r2_score(Y_test,y_pred)))\r"+\
@@ -86,6 +86,17 @@ class SourceCode:
             "print('Mean Squared Error {:.2f}'.format(mean_squared_error(Y_test,y_pred)))"
     }
 
+    cor_matrix="f,ax = plt.subplots(figsize=(18, 18))\rmatrix = np.triu(X.corr())\rse.heatmap(X.corr(), annot=True, linewidths=.5, fmt= '.1f',ax=ax, mask=matrix)\rplt.show()\n"
+    tf_model_load="model = tf.keras.models.load_model(./autoaimodel.h5)"
+    tf_model_metric={
+        'Classification':{
+            'binary':"y_pred=model.predict(Y_test)\ry_pred=np.round(y_pred)# Classification Report\rprint(classification_report(Y_test,y_pred))\r\n",
+            'multi':"y_pred=model.predict(Y_test)\ry_pred=np.argmax(y_pred,axis=1)# Classification Report\rprint(classification_report(Y_test,y_pred))\r\n"
+        },
+        'Regression':"# Metrics\r\ny_pred=model.predict(X_test)\rprint('R2 Score: {:.2f}'.format(r2_score(Y_test,y_pred)))\r"+\
+            "print('Mean Absolute Error {:.2f}'.format(mean_absolute_error(Y_test,y_pred)))\r"+\
+            "print('Mean Squared Error {:.2f}'.format(mean_squared_error(Y_test,y_pred)))"
+    }
     models={
         'Classification':{
             'LogisticRegression':"from sklearn.linear_model import LogisticRegression\r\n",
@@ -106,7 +117,9 @@ class SourceCode:
             'RadiusNeighborsClassifier':'from sklearn.neighbors import RadiusNeighborsClassifier\r\n',
             'XGBClassifier':'from xgboost import XGBClassifier\r\n',
             'MultinomialNB':'from sklearn.naive_bayes import MultinomialNB\r\n',
-            'Perceptron':'from sklearn.linear_model import Perceptron\r\n'
+            'Perceptron':'from sklearn.linear_model import Perceptron\r\n',
+            'TF':'import tensorflow as tf\r\n',
+            'LGBMClassifier':'from lightgbm import LGBMClassifier\r\n',
         },
         'Regression':{
             'LinearRegression':"from sklearn.linear_model import LinearRegression\r\n",
@@ -134,6 +147,8 @@ class SourceCode:
             'RadiusNeighborsRegressor':'from sklearn.neighbors import RadiusNeighborsRegressor\r\n',
             'PassiveAggressiveRegressor':'from sklearn.linear_model import PassiveAggressiveRegressor\r\n',
             'HuberRegressor':'from sklearn.linear_model import HuberRegressor\r\n',
-            'ElasticNet':'from sklearn.linear_model import ElasticNet'
+            'ElasticNet':'from sklearn.linear_model import ElasticNet\r\n',
+            'PoissonRegressor':'from sklearn.linear_model import PoissonRegressor\r\n',
+            'TF':'import tensorflow as tf\r\n'
         }
     }
