@@ -15,6 +15,7 @@
 import numpy as np
 import sklearn as sk
 import xgboost
+import lightgbm as lgbm
 from sklearn.experimental import enable_hist_gradient_boosting
 from sklearn import tree,ensemble,svm,linear_model,neighbors,naive_bayes
 
@@ -26,7 +27,7 @@ class classifier_config:
     Class variable model consist of a model type key with a list datatype value.
     where the list consist of model class object and dictionary of parameters specific to the model
     """
-    
+
     models={
         "SVC":[
             svm.SVC,
@@ -38,7 +39,7 @@ class classifier_config:
             }
         ],
         "NuSVC":[
-            svm.NuSVC, 
+            svm.NuSVC,
             {
                 "nu":{'float':[0.1,1.0]},
                 "gamma":{"str":['auto','scale']},
@@ -47,12 +48,12 @@ class classifier_config:
             }
         ],
         "LinearSVC":[
-            svm.LinearSVC, 
+            svm.LinearSVC,
             {
                 "C":{"int":[1,3]},
                 "loss":{'str':['hinge', 'squared_hinge']},
                 'tol':{'float':[1e-3,0.1]},
-                "penalty":{'str':['l2']}, 
+                "penalty":{'str':['l2']},
             }
         ],
         "DecisionTreeClassifier":[
@@ -98,7 +99,7 @@ class classifier_config:
         "LogisticRegression":[
             linear_model.LogisticRegression,
             {
-                "penalty":{'str':['l1','l2','elasticnet']}, 
+                "penalty":{'str':['l1','l2','elasticnet']},
                 'tol':{'float':[1e-3,0.1]},
                 "C":{"int":[1,3]},
                 "solver":{'str':['newton-cg','liblinear','lbfgs', 'sag', 'saga']},
@@ -197,7 +198,7 @@ class classifier_config:
                 "epsilon":{'float':[1e-8, 0.1]},
                 'n_jobs':{'str':[-1]}
             }
-        ], 
+        ],
         "CategoricalNB":[
             naive_bayes.CategoricalNB,
             {
@@ -221,6 +222,20 @@ class classifier_config:
                 "tol":{'float':[1e-3,0.1]},
                 'n_jobs':{'str':[-1]}
             }
+        ],
+        "lgbm":[
+            lgbm.LGBMClassifier,
+            {
+                "n_estimators":{'int':[100,1000]},
+                "learning_rate":{'float':[1e-3,0.1]},
+                "reg_alpha":{'float':[1e-3,0.1]},
+                "reg_lambda":{'float':[1e-3,0.1]},
+                "max_depth":{'int':[3,50]},
+                'n_jobs':{'str':[-1]},
+                "boosting_type":{'str':['gbdt','dart','goss','rf']}
+            }
         ]
+
+
     }
 
