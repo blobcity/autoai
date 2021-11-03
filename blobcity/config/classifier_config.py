@@ -246,6 +246,17 @@ class classifier_config:
                   "store_covariance":{"bool":[True,False]},
                   "tol":{"float":[1e-4,0.1]}
               }
+        ],
+        "PassiveAggressiveClassifier":[
+              linear_model.PassiveAggressiveClassifier,
+              {
+                  "fit_intercept":{'bool':[True,False]},
+                  "max_iter":{'int':[1000,5000]},
+                  "tol":{'float':[1e-3,0.1]},
+                  "loss":{"str":['huber','epsilon_insensitive','squared_epsilon_insensitive','squared_loss']},
+                  'n_jobs':{'str':[-1]},
+                  "early_stopping":{'bool':[True,False]}
+              }
         ]
     }
 
