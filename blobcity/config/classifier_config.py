@@ -29,7 +29,7 @@ class classifier_config:
     """
 
     models={
-"""         "SVC":[
+        "SVC":[
             svm.SVC,
             {
                 "C":{"int":[1,3]},
@@ -222,7 +222,7 @@ class classifier_config:
                 "tol":{'float':[1e-3,0.1]},
                 'n_jobs':{'str':[-1]}
             }
-        ], """
+        ],
         "LGBMClassifier":[
             lgbm.LGBMClassifier,
             {
