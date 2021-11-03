@@ -17,7 +17,7 @@ import sklearn as sk
 import xgboost
 import lightgbm as lgbm
 from sklearn.experimental import enable_hist_gradient_boosting
-from sklearn import tree,ensemble,svm,linear_model,neighbors,naive_bayes
+from sklearn import tree,ensemble,svm,linear_model,neighbors,naive_bayes,discriminant_analysis
 
 """
 This python file consist of Class variable models to store detail regarding different model to be utilized for classification problem
@@ -237,6 +237,15 @@ class classifier_config:
                 'verbose':{'bool':[-1]},
                 "boosting_type":{'str':['gbdt','dart','rf']}
             }
+        ],
+        "LinearDiscriminantAnalysis":[
+              discriminant_analysis.LinearDiscriminantAnalysis,
+              {
+                  "solver":{"str":['svd','lsqr','eigen']},
+                  "shrinkage":{"float":[0.0,1.0]},
+                  "store_covariance":{"bool":[True,False]},
+                  "tol":{"float":[1e-4,0.1]}
+              }
         ]
     }
 
