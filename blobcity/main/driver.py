@@ -13,7 +13,6 @@
 # limitations under the License.
 
 
-
 import pickle
 import numpy as np
 import pandas as pd
@@ -100,6 +99,14 @@ def spill(filepath,yaml_path=None,doc=None):
     code_generator(data,filepath,doc)
 
 def calculate_feature_importance(X,Y,dict_class):
+    """
+    param1:pd.DataFrame
+    param2:pd.Series/pd.DataFrame
+    param3: class Object
+    return: dictionary
+
+    Function to calculate the feature importance of the features
+    """
     if X.shape[1]>2:
         score_func=f_classif if(dict_class.getdict()['problem']["type"]=='Classification') else f_regression
         fit = SelectKBest(score_func=score_func, k=X.shape[1]).fit(X,Y)
@@ -112,4 +119,3 @@ def calculate_feature_importance(X,Y,dict_class):
     else:
         print('Dataset has only {} features, required atleast 2 for feature importances'.format(X.shape[1]))
         return None
-

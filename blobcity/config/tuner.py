@@ -203,9 +203,8 @@ def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy):
     n_trials=50
     try:
         prog=Progress()
-        #print("Model Selected :- {}".format(modelName().__class__.__name__))
         n_jobs= 1 if modelName().__class__.__name__ in ['XGBClassifier','XGBRegressor','LGBMRegressor','LGBMClassifier','CatBoostRegressor','CatBoostClassifier'] else -1
-        prog.create_progressbar(n_trials,"Model Tuning (Stage 3 of 3) :")
+        prog.create_progressbar(n_trials,"Tuning {} (Stage 3 of 3) :".format(modelName().__class__.__name__))
         study = optuna.create_study(direction="maximize")
         study.optimize(objective,n_trials=n_trials,n_jobs=n_jobs,callbacks=[early_stopping_opt])
         model = modelName(**study.best_params).fit(X,Y)
