@@ -118,10 +118,12 @@ class SourceCode:
             'XGBClassifier':'from xgboost import XGBClassifier\r\n',
             'MultinomialNB':'from sklearn.naive_bayes import MultinomialNB\r\n',
             'Perceptron':'from sklearn.linear_model import Perceptron\r\n',
-            'TF':'import tensorflow as tf\r\n',
+            'LinearDiscriminantAnalysis':'from sklearn.discriminant_analysis import LinearDiscriminantAnalysis\r\n',
+            'PassiveAggressiveClassifier':'from sklearn.linear_model import PassiveAggressiveClassifier\r\n',
             'LGBMClassifier':'from lightgbm import LGBMClassifier\r\n',
         },
         'Regression':{
+            'OrthogonalMatchingPursuit':'from sklearn.linear_model import OrthogonalMatchingPursuit\r\n',
             'LinearRegression':"from sklearn.linear_model import LinearRegression\r\n",
             'Ridge':"from sklearn.linear_model import Ridge\r\n",
             'SGDRegressor':"from sklearn.linear_model import SGDRegressor\r\n",

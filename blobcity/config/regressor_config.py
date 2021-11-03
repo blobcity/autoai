@@ -296,8 +296,9 @@ class regressor_config:
         "OrthogonalMatchingPursuit":[
             linear_model.OrthogonalMatchingPursuit,
             {
-                "tol":{"float":[1e-3,0.1]},
-                "fit_intercept":{'bool':[True,False]}
+                "tol":{"float":[1e-4,0.1]},
+                "fit_intercept":{'bool':[True,False]},
+                "n_nonzero_coefs":{'str':[0.1,0.15,0.2]}
             }
         ]
     }

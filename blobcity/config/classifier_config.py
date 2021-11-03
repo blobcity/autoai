@@ -237,12 +237,12 @@ class classifier_config:
                 'verbose':{'bool':[-1]},
                 "boosting_type":{'str':['gbdt','dart','rf']}
             }
-        ],
+        ], 
         "LinearDiscriminantAnalysis":[
               discriminant_analysis.LinearDiscriminantAnalysis,
               {
-                  "solver":{"str":['svd','lsqr','eigen']},
-                  "shrinkage":{"float":[0.0,1.0]},
+                  "solver":{"str":['lsqr','eigen']},
+                  "shrinkage":{"float":[1e-3,1.0]},
                   "store_covariance":{"bool":[True,False]},
                   "tol":{"float":[1e-4,0.1]}
               }
@@ -250,10 +250,10 @@ class classifier_config:
         "PassiveAggressiveClassifier":[
               linear_model.PassiveAggressiveClassifier,
               {
-                  "fit_intercept":{'bool':[True,False]},
+                  "C":{"float":[1,4]},
                   "max_iter":{'int':[1000,5000]},
                   "tol":{'float':[1e-3,0.1]},
-                  "loss":{"str":['huber','epsilon_insensitive','squared_epsilon_insensitive','squared_loss']},
+                  "loss":{"str":['hinge','squared_hinge']},
                   'n_jobs':{'str':[-1]},
                   "early_stopping":{'bool':[True,False]}
               }
