@@ -91,7 +91,7 @@ model.stats()
 
 Print the key model parameters, such as Precision, Recall, F1-Score. The parameters change based on the type of AutoAI problem. 
 
-# Persistance
+# Persistence
 ``` Python
 model.save('./my_model.pkl')
 
