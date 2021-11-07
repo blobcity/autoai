@@ -1,8 +1,7 @@
 <a href="https://pix.blobcity.com/I1Nk23FY"><img src="https://blobcity.com/assets/img/blobcity-logo.svg" style="width: 40%"/></a>
 
 [![PyPI version](https://badge.fury.io/py/blobcity.svg)](https://badge.fury.io/py/blobcity)
-[![Downloads](https://pepy.tech/badge/blobcity/month)](https://pepy.tech/project/blobcity)
-[![Vulnerabilities](https://shields.io/snyk/vulnerabilities/github/blobcity/autoai)](https://snyk.io/product/open-source-security-management/)
+![Downloads](https://shields.io/pypi/dm/blobcity)
 [![Python](https://shields.io/pypi/pyversions/blobcity)](https://pypi.org/project/blobcity/)
 [![License](https://shields.io/pypi/l/blobcity)](https://pypi.org/project/blobcity/)
 
@@ -35,26 +34,28 @@ model.spill("my_code.py")
 
 Automatic inference of Regression / Classification is supported by the framework.
 
-Supported input data formats are `.csv` and `.xlsx`. Extension for other file formats is being worked on. 
+Data input formats supported include:
+1. Local CSV / XLSX file
+2. URL to a CSV / XLSX file
+3. Pandas DataFrame 
 
-The `spill` function generates the model code with exhaustive documentation. Training code is also included for scikit-learn models. TensorFlow and other DNN models produce only the test / final use code. 
-
-## Use a Pandas Data Frame
 ``` Python
-model = bc.train(df=my_df, target="Y_column")
+model = bc.train(file="data.csv", target="Y_column") #local file
 ```
 
-If loading data from a Database or external system, create a DataFrame from your data source, and pass it directly to the `train` function.
-
-## From a URL
 ``` Python
-model = bc.train(file="https://example.com/data.csv", target="Y_column")
+model = bc.train(df=my_df, target="Y_column") #DataFrame
 ```
 
-The `file` parameter can be a local file, or a URL. The function will load data from the specified URL. The file at the URL must be either in CSV or XLSX format. The URL should be accessible publicly without authentication. 
+``` Python
+model = bc.train(file="https://example.com/data.csv", target="Y_column") #url
+```
 
 # Code Generation
-Multiple formats of code generation is supported by the framework. The `spill` function can be used to generate both `ipynb` and `py` files.
+The `spill` function generates the model code with exhaustive documentation. Training code is also included for scikit-learn models. TensorFlow and other DNN models produce only the test / final use code. 
+
+
+Multiple formats of code generation is supported by the framework. The `spill` function can be used to generate both `ipynb` and `py` files. You can choose to enable or disable code export along with docs.
 
 ``` Python
 model.spill("my_code.ipynb"); #produces Jupyter Notebook file with full markdown docs
@@ -65,6 +66,15 @@ model.spill("my_code.py", docs=True) #python code with full docs
 
 model.spill("my_code.ipynb", docs=False) #Notebook file with minimal markdown
 ```
+
+# Predictions
+Use a trained model to generate predictions on new data. 
+
+```Python
+prediction = model.predict(file="unseen_data.csv")
+```
+
+All required features must be present in the `unseen_data.csv` file. It is possible for the model to now use all features provided to the `train` function. In case a partial feature list is chosen, only the selected features are required to be provided. 
 
 # Feature Selection
 Framework automatically performs a feature selection. All features (except target) are considered by default for feature selection.
