@@ -1,6 +1,6 @@
-## Welcome to GitHub Pages
+## BlobCity AutoAI
 
-You can use the [editor on GitHub](https://github.com/blobcity/autoai/edit/main/docs/index.md) to maintain and preview the content for your website in Markdown files.
+A framework for Automatic AI. Given data and a target problem to solve, AutoAI can help you discover and fine tune the best performing AI model. 
 
 Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
 
