@@ -1,7 +1,7 @@
 <a href="https://pix.blobcity.com/I1Nk23FY"><img src="https://blobcity.com/assets/img/blobcity-logo.svg" style="width: 40%"/></a>
 
 [![PyPI version](https://badge.fury.io/py/blobcity.svg)](https://badge.fury.io/py/blobcity)
-![Downloads](https://shields.io/pypi/dm/blobcity)
+[![Downloads](https://pepy.tech/badge/blobcity/month)](https://pepy.tech/project/blobcity)
 [![Python](https://shields.io/pypi/pyversions/blobcity)](https://pypi.org/project/blobcity/)
 [![License](https://shields.io/pypi/l/blobcity)](https://pypi.org/project/blobcity/)
 
