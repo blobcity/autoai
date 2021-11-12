@@ -69,11 +69,29 @@ This does not guarantee that all specified features will be used in the final mo
 
 ```Python
 model.features() #prints the features selected by the model
+```
 
+```Shell
+['Present_Price',
+ 'Vehicle_Age',
+ 'Fuel_Type_CNG',
+ 'Fuel_Type_Diesel',
+ 'Fuel_Type_Petrol',
+ 'Seller_Type_Dealer',
+ 'Seller_Type_Individual',
+ 'Transmission_Automatic',
+ 'Transmission_Manual']
+ ```
+
+AutoAI ignores features that have a low importance to the effective output. The feature importance plot can be viewed. 
+
+```Python
 model.plot_feature_importance() #shows a feature importance graph
 ```
 
-One can manually specify a subset of features for training. An automatic feature selection will still be carried out but will be restricted to the subset of features provided. 
+![Feature Importance Plot](https://cdn.blobcity.com/img/autoai-feature-importance-example.png)
+
+There might be scenarios where you want to explicitely exclude some columns, or only use a subset of columns in the training. Manually specify the features to be used. AutoAI will still perform a feature selection within the list of features provided to improve effective model accuracy. 
 
 ``` Python
 model = bc.train(file="data.csv", target="Y_value", features=["col1", "col2", "col3"])
