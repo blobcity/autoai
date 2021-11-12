@@ -61,12 +61,6 @@ Pre-processing is carried out automatically on train data. The predict function 
 One can view the pre-processing methods used on the data by exporting the entire model configuration to a YAML file. Check the section below on "Exporting to YAML."
 
 # Feature Selection
-AutoAI automatically performs a feature selection on input data. All features (except target) are potential candidates for the X input.  
-
-AutoAI will automatically remove ID / Primary-key columns. 
-
-This does not guarantee that all specified features will be used in the final model. The framework will perform an automated feature selection from amongst these features. This only guarantees that other features if present in the data will not be considered. 
-
 ```Python
 model.features() #prints the features selected by the model
 ```
@@ -83,6 +77,12 @@ model.features() #prints the features selected by the model
  'Transmission_Manual']
  ```
 
+AutoAI automatically performs a feature selection on input data. All features (except target) are potential candidates for the X input.  
+
+AutoAI will automatically remove ID / Primary-key columns. 
+
+This does not guarantee that all specified features will be used in the final model. The framework will perform an automated feature selection from amongst these features. This only guarantees that other features if present in the data will not be considered. 
+
 AutoAI ignores features that have a low importance to the effective output. The feature importance plot can be viewed. 
 
 ```Python
@@ -98,6 +98,11 @@ model = bc.train(file="data.csv", target="Y_value", features=["col1", "col2", "c
 ```
 
 # Model Search, Train & Hyper-parameter Tuning
+Model search, train and hyper-parameter tuning is fully automatic. It is a 3 step processes that tests your data across various AI/ML models. It finds models with high success tendency, and performs a hyper-parameter tuning to find you the best possible result. 
+
+[Regression Models Library](https://github.com/blobcity/autoai/blob/main/blobcity/config/regressor_config.py)
+
+[Classification Models Library](https://github.com/blobcity/autoai/blob/main/blobcity/config/classifier_config.py)
 
 
 # Code Generation
