@@ -56,6 +56,9 @@ model = bc.train(df=my_df, target="Y_column") #DataFrame
 # Code Generation
 High-quality code generation is why most Data Scientists choose AutoAI. The `spill` function generates the model code with exhaustive documentation. scikit-learn models export with training code included. TensorFlow and other DNN models produce only the test / final use code. 
 
+![AutoAI Generated Code Example](https://cdn.blobcity.com/img/autoai-code-gen-example.gif)
+
+
 Code generation is supported in `ipynb` and `py` file formats, with options to enable or disable detailed documentation exports.
 
 ``` Python
@@ -67,10 +70,6 @@ model.spill("my_code.py", docs=True) #python code with full docs
 
 model.spill("my_code.ipynb", docs=False) #Notebook file with minimal markdown
 ```
-
-
-![AutoAI Generated Code Example](https://cdn.blobcity.com/img/autoai-code-gen-example.gif)
-
 
 # Predictions
 Use a trained model to generate predictions on new data. 
