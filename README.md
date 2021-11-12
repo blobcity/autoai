@@ -15,7 +15,9 @@
 
 
 # BlobCity AutoAI
-A framework to find, train and generate code for the best performing AI model. Works on Classification and Regression problems on numerical data. This is a beta release. The framework is being actively worked upon. Please report any issues you encounter.
+A framework to find the best performing AI/ML model for any AI problem. Works for Classification and Regression type of problems on numerical data. AutoAI makes AI easy and accessible to everyone. It not only trains the best-performing model but also exports high-quality code for using the trained model.
+
+The framework is currently in beta release, with active development being still in progress. Please report any issues you encounter.
 
 [![Issues](https://shields.io/github/issues/blobcity/autoai)](https://github.com/blobcity/autoai/issues)
 
@@ -44,18 +46,17 @@ model = bc.train(file="data.csv", target="Y_column") #local file
 ```
 
 ``` Python
-model = bc.train(df=my_df, target="Y_column") #DataFrame
-```
-
-``` Python
 model = bc.train(file="https://example.com/data.csv", target="Y_column") #url
 ```
 
+``` Python
+model = bc.train(df=my_df, target="Y_column") #DataFrame
+```
+
 # Code Generation
-The `spill` function generates the model code with exhaustive documentation. Training code is also included for scikit-learn models. TensorFlow and other DNN models produce only the test / final use code. 
+High-quality code generation is why most Data Scientists choose AutoAI. The `spill` function generates the model code with exhaustive documentation. scikit-learn models export with training code included. TensorFlow and other DNN models produce only the test / final use code. 
 
-
-Multiple formats of code generation is supported by the framework. The `spill` function can be used to generate both `ipynb` and `py` files. You can choose to enable or disable code export along with docs.
+Code generation is supported in `ipynb` and `py` file formats, with options to enable or disable detailed documentation exports.
 
 ``` Python
 model.spill("my_code.ipynb"); #produces Jupyter Notebook file with full markdown docs
@@ -67,6 +68,10 @@ model.spill("my_code.py", docs=True) #python code with full docs
 model.spill("my_code.ipynb", docs=False) #Notebook file with minimal markdown
 ```
 
+
+![AutoAI Generated Code Example](https://cdn.blobcity.com/img/autoai-code-gen-example.gif)
+
+
 # Predictions
 Use a trained model to generate predictions on new data. 
 
@@ -74,17 +79,12 @@ Use a trained model to generate predictions on new data.
 prediction = model.predict(file="unseen_data.csv")
 ```
 
-All required features must be present in the `unseen_data.csv` file. It is possible for the model to now use all features provided to the `train` function. In case a partial feature list is chosen, only the selected features are required to be provided. 
+All required features must be present in the `unseen_data.csv` file. Consider checking the results of the automatic feature selection to know the list of features needed by the `predict` function.
 
 # Feature Selection
-Framework automatically performs a feature selection. All features (except target) are considered by default for feature selection.
-Framework is smart enough to remove ID / Primary key columns. 
+AutoAI automatically performs a feature selection on input data. All features (except target) are potential candidates for the X input.  
 
-You can manually specify a subset of features to be used for training. An automatic feature selection will still be carried out, but will be restricted to the subset of features provided. 
-
-``` Python
-model = bc.train(file="data.csv", target="Y_value", features=["col1", "col2", "col3"])
-```
+AutoAI will automatically remove ID / Primary-key columns. 
 
 This does not guarantee that all specified features will be used in the final model. The framework will perform an automated feature selection from amongst these features. This only guarantees that other features if present in the data will not be considered. 
 
@@ -93,6 +93,19 @@ model.features() #prints the features selected by the model
 
 model.plot_feature_importance() #shows a feature importance graph
 ```
+
+One can manually specify a subset of features for training. An automatic feature selection will still be carried out but will be restricted to the subset of features provided. 
+
+``` Python
+model = bc.train(file="data.csv", target="Y_value", features=["col1", "col2", "col3"])
+```
+
+# Pre-processing
+The framework has built-in support for several data pre-processing techniques, such as imputing missing values, column encoding, and data scaling. 
+
+Pre-processing is carried out automatically on train data. The predict function carries out the same pre-processing on new data. The user is not required to be concerned with the pre-processing choices of the framework. 
+
+One can view the pre-processing methods used on the data by exporting the entire model configuration to a YAML file. Check the section below on "Exporting to YAML."
 
 # Printing Model Stats
 ``` Python
