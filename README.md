@@ -63,11 +63,14 @@ Code generation is supported in `ipynb` and `py` file formats, with options to e
 
 ``` Python
 model.spill("my_code.ipynb"); #produces Jupyter Notebook file with full markdown docs
-
+```
+``` Python
 model.spill("my_code.py") #produces python code with minimal docs
-
+```
+``` Python
 model.spill("my_code.py", docs=True) #python code with full docs
-
+```
+``` Python
 model.spill("my_code.ipynb", docs=False) #Notebook file with minimal markdown
 ```
 
