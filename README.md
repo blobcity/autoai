@@ -98,7 +98,7 @@ model = bc.train(file="data.csv", target="Y_value", features=["col1", "col2", "c
 ```
 
 # Model Search, Train & Hyper-parameter Tuning
-Model search, train and hyper-parameter tuning is fully automatic. It is a 3 step processes that tests your data across various AI/ML models. It finds models with high success tendency, and performs a hyper-parameter tuning to find you the best possible result. 
+Model search, train and hyper-parameter tuning is fully automatic. It is a 3 step process that tests your data across various AI/ML models. It finds models with high success tendency, and performs a hyper-parameter tuning to find you the best possible result. 
 
 [Regression Models Library](https://github.com/blobcity/autoai/blob/main/blobcity/config/regressor_config.py)
 
