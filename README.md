@@ -53,6 +53,35 @@ model = bc.train(file="https://example.com/data.csv", target="Y_column") #url
 model = bc.train(df=my_df, target="Y_column") #DataFrame
 ```
 
+# Pre-processing
+The framework has built-in support for several data pre-processing techniques, such as imputing missing values, column encoding, and data scaling. 
+
+Pre-processing is carried out automatically on train data. The predict function carries out the same pre-processing on new data. The user is not required to be concerned with the pre-processing choices of the framework. 
+
+One can view the pre-processing methods used on the data by exporting the entire model configuration to a YAML file. Check the section below on "Exporting to YAML."
+
+# Feature Selection
+AutoAI automatically performs a feature selection on input data. All features (except target) are potential candidates for the X input.  
+
+AutoAI will automatically remove ID / Primary-key columns. 
+
+This does not guarantee that all specified features will be used in the final model. The framework will perform an automated feature selection from amongst these features. This only guarantees that other features if present in the data will not be considered. 
+
+```Python
+model.features() #prints the features selected by the model
+
+model.plot_feature_importance() #shows a feature importance graph
+```
+
+One can manually specify a subset of features for training. An automatic feature selection will still be carried out but will be restricted to the subset of features provided. 
+
+``` Python
+model = bc.train(file="data.csv", target="Y_value", features=["col1", "col2", "col3"])
+```
+
+# Model Search, Train & Hyper-parameter Tuning
+
+
 # Code Generation
 High-quality code generation is why most Data Scientists choose AutoAI. The `spill` function generates the model code with exhaustive documentation. scikit-learn models export with training code included. TensorFlow and other DNN models produce only the test / final use code. 
 
@@ -83,33 +112,8 @@ prediction = model.predict(file="unseen_data.csv")
 
 All required features must be present in the `unseen_data.csv` file. Consider checking the results of the automatic feature selection to know the list of features needed by the `predict` function.
 
-# Feature Selection
-AutoAI automatically performs a feature selection on input data. All features (except target) are potential candidates for the X input.  
 
-AutoAI will automatically remove ID / Primary-key columns. 
-
-This does not guarantee that all specified features will be used in the final model. The framework will perform an automated feature selection from amongst these features. This only guarantees that other features if present in the data will not be considered. 
-
-```Python
-model.features() #prints the features selected by the model
-
-model.plot_feature_importance() #shows a feature importance graph
-```
-
-One can manually specify a subset of features for training. An automatic feature selection will still be carried out but will be restricted to the subset of features provided. 
-
-``` Python
-model = bc.train(file="data.csv", target="Y_value", features=["col1", "col2", "col3"])
-```
-
-# Pre-processing
-The framework has built-in support for several data pre-processing techniques, such as imputing missing values, column encoding, and data scaling. 
-
-Pre-processing is carried out automatically on train data. The predict function carries out the same pre-processing on new data. The user is not required to be concerned with the pre-processing choices of the framework. 
-
-One can view the pre-processing methods used on the data by exporting the entire model configuration to a YAML file. Check the section below on "Exporting to YAML."
-
-# Printing Model Stats
+# Model Stats
 ``` Python
 model.stats()
 ```
