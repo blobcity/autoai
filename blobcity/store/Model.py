@@ -14,10 +14,12 @@
 
 import os
 import pickle
+import time
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from blobcity.utils import get_dataframe_type,Progress,write_dataframe
 from blobcity.code_gen import code_generator
 import yaml
 """
@@ -63,16 +65,14 @@ class Model:
         param1: self
         param2: pd.DataFrame
         param3: string : either list or pd.DataFrame to return 
-        param4: string : file to store output pd.DataFrame
+        param4: string : file path to store output pd.DataFrame,supported file types {'csv','json','xlsx'} 
         return: List/pd.DataFrame
 
         Function returns List/Array for predicted value from the trained model.
         """
-        if isinstance(test,pd.DataFrame):
-            test=Model().__quick_clean(test[self.yamldata['features']['X_values']])
-
-        if self.model.__class__.__name__ not in ['XGBClassifier','XGBRegressor']:
-            result=self.model.predict(test)
+        test=get_dataframe_type(test)
+        if isinstance(test,pd.DataFrame):test=Model().__quick_clean(test[self.yamldata['features']['X_values']])
+        if self.model.__class__.__name__ not in ['XGBClassifier','XGBRegressor']:result=self.model.predict(test)
         else:
             if type(test)=="list":
                 test_df=pd.DataFrame(test, columns=self.featureList)
@@ -82,16 +82,17 @@ class Model:
             
         if self.yamldata['problem']["type"]=='Classification':
             main_result=[]
-            for i in range(len(result)):
-                for k in self.target_encode.keys():
-                    if k == result[i]:
-                        main_result.append(self.target_encode[k])
-            result= main_result 
+            if self.target_encode!={}:
+                for i in range(len(result)):
+                    for k in self.target_encode.keys():
+                        if k == result[i]:
+                            main_result.append(self.target_encode[k])
+                result= main_result 
         
         result_dataframe=test.copy(deep=True)
         result_dataframe['prediction']=result
         
-        if path!="":result_dataframe.to_csv(path)
+        if path!="":write_dataframe(dataframe=result_dataframe,path=path)
         if return_type=="list": return result
         elif return_type=="df" and isinstance(test,pd.DataFrame):return result_dataframe
 
@@ -119,10 +120,7 @@ class Model:
         """
         if model_path not in [None,""]:
             path_components = model_path.split('.')
-            if len(path_components)<=2:
-                extension = path_components[1]
-            else:
-                extension = path_components[2]
+            extension = path_components[1] if len(path_components)<=2 else path_components[-1]
 
             if extension == '/':
                 final_path = os.path.join(model_path, 'autoaimodel.pkl')
@@ -227,13 +225,16 @@ class Model:
         
         problem=self.yamldata['problem']["type"]
         if problem=='Classification':
-            targets=self.target_encode.values()
+            if self.target_encode!={}: targets=self.target_encode.values()
             cf_matrix=self.plot_data
             group_counts = ['{0:0.0f}'.format(value) for value in cf_matrix.flatten()]
             group_percentages = ["{0:.2%}".format(value) for value in cf_matrix.flatten()/np.sum(cf_matrix)]
             labels = [f'{v1}\n\n{v2}' for v1, v2 in zip(group_counts,group_percentages)]
             labels = np.asarray(labels).reshape(cf_matrix.shape[0],cf_matrix.shape[0])
-            sns.heatmap(cf_matrix, annot=labels, fmt='',xticklabels=targets,yticklabels=targets,cmap='Blues')
+            if self.target_encode!={}:
+                sns.heatmap(cf_matrix, annot=labels, fmt='',xticklabels=targets,yticklabels=targets,cmap='Blues')
+            else: 
+                sns.heatmap(cf_matrix, annot=labels, fmt='',cmap='Blues')
             plt.show()
         elif problem=="Regression":
             #plot for regression problem
@@ -253,6 +254,3 @@ class Model:
                     raise ValueError("entered row counts {} more than actual row counts {}".format(abs(len(self.plot_data[0])-abs(n_rows)),len(self.plot_data[0])))
             else:
                 raise ValueError("Number of rows can't be Zero")
-			
-
-    

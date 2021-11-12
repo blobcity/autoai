@@ -61,10 +61,10 @@ class SourceCode:
         'encode':{
             'X':"# Handling AlphaNumeric Features\r"+"X=pd.get_dummies(X)\r\n",
             'Y':"# Handling Target Encoding\r"+'def EncodeY(Y):\r'+
-                "\tun_EncodedT=np.sort(pd.unique(Y), axis=-1, kind='mergesort')\r"+
+                "\tactual_target=np.sort(pd.unique(Y), axis=-1, kind='mergesort')\r"+
                 '\tY=LabelEncoder().fit_transform(Y)\r'+
-                "\tEncodedT=[xi for xi in range(len(un_EncodedT))]\r"+
-                "\tprint('Encoded Target: {} to {}'.format(un_EncodedT,EncodedT))\r"+
+                "\tencoded_target=[xi for xi in range(len(actual_target))]\r"+
+                "\tprint('Encoded Target: {} to {}'.format(actual_target,encoded_target))\r"+
                 "\treturn Y\r"+
                 "Y=EncodeY(Y)\r\n"
         }
@@ -118,9 +118,12 @@ class SourceCode:
             'XGBClassifier':'from xgboost import XGBClassifier\r\n',
             'MultinomialNB':'from sklearn.naive_bayes import MultinomialNB\r\n',
             'Perceptron':'from sklearn.linear_model import Perceptron\r\n',
-            'TF':'import tensorflow as tf\r\n'
+            'LinearDiscriminantAnalysis':'from sklearn.discriminant_analysis import LinearDiscriminantAnalysis\r\n',
+            'PassiveAggressiveClassifier':'from sklearn.linear_model import PassiveAggressiveClassifier\r\n',
+            'LGBMClassifier':'from lightgbm import LGBMClassifier\r\n',
         },
         'Regression':{
+            'OrthogonalMatchingPursuit':'from sklearn.linear_model import OrthogonalMatchingPursuit\r\n',
             'LinearRegression':"from sklearn.linear_model import LinearRegression\r\n",
             'Ridge':"from sklearn.linear_model import Ridge\r\n",
             'SGDRegressor':"from sklearn.linear_model import SGDRegressor\r\n",
