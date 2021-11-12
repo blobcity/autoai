@@ -141,7 +141,8 @@ Print the key model parameters, such as Precision, Recall, F1-Score. The paramet
 # Persistence
 ``` Python
 model.save('./my_model.pkl')
-
+```
+```Python
 model = bc.load('./my_model.pkl')
 ```
 
