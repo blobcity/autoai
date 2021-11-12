@@ -154,6 +154,10 @@ model.plot_prediction(100)
 
 
 ## Confusion Matrix (for Classification)
+```Python
+model.plot_prediction()
+```
+
 ![AutoAI Generated Code Example](https://cdn.blobcity.com/img/autoai-confusion-matrix.png)
 
 ## Numercial Stats
