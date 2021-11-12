@@ -136,7 +136,27 @@ prediction = model.predict(file="unseen_data.csv")
 All required features must be present in the `unseen_data.csv` file. Consider checking the results of the automatic feature selection to know the list of features needed by the `predict` function.
 
 
-# Model Stats
+# Stats & Accuracy
+```Python
+model.plot_prediction()
+```
+
+The function is shared across Regression and Classification problems. It plots a relevant chart to assess efficiency of training. 
+
+## Actual v/s Predicted Plot (for Regression)
+![Actual v/s Predicted Plot](https://cdn.blobcity.com/img/autoai-regression-plot-full.png)
+
+Plotting only first `100` rows. You can specify `-100` to plot last 100 rows.
+```Python
+model.plot_prediction(100)
+```
+![Actual v/s Predicted Plot first 100](https://cdn.blobcity.com/img/autoai-regression-plot-100.png)
+
+
+## Confusion Matrix (for Classification)
+![AutoAI Generated Code Example](https://cdn.blobcity.com/img/autoai-confusion-matrix.png)
+
+## Numercial Stats
 ``` Python
 model.stats()
 ```
