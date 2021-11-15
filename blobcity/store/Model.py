@@ -61,7 +61,6 @@ class Model:
 
     def __json_to_df(self,test):
         test={k : [v] for k,v in test.items()}
-        print(test)
         test=pd.DataFrame.from_dict(test)
         test=pd.get_dummies(test)  
         return test
@@ -90,7 +89,6 @@ class Model:
             if list(test.keys())==self.yamldata['features']['X_values']:test=Model().__json_to_df(test)
             else: raise ValueError(f"Model is trained on {len(self.yamldata['features']['X_values'])} features,provided {len(test.keys())} features")
         test=Model().__check_columns(test,self.featureList)
-        print(test)
         if self.model.__class__.__name__ not in ['XGBClassifier','XGBRegressor']:result=self.model.predict(test)
         else:
             if type(test)=="list":
