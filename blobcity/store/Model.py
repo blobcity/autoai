@@ -59,7 +59,22 @@ class Model:
         if "object" in test_dataframe.dtypes.to_list():
             test_dataframe=pd.get_dummies(test_dataframe)
         return test_dataframe
+
+    def __json_to_df(self,test):
+        test={k : [v] for k,v in test.items()}
+        print(test)
+        test=pd.DataFrame.from_dict(test)
+        test=pd.get_dummies(test)  
+        return test
         
+    def __check_columns(self,test,cols):
+        n_cols=0 
+        for i in cols:
+            if i not in test.columns.to_list():
+                test.insert(n_cols, i, [0]*test.shape[0])
+            n_cols+=1
+        return test
+
     def predict(self,test,return_type="list",path=""):
         """
         param1: self
@@ -70,8 +85,13 @@ class Model:
 
         Function returns List/Array for predicted value from the trained model.
         """
-        test=get_dataframe_type(test)
+        if type(test)==str:test=get_dataframe_type(test)
         if isinstance(test,pd.DataFrame):test=Model().__quick_clean(test[self.yamldata['features']['X_values']])
+        if isinstance(test,dict):
+            if list(test.keys())==self.yamldata['features']['X_values']:test=Model().__json_to_df(test)
+            else: raise ValueError(f"Model is trained on {len(self.yamldata['features']['X_values'])} features,provided {len(test.keys())} features")
+        test=Model().__check_columns(test,self.featureList)
+        print(test)
         if self.model.__class__.__name__ not in ['XGBClassifier','XGBRegressor']:result=self.model.predict(test)
         else:
             if type(test)=="list":
