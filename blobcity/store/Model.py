@@ -13,8 +13,7 @@
 # limitations under the License.
 
 import os
-import pickle
-import time
+import dill
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -141,30 +140,22 @@ class Model:
         if model_path not in [None,""]:
             path_components = model_path.split('.')
             extension = path_components[1] if len(path_components)<=2 else path_components[-1]
-
-            if extension == '/':
-                final_path = os.path.join(model_path, 'autoaimodel.pkl')
-                pickle.dump(self, open(final_path, 'wb'))
-                print("The model is stored at {}".format(final_path))
-            elif extension == 'pkl':
+            if extension == 'pkl' and self.yamldata['model']['type'] not in ['TF','tf','Tensorflow']:
                 final_path = model_path
-                pickle.dump(self, open(final_path, 'wb'))
+                dill.dump(self, open(final_path, 'wb'))
                 print("The model is stored at {}".format(final_path))
-             
-                """ 
-            elif extension == 'h5' or self.yamldata['model']['type'] in ['TF','tf']:
-                model_path = model_path if model_path!="./" else os.path.join(model_path, 'autoaimodel.h5')
-                class_path = model_path if model_path!="./" else os.path.join(model_path, 'autoaimodel.pkl')
-                try:
-                    tfmodel_temp=self.model
-                    self.model.save(model_path)
-                    self.model=None
-                    pickle.dump(self, open(class_path, 'wb'))
-                    self.model=tfmodel_temp
-                    print("The model is stored at {}".format(model_path))
-                    return model_path
-                except:
-                    raise TypeError("Your model is not a Keras model of type .h5. Try .pkl extension.") """  
+            elif extension=='pkl' and self.yamldata['model']['type'] in ['TF','tf','Tensorflow']:
+                base_path=os.path.splitext(model_path)[0]
+                tmp=self.model
+                if self.yamldata['problem']['type']=="Classification":
+                    tmp.export_model().save(base_path+".h5")
+                elif self.yamldata['problem']['type']=="Regression":
+                    tmp.export_model().save(base_path, save_format="tf")
+                else:
+                    raise TypeError("Wrong problem type identified")
+                self.model=None
+                dill.dump(self, open(model_path, 'wb'))
+                self.model=tmp
             else:
                 raise TypeError(f"{extension} file type must be .pkl")
         else:

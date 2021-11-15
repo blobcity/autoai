@@ -95,8 +95,8 @@ def classification_metrics(y_true,y_pred):
     """
     result=dict()
     result['F1-Score']=f1_score(y_true, y_pred, average="weighted")
-    result['precision']=precision_score(y_true, y_pred,average="weighted")
-    result['recall']=recall_score(y_true, y_pred,average="weighted")
+    result['Precision']=precision_score(y_true, y_pred,average="weighted")
+    result['Recall']=recall_score(y_true, y_pred,average="weighted")
     return result
 
 def metricResults(y_true,y_pred,ptype):
