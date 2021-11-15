@@ -1,3 +1,4 @@
+dill>=0.3.4
 cliff>=3.6.0
 joblib>=1.0.0
 numpy>=1.21.0
