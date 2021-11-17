@@ -221,6 +221,7 @@ class regressor_config:
                 'reg_alpha': {'float':[1e-3,0.1]},
                 'reg_lambda': {'float':[1e-3,0.1]},
                 'verbosity':{'str':[0]},
+                'n_jobs':{'str':[1]}
             }
         ], 
         "GammaRegressor":[

@@ -87,6 +87,23 @@ def sort_score(modelScore):
     sorted_dict=dict(sorted(modelScore.items(), key=lambda item: item[1],reverse=True))
     return sorted_dict
 
+def eval_model(models,m,X,Y,k):
+    """
+    param1: dictionary
+    param2: string
+    param3: pd.DataFrame 
+    param4: pd.Dataframe/pd.Series/numpy.array
+    param5: int
+    return: float
+
+    Function to fetch cross validation score for specific models from the dictionary
+    """
+    if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0,n_jobs=1)
+    elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
+    elif m in ['LGBMClassifier','LGBMRegressor']: model=models[m][0](verbose=-1,n_jobs=1)
+    else: model=models[m][0]()
+    return cv_score(model,X,Y,k)
+
 def train_on_sample_data(dataframe,target,models):
     """
     param1: pandas.DataFrame
@@ -107,10 +124,7 @@ def train_on_sample_data(dataframe,target,models):
     modelScore={}
     prog.create_progressbar(len(models),"Quick Search (Stage 1 of 3) :")
     for m in models:
-        if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0)
-        elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
-        else: model=models[m][0]()
-        modelScore[m]=cv_score(model,X,Y,k)
+        modelScore[m]=eval_model(models,m,X,Y,k)
         prog.trials=prog.trials-1
         prog.update_progressbar(1)
     prog.update_progressbar(prog.trials)
@@ -133,10 +147,7 @@ def train_on_full_data(X,Y,models,best):
     modelScore={}
     prog.create_progressbar(len(best),"Deep Search (Stage 2 of 3) :")
     for m in best:
-        if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0)
-        elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
-        else: model=models[m][0]()
-        modelScore[m]=cv_score(model,X,Y,k)
+        modelScore[m]=eval_model(models,m,X,Y,k)
         prog.trials=prog.trials-1
         prog.update_progressbar(1)
     prog.update_progressbar(prog.trials)
