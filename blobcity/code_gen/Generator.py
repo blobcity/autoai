@@ -215,15 +215,16 @@ def modeler(yml_data,key,with_doc,codes="",nb=None):
 
     The function adds code syntax related to the Machine learning model initialization and training.
     """
-    param=SourceCode.parameters.replace("PARAM", str(yml_data['model']['parameters']))
-    model=SourceCode.models_init.replace("MODELNAME", str(yml_data['model']['type']))
+    if yml_data['model']['type'] not in ['TF','tf','Tensorflow']:
+        param=SourceCode.parameters.replace("PARAM", str(yml_data['model']['parameters']))
+        model=SourceCode.models_init.replace("MODELNAME", str(yml_data['model']['type']))
+    else:param,model="\n",SourceCode.tf_load
+        
     imports,metaDesc=SourceCode.models[key][yml_data['model']['type']],PyComments.models[key][yml_data['model']['type']]
     
     if nb!=None:
         nb['cells'][1]['source']=nb['cells'][1]['source']+imports
-        if with_doc:
-            nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.models[key][yml_data['model']['type']]))
-            
+        if with_doc:nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.models[key][yml_data['model']['type']]))
         nb['cells'].append(nbf.v4.new_code_cell(param+model))
         return nb
     elif codes!="":
@@ -233,7 +234,7 @@ def modeler(yml_data,key,with_doc,codes="",nb=None):
             codes=codes+"# "+metaDesc
         return codes+param+model
 
-def model_metrics(key,codes="",nb=None,with_doc=False):
+def model_metrics(yml_data,key,codes="",nb=None,with_doc=False):
     """
     param1: dictionary : AutoAI steps data
     param2: string : Code syntaxs
@@ -246,11 +247,26 @@ def model_metrics(key,codes="",nb=None,with_doc=False):
     if with_doc: 
         if nb!=None: nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['metrics']))
         else: codes=codes+PyComments.procedure['metrics']
+
     if nb!=None and codes=="":
-        nb['cells'].append(nbf.v4.new_code_cell(SourceCode.metric[key]))
+        if yml_data['model']['type'] not in ['TF','tf','Tensorflow']:
+            nb['cells'].append(nbf.v4.new_code_cell(SourceCode.metric[key]))
+        else:
+            if key == 'Classification':
+                tf_metric_type=SourceCode.tf_metric[key]['binary'] if yml_data['model']['classification_type']=='binary' else SourceCode.tf_metric[key]['multi']
+                nb['cells'].append(nbf.v4.new_code_cell(tf_metric_type))
+            else:nb['cells'].append(nbf.v4.new_code_cell(SourceCode.tf_metric[key]))
         return nb
     else:
-        return codes+SourceCode.metric[key]
+        if yml_data['model']['type'] not in ['TF','tf','Tensorflow']:
+           return codes+SourceCode.metric[key]
+        else:
+            if key == 'Classification':
+                tf_metric_type=SourceCode.tf_metric[key]['binary'] if yml_data['model']['classification_type']=='binary' else SourceCode.tf_metric[key]['multi']
+                return codes+tf_metric_type
+            else:
+                return codes+SourceCode.tf_metric[key]
+        
 
 def pycoder(yml_data,CGpath,doc=False):
     """
@@ -270,7 +286,7 @@ def pycoder(yml_data,CGpath,doc=False):
     codes=add_corr_matrix(codes=codes,with_doc=doc)
     codes=splits(codes=codes,with_doc=doc)
     codes=modeler(yml_data,key,doc,codes=codes)
-    codes=model_metrics(key,codes=codes,with_doc=doc)
+    codes=model_metrics(yml_data,key,codes=codes,with_doc=doc)
     write_pycode(CGpath,codes)
 
 def ipynbcoder(yml_data,CGpath,doc=True):
@@ -292,7 +308,7 @@ def ipynbcoder(yml_data,CGpath,doc=True):
     nb=add_corr_matrix(nb=nb,with_doc=doc)
     nb=splits(nb=nb,with_doc=doc)
     nb=modeler(yml_data,key,doc,nb=nb) 
-    nb=model_metrics(key,nb=nb,with_doc=doc)
+    nb=model_metrics(yml_data,key,nb=nb,with_doc=doc)
     write_ipynbcode(CGpath,nb)
 
 def code_generator(data,filepath,doc=None):
