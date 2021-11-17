@@ -33,7 +33,9 @@ def train(file=None, df=None, target=None,features=None,use_neural=False,accurac
 
     param3: string: target/dependent column name.
 
-    param4: float: range[0.1,1.0] 
+    param4: boolean: whether to train tensorflow models
+
+    param5: float: range[0.1,1.0] 
 
     return: Model Class Object
     Performs a model search on the data proivded. A yaml file is generated once the best fit model configuration

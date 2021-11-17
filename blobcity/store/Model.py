@@ -45,6 +45,10 @@ class Model:
     
     def __quick_clean(self,test_dataframe):
         """
+        param1:pandas.DataFrame
+        return:pandas.DataFrame
+
+        Function return processed dataframe
         """
         cols=test_dataframe.columns.to_list()
         for i in cols:
@@ -60,26 +64,39 @@ class Model:
         return test_dataframe
 
     def __json_to_df(self,test):
+        """
+        param1:Dictionary
+        return: pandas.DataFrame
+
+        Function converts Dictionary/Json to pandas.DataFrame
+        """
         test={k : [v] for k,v in test.items()}
         test=pd.DataFrame.from_dict(test)
         test=pd.get_dummies(test)  
         return test
         
     def __check_columns(self,test,cols):
-        n_cols=0 
-        for i in cols:
-            if i not in test.columns.to_list():
-                test.insert(n_cols, i, [0]*test.shape[0])
-            n_cols+=1
+        """
+        param1: pandas.DataFrame
+        param2: list
+        return: pandas.DataFrame
+
+        Function adds missing columns into the dataframe at the appropriate index.
+        """
+        if isinstance(test,pd.DataFrame):
+            n_cols=0 
+            for i in cols:
+                if i not in test.columns.to_list():
+                    test.insert(n_cols, i, [0]*test.shape[0])
+                n_cols+=1
         return test
 
     def predict(self,test,return_type="list",path=""):
         """
-        param1: self
-        param2: pd.DataFrame
-        param3: string : either list or pd.DataFrame to return 
-        param4: string : file path to store output pd.DataFrame,supported file types {'csv','json','xlsx'} 
-        return: List/pd.DataFrame
+        param1: pd.DataFrame
+        param2: string : either list or pd.DataFrame to return 
+        param3: string : file path to store output pd.DataFrame,supported file types {'csv','json','xlsx'} 
+        return: List or pd.DataFrame
 
         Function returns List/Array for predicted value from the trained model.
         """
@@ -96,8 +113,10 @@ class Model:
                 result=self.model.predict(test_df)  
             else:
                 result=self.model.predict(test) 
-            
         if self.yamldata['problem']["type"]=='Classification':
+            if self.yamldata['model']['type']=='TF':
+                if self.yamldata['model']['classification_type']=='binary': result=np.round(result).flatten().astype(np.int)
+                else: result=np.argmax(result,axis=1).flatten().astype(np.int)
             main_result=[]
             if self.target_encode!={}:
                 for i in range(len(result)):
@@ -105,6 +124,8 @@ class Model:
                         if k == result[i]:
                             main_result.append(self.target_encode[k])
                 result= main_result 
+        else:
+            if self.yamldata['model']['type']=='TF': result=result.flatten().astype(np.float)
         
         result_dataframe=test.copy(deep=True)
         result_dataframe['prediction']=result
@@ -134,6 +155,7 @@ class Model:
         param: Entire Path for model pickle file, Supported formats is .pkl.
         
         Function saves the model and its weights serially and returns the filepath where it is saved.
+        if the model is of type Tensorflow/Neural Network the function will save addition Tensorflow files or .h5 file with same path and name for the file.
         """
         if model_path not in [None,""]:
             path_components = model_path.split('.')
@@ -141,18 +163,21 @@ class Model:
             if extension == 'pkl' and self.yamldata['model']['type'] not in ['TF','tf','Tensorflow']:
                 final_path = model_path
                 dill.dump(self, open(final_path, 'wb'))
-                print("The model is stored at {}".format(final_path))
+                print("The model class is stored at {}".format(final_path))
             elif extension=='pkl' and self.yamldata['model']['type'] in ['TF','tf','Tensorflow']:
                 base_path=os.path.splitext(model_path)[0]
                 tmp=self.model
                 if self.yamldata['problem']['type']=="Classification":
                     tmp.export_model().save(base_path+".h5")
+                    print(f"Stored Tensorflow model at: {base_path}.h5")
                 elif self.yamldata['problem']['type']=="Regression":
                     tmp.export_model().save(base_path, save_format="tf")
+                    print(f"Stored Custom Tensorflow files at : {base_path}")
                 else:
                     raise TypeError("Wrong problem type identified")
                 self.model=None
                 dill.dump(self, open(model_path, 'wb'))
+                print(f"Stored Model Class at : {base_path}.pkl")
                 self.model=tmp
             else:
                 raise TypeError(f"{extension} file type must be .pkl")

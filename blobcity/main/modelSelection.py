@@ -19,19 +19,33 @@ import itertools
 import numpy as np
 import pandas as pd
 from math import isnan
+import autokeras as ak
+import tensorflow as tf
 from blobcity.store import Model
 from blobcity.utils import Progress
+from sklearn.metrics import r2_score
 from blobcity.config import tuner as Tuner
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.model_selection import cross_val_score
+
 from blobcity.config import classifier_config,regressor_config
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
     warnings.filterwarnings("ignore", category=DeprecationWarning)
+    tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
     os.environ["PYTHONWARNINGS"] = "ignore"
 """
 This python file consists of function to get best performing model for a given dataset.
 """
+
+class CustomCallback(tf.keras.callbacks.Callback):
+    def on_train_end(self, logs=None):
+        prog.trials=prog.trials-1
+        prog.update_progressbar(1)
+    def on_epoch_end(self, epoch, logs=None):
+        prog.trials=prog.trials-1
+        prog.update_progressbar(1)
+
 def getKFold(X):
 
     """
@@ -73,7 +87,7 @@ def sort_score(modelScore):
     sorted_dict=dict(sorted(modelScore.items(), key=lambda item: item[1],reverse=True))
     return sorted_dict
 
-def train_on_sample_data(dataframe,target,models,DictClass,prog):
+def train_on_sample_data(dataframe,target,models):
     """
     param1: pandas.DataFrame
     param2: string
@@ -104,7 +118,7 @@ def train_on_sample_data(dataframe,target,models,DictClass,prog):
     clean_dict = {k: modelScore[k] for k in modelScore if not isnan(modelScore[k])}
     return dict(itertools.islice(sort_score(clean_dict).items(), 5))
 
-def train_on_full_data(dataframe,target,models,best,DictClass,prog):
+def train_on_full_data(X,Y,models,best):
     """
     param1: pandas.DataFrame
     param2: string
@@ -115,7 +129,6 @@ def train_on_full_data(dataframe,target,models,best,DictClass,prog):
     Function returns single best model with best accuracy in a dictionary. 
     Accuracy is calculated using average cross validation score on specified kfold counts.
     """
-    X,Y=dataframe.drop(target,axis=1),dataframe[target]
     k=getKFold(X)
     modelScore={}
     prog.create_progressbar(len(best),"Deep Search (Stage 2 of 3) :")
@@ -131,11 +144,42 @@ def train_on_full_data(dataframe,target,models,best,DictClass,prog):
     clean_dict = {k: modelScore[k] for k in modelScore if not isnan(modelScore[k])}
     return dict(itertools.islice(sort_score(clean_dict).items(), 1))
 
+def train_on_neural(X,Y,ptype):
+    """
+    param1: pandas.DataFrame
+    param2: string
+    param3: string
+    param4: Class object
+    return: keras model
+
+    Function returns keras model.
+    """
+    max_trials,n_epochs=10,20
+    prog.create_progressbar(n_counters=((max_trials+2)*n_epochs),desc="Neural Network Models")
+    clf = ak.StructuredDataClassifier(overwrite=True,max_trials=max_trials) if ptype=='Classification' else ak.StructuredDataRegressor(overwrite=True,max_trials=max_trials) 
+    clf.fit(X,Y, epochs=n_epochs,verbose=0,callbacks=[CustomCallback()])
+    loss,acc=clf.evaluate(X,Y,verbose=0)
+    y_pred=clf.predict(X,verbose=0)
+    if ptype=="Classification":
+        y_pred= y_pred.astype(np.int)
+    if ptype=='Regression':
+        acc=r2_score(Y,y_pred)
+        print("Loss: {}, Accuracy: {:.2f}".format(loss,acc))
+    else:
+        print("Loss: {}, Accuracy: {:.2f}".format(loss,acc))
+    results= Tuner.metricResults(Y,y_pred,ptype)
+    plot_data=Tuner.prediction_data(Y, y_pred, ptype)
+    prog.update_progressbar(prog.trials)
+    prog.close_progressbar()
+    return (clf,acc,results,plot_data)
+
 def model_search(dataframe,target,DictClass,use_neural=False,accuracy_criteria=0.99):
     """
     param1: pandas.DataFrame
     param2: string
     param3: Class object
+    param4: boolean
+    param5: float
     return: Class object
 
     Function first fetches model dictionary which consists of model object and required parameter,
@@ -147,20 +191,41 @@ def model_search(dataframe,target,DictClass,use_neural=False,accuracy_criteria=0
     Then update YAML dictionary with appropriate model details such has selected type and parameters.
     Function finally return a model class object.
     """
+    global prog
     prog=Progress()
     ptype=DictClass.getdict()['problem']["type"]
     modelsList=classifier_config().models if ptype=="Classification" else regressor_config().models
+    X,Y=dataframe.drop(target,axis=1),dataframe[target]
     if dataframe.shape[0]>500:
-        best=train_on_full_data(dataframe,target,modelsList,train_on_sample_data(dataframe,target,modelsList,DictClass,prog),DictClass,prog)
+        best=train_on_full_data(X,Y,modelsList,train_on_sample_data(dataframe,target,modelsList))
     else:
-        best=train_on_full_data(dataframe,target,modelsList,modelsList,DictClass,prog)
+        best=train_on_full_data(X,Y,modelsList,modelsList)
     modelResult = Tuner.tune_model(dataframe,target,best,modelsList,ptype,accuracy=accuracy_criteria)
     modelData=Model()
     if ptype=="Classification":modelData.target_encode=DictClass.get_encoded_label()
     modelData.featureList=dataframe.drop(target,axis=1).columns.to_list()
-    modelData.model,modelData.params,acc,modelData.metrics,modelData.plot_data = modelResult
-    DictClass.addKeyValue('model',{'type': modelData.model.__class__.__name__})
-    DictClass.UpdateNestedKeyValue('model','parameters',modelResult[1])
-    print("{} CV Score : {:.2f}".format(modelData.model.__class__.__name__,acc))
+    if use_neural:
+        neural_network=train_on_neural(X,Y,ptype)
+        if modelResult[2]>neural_network[1]:
+            modelData.model,modelData.params,acc,modelData.metrics,modelData.plot_data = modelResult
+            DictClass.addKeyValue('model',{'type': modelData.model.__class__.__name__})
+            DictClass.UpdateNestedKeyValue('model','parameters',modelResult[1])
+            class_name=modelData.model.__class__.__name__
+        else:
+            modelData.model,acc,modelData.metrics,modelData.plot_data = neural_network
+            DictClass.addKeyValue('model',{'type':'TF'})
+            if ptype=="Classification":
+                n_labels=dataframe[target].nunique(dropna=False)
+                cls_type='binary' if n_labels<=2 else 'multiclass'
+                DictClass.UpdateNestedKeyValue('model','classification_type',cls_type)
+                DictClass.UpdateNestedKeyValue('model','save_type',"h5")
+            if ptype=='Regression':
+                DictClass.UpdateNestedKeyValue('model','save_type',"pb")
+            class_name="Neural Network"
+    else:
+        modelData.model,modelData.params,acc,modelData.metrics,modelData.plot_data = modelResult
+        DictClass.addKeyValue('model',{'type': modelData.model.__class__.__name__})
+        DictClass.UpdateNestedKeyValue('model','parameters',modelResult[1])
+        class_name=modelData.model.__class__.__name__
+    print("{} CV Score : {:.2f}".format(class_name,acc))
     return modelData
-
