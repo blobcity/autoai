@@ -136,6 +136,7 @@ class classifier_config:
                 'reg_lambda': {'float':[1e-3,0.1]},
                 'booster':{'str':['gbtree', 'gblinear','dart']},
                 'verbosity':{'str':[0]},
+                'n_jobs':{'str':[1]}
             }
         ],
         "RadiusNeighborsClassifier":[
