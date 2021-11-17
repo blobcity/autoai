@@ -87,13 +87,13 @@ class SourceCode:
     }
 
     cor_matrix="f,ax = plt.subplots(figsize=(18, 18))\rmatrix = np.triu(X.corr())\rse.heatmap(X.corr(), annot=True, linewidths=.5, fmt= '.1f',ax=ax, mask=matrix)\rplt.show()\n"
-    tf_model_load="model = tf.keras.models.load_model(./autoaimodel.h5)"
-    tf_model_metric={
+    tf_load="model = bc.load('PICKLE FILE PATH')\r#summary\rnn=model.model\rnn.summary()\nnn.fit(X_train,Y_train,epochs=10)"
+    tf_metric={
         'Classification':{
-            'binary':"y_pred=model.predict(Y_test)\ry_pred=np.round(y_pred)# Classification Report\rprint(classification_report(Y_test,y_pred))\r\n",
-            'multi':"y_pred=model.predict(Y_test)\ry_pred=np.argmax(y_pred,axis=1)# Classification Report\rprint(classification_report(Y_test,y_pred))\r\n"
+            'binary':"\ry_pred=nn.predict(X_test)\ry_pred=np.round(y_pred)# Classification Report\rprint(classification_report(Y_test,y_pred))\r\n",
+            'multi':"\rnn=model.model\ry_pred=nn.predict(test_df)\ry_pred=np.argmax(y_pred,axis=1)# Classification Report\rprint(classification_report(Y_test,y_pred))\r\n"
         },
-        'Regression':"# Metrics\r\ny_pred=model.predict(X_test)\rprint('R2 Score: {:.2f}'.format(r2_score(Y_test,y_pred)))\r"+\
+        'Regression':"# Metrics\r\ntest_df = pd.DataFrame(X_test,columns = X.columns.to_list())\nnn=model.model\ry_pred=nn.predict(test_df)\rprint('R2 Score: {:.2f}'.format(r2_score(Y_test,y_pred)))\r"+\
             "print('Mean Absolute Error {:.2f}'.format(mean_absolute_error(Y_test,y_pred)))\r"+\
             "print('Mean Squared Error {:.2f}'.format(mean_squared_error(Y_test,y_pred)))"
     }
@@ -121,6 +121,7 @@ class SourceCode:
             'LinearDiscriminantAnalysis':'from sklearn.discriminant_analysis import LinearDiscriminantAnalysis\r\n',
             'PassiveAggressiveClassifier':'from sklearn.linear_model import PassiveAggressiveClassifier\r\n',
             'LGBMClassifier':'from lightgbm import LGBMClassifier\r\n',
+            'TF':'import blobcity as bc\r\n'
         },
         'Regression':{
             'OrthogonalMatchingPursuit':'from sklearn.linear_model import OrthogonalMatchingPursuit\r\n',
@@ -151,6 +152,6 @@ class SourceCode:
             'HuberRegressor':'from sklearn.linear_model import HuberRegressor\r\n',
             'ElasticNet':'from sklearn.linear_model import ElasticNet\r\n',
             'PoissonRegressor':'from sklearn.linear_model import PoissonRegressor\r\n',
-            'TF':'import tensorflow as tf\r\n'
+            'TF':'import blobcity as bc\r\n'
         }
     }

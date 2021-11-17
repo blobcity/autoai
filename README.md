@@ -53,6 +53,16 @@ model = bc.train(file="https://example.com/data.csv", target="Y_column") #url
 model = bc.train(df=my_df, target="Y_column") #DataFrame
 ```
 
+# Bug Bounty
+![Bug Bounty](https://cdn.blobcity.com/img/bug-bounty.gif)
+Found a bug? Report a bug by creating a new [issue](https://github.com/blobcity/autoai/issues) and win a BlobCity T-Shirt. Valid till 30 Nov 2021.
+
+*Availability:* Currently, we can ship a T-Shirt to only the following countries: Australia, Brazil, Canada, Denmark, Deutschland, Finland, France, India, Ireland, Italy, Japan, Netherlands, New Zealand, Norway, Portugal, Singapore, Sweden, Switzerland, United Kingdom, and the United States. For all others, we thank you for helping us discover bugs. We will be happy to acknowledge your contribution by tagging you in a post on our official social media handles.
+
+*Qualification:* A repo maintainer must be able to reproduce and confirm the bug on the latest release as on the day of reporting the issue. Write clear instructions on the issue report. Include code and example data where possible. If the product does not behave per the documentation, then it qualifies for a bug. However, a spelling mistake in documentation is not considered a bug.
+
+*Disclaimer:* The color and design of the T-Shirt may vary slightly across countries.
+
 # Pre-processing
 The framework has built-in support for several data pre-processing techniques, such as imputing missing values, column encoding, and data scaling. 
 
