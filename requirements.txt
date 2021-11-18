@@ -10,4 +10,3 @@ imbalanced-learn >= 0.8.0
 xgboost>=1.4.0
 catboost>=0.26
 lightgbm>=3.2.0
-autokeras
