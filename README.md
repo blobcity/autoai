@@ -199,7 +199,7 @@ Leverage BlobCity AI Cloud for fast training on large datasets. Reasonable cloud
 - [x] Numercial data Classification and Regression
 - [x] Automatic feature selection
 - [x] Code generation
-- [ ] Neural Networks & Deep Learning
+- [x] Neural Networks & Deep Learning
 - [ ] Image classification
 - [ ] Optical Character Recognition (english only)
 - [ ] Video tagging with YOLO
