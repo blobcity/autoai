@@ -96,16 +96,17 @@ def load(model_path=None):
             raise TypeError(f"{model_path}, path can't be None or Null")
         
 
-def spill(filepath,yaml_path=None,doc=None):
+def spill(filepath=None,yaml_data=None,doc=None):
     """
     param1:string : filepath and format of generated file to store. either .py or .ipynb
-    param2:string : filepath of already generated YAML file 
+    param2:string : filepath of already generated YAML file or dictionary object.
     param3:boolean : whether generate code along with documentation
 
     Function calls generator functions to generate source code for the AutoAI Procedure
     """
-    if yaml_path in [None,""] : raise TypeError("YAML file path can't be None")
-    data=yml_reader(yaml_path)
+    if yaml_data in [None,""] : raise TypeError("YAML file path can't be None")
+    if type(yaml_data)==dict: data=yaml_data 
+    elif type(yaml_data)==str:data=yml_reader(yaml_data)
     code_generator(data,filepath,doc)
 
 def calculate_feature_importance(X,Y,dict_class):
