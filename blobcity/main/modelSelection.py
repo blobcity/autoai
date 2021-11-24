@@ -122,7 +122,7 @@ def train_on_sample_data(dataframe,target,models):
     X,Y=df.drop(target,axis=1),df[target]
     k=getKFold(X)
     modelScore={}
-    prog.create_progressbar(len(models),"Quick Search (Stage 1 of 3) :")
+    prog.create_progressbar(len(models),"Quick Search (Stage 1 of 4) :")
     for m in models:
         modelScore[m]=eval_model(models,m,X,Y,k)
         prog.trials=prog.trials-1
@@ -145,7 +145,7 @@ def train_on_full_data(X,Y,models,best):
     """
     k=getKFold(X)
     modelScore={}
-    prog.create_progressbar(len(best),"Deep Search (Stage 2 of 3) :")
+    prog.create_progressbar(len(best),"Deep Search (Stage 2 of 4) :")
     for m in best:
         modelScore[m]=eval_model(models,m,X,Y,k)
         prog.trials=prog.trials-1
@@ -166,7 +166,7 @@ def train_on_neural(X,Y,ptype):
     Function returns keras model.
     """
     max_trials,n_epochs=10,20
-    prog.create_progressbar(n_counters=((max_trials+2)*n_epochs),desc="Neural Network Models")
+    prog.create_progressbar(n_counters=((max_trials+2)*n_epochs),desc="Neural Network Models (stage 4 of 4)")
     clf = ak.StructuredDataClassifier(overwrite=True,max_trials=max_trials) if ptype=='Classification' else ak.StructuredDataRegressor(overwrite=True,max_trials=max_trials) 
     clf.fit(X,Y, epochs=n_epochs,verbose=0,callbacks=[CustomCallback()])
     loss,acc=clf.evaluate(X,Y,verbose=0)
