@@ -19,11 +19,10 @@ from tqdm import tqdm_notebook,tqdm
 Class to handle custom progress bar for model tuning process
 """
 class Progress():
-    pbar=None
-    trials=0
-    def __init__(self):
-        self.trials=0
-        self.pbar=None
+
+    def __init__(self,trials=0,pbar=None):
+        self.trials=trials
+        self.pbar=pbar
 
     def isnotebook(self):
         """
