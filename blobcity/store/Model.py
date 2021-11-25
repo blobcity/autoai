@@ -25,23 +25,16 @@ import yaml
 Python file consists of Class Model to initialize/store and retrive data associated to trained machine learning model.
 """
 class Model:
-    params=dict()
-    featureList=[]
-    model=None
-    metrics=dict()
-    yamldata=None
-    feature_importance_=dict()
-    target_encode=dict()
-    plot_data=None
-    def __init__(self):
-        self.params=dict()
-        self.featureList=[]
-        self.model=None
-        self.metrics=dict()
-        self.yamldata=None
-        self.feature_importance_=dict()
-        self.plot_data=None
-        self.target_encode=dict()
+    
+    def __init__(self,params=dict(),featureList=[],model=None,metrics=dict(),yamldata=None,feature_importance=dict(),plot_data=None,target_encode=dict()):
+        self.params=params
+        self.featureList=featureList
+        self.model=model
+        self.metrics=metrics
+        self.yamldata=yamldata
+        self.feature_importance_=feature_importance
+        self.plot_data=plot_data
+        self.target_encode=target_encode
     
     def __quick_clean(self,test_dataframe):
         """
