@@ -166,7 +166,7 @@ def train_on_neural(X,Y,ptype):
     Function returns keras model.
     """
     max_trials,n_epochs=10,20
-    prog.create_progressbar(n_counters=((max_trials+2)*n_epochs),desc="Neural Network Models (stage 4 of 4)")
+    prog.create_progressbar(n_counters=((max_trials+2)*n_epochs),desc="Neural Networks (stage 4 of 4)")
     clf = ak.StructuredDataClassifier(overwrite=True,max_trials=max_trials) if ptype=='Classification' else ak.StructuredDataRegressor(overwrite=True,max_trials=max_trials) 
     clf.fit(X,Y, epochs=n_epochs,verbose=0,callbacks=[CustomCallback()])
     loss,acc=clf.evaluate(X,Y,verbose=0)
@@ -210,6 +210,7 @@ def model_search(dataframe,target,DictClass,use_neural=False,accuracy_criteria=0
     if dataframe.shape[0]>500:
         best=train_on_full_data(X,Y,modelsList,train_on_sample_data(dataframe,target,modelsList))
     else:
+        print("Quick Search(Stage 1 of 4) is skipped")
         best=train_on_full_data(X,Y,modelsList,modelsList)
     modelResult = Tuner.tune_model(dataframe,target,best,modelsList,ptype,accuracy=accuracy_criteria)
     modelData=Model()
@@ -234,6 +235,7 @@ def model_search(dataframe,target,DictClass,use_neural=False,accuracy_criteria=0
                 DictClass.UpdateNestedKeyValue('model','save_type',"pb")
             class_name="Neural Network"
     else:
+        print("Neural Networks (stage 4 of 4) is Skipped")
         modelData.model,modelData.params,acc,modelData.metrics,modelData.plot_data = modelResult
         DictClass.addKeyValue('model',{'type': modelData.model.__class__.__name__})
         DictClass.UpdateNestedKeyValue('model','parameters',modelResult[1])
