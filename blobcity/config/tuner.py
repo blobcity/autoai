@@ -19,7 +19,7 @@ import warnings
 from blobcity.main import modelSelection
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.model_selection import cross_val_score
-from blobcity.utils import Progress
+from blobcity.utils import Progress,scaling_data
 from sklearn.metrics import r2_score,mean_squared_error,mean_absolute_error,f1_score,precision_score,recall_score,confusion_matrix
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
@@ -179,12 +179,15 @@ def prediction_data(y_true,y_pred,ptype):
         data_pred=[y_true.values,y_pred]
         return data_pred        
 
-def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy):
+def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy,DictionaryClass):
     """
     param1: pandas.DataFrame
-    param2: string 
-    param3: dictionary
-    param4: dictionary
+    param2: string : target column name
+    param3: string : Model Key / Class name
+    param4: dictionary : model dictionary 
+    param5: string : Problem type either classification or reggression
+    param6: float : Value to consider for stop model fining tune on desired accuracy criteria
+    param7: class object
     return: tuple(model,parameter)
 
     Function first fetchs required parameter details for the specific model by calling getParamList function and number of required kfold counts.
@@ -203,6 +206,9 @@ def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy):
     n_trials=50
     try:
         prog=Progress()
+        if modelName().__class__.__name__ in ['SVC','NuSVC','LinearSVC','SVR','NuSVR','LinearSVR','KNeighborsClassifier','KNeighborsRegressor','RadiusNeighborsClassifier','RadiusNeighborsRegressor']:
+            X = scaling_data(X,DictionaryClass,update=True)
+            
         n_jobs= 1 if modelName().__class__.__name__ in ['XGBClassifier','XGBRegressor','LGBMRegressor','LGBMClassifier','CatBoostRegressor','CatBoostClassifier'] else -1
         prog.create_progressbar(n_trials,"Tuning {} (Stage 3 of 4) :".format(modelName().__class__.__name__))
         study = optuna.create_study(direction="maximize")

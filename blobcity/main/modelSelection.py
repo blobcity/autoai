@@ -22,12 +22,11 @@ from math import isnan
 import autokeras as ak
 import tensorflow as tf
 from blobcity.store import Model
-from blobcity.utils import Progress
+from blobcity.utils import Progress,scaling_data
 from sklearn.metrics import r2_score
 from blobcity.config import tuner as Tuner
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.model_selection import cross_val_score
-
 from blobcity.config import classifier_config,regressor_config
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
@@ -87,24 +86,27 @@ def sort_score(modelScore):
     sorted_dict=dict(sorted(modelScore.items(), key=lambda item: item[1],reverse=True))
     return sorted_dict
 
-def eval_model(models,m,X,Y,k):
+def eval_model(models,m,X,Y,k,DictionaryClass):
     """
-    param1: dictionary
-    param2: string
+    param1: dictionary : Dictionary of models
+    param2: string : model key
     param3: pd.DataFrame 
     param4: pd.Dataframe/pd.Series/numpy.array
-    param5: int
+    param5: int : cv split
+    param6: Class object
     return: float
 
-    Function to fetch cross validation score for specific models from the dictionary
+    Function to fetch cross validation score for specific models from the dictionary.
+    If the model/algorithm belong to distance based prediction and training scale the data to speedup the training.
     """
+    X = X if m not in ['SVC','NuSVC','LinearSVC','SVR','NuSVR','LinearSVR','KNeighborsClassifier','KNeighborsRegressor','RadiusNeighborsClassifier','RadiusNeighborsRegressor'] else scaling_data(X,DictionaryClass)
     if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0,n_jobs=1)
     elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
     elif m in ['LGBMClassifier','LGBMRegressor']: model=models[m][0](verbose=-1,n_jobs=1)
     else: model=models[m][0]()
     return cv_score(model,X,Y,k)
 
-def train_on_sample_data(dataframe,target,models):
+def train_on_sample_data(dataframe,target,models,DictionaryClass):
     """
     param1: pandas.DataFrame
     param2: string
@@ -124,7 +126,7 @@ def train_on_sample_data(dataframe,target,models):
     modelScore={}
     prog.create_progressbar(len(models),"Quick Search (Stage 1 of 4) :")
     for m in models:
-        modelScore[m]=eval_model(models,m,X,Y,k)
+        modelScore[m]=eval_model(models,m,X,Y,k,DictionaryClass)
         prog.trials=prog.trials-1
         prog.update_progressbar(1)
     prog.update_progressbar(prog.trials)
@@ -132,7 +134,7 @@ def train_on_sample_data(dataframe,target,models):
     clean_dict = {k: modelScore[k] for k in modelScore if not isnan(modelScore[k])}
     return dict(itertools.islice(sort_score(clean_dict).items(), 5))
 
-def train_on_full_data(X,Y,models,best):
+def train_on_full_data(X,Y,models,best,DictionaryClass):
     """
     param1: pandas.DataFrame
     param2: string
@@ -147,7 +149,7 @@ def train_on_full_data(X,Y,models,best):
     modelScore={}
     prog.create_progressbar(len(best),"Deep Search (Stage 2 of 4) :")
     for m in best:
-        modelScore[m]=eval_model(models,m,X,Y,k)
+        modelScore[m]=eval_model(models,m,X,Y,k,DictionaryClass)
         prog.trials=prog.trials-1
         prog.update_progressbar(1)
     prog.update_progressbar(prog.trials)
@@ -184,13 +186,14 @@ def train_on_neural(X,Y,ptype):
     prog.close_progressbar()
     return (clf,acc,results,plot_data)
 
-def model_search(dataframe,target,DictClass,use_neural=False,accuracy_criteria=0.99):
+def model_search(dataframe,target,DictClass,disable_colinearity,use_neural=False,accuracy_criteria=0.99):
     """
     param1: pandas.DataFrame
     param2: string
     param3: Class object
     param4: boolean
-    param5: float
+    param5: boolean
+    param6: float
     return: Class object
 
     Function first fetches model dictionary which consists of model object and required parameter,
@@ -208,11 +211,11 @@ def model_search(dataframe,target,DictClass,use_neural=False,accuracy_criteria=0
     modelsList=classifier_config().models if ptype=="Classification" else regressor_config().models
     X,Y=dataframe.drop(target,axis=1),dataframe[target]
     if dataframe.shape[0]>500:
-        best=train_on_full_data(X,Y,modelsList,train_on_sample_data(dataframe,target,modelsList))
+        best=train_on_full_data(X,Y,modelsList,train_on_sample_data(dataframe,target,modelsList,DictClass),DictClass)
     else:
         print("Quick Search(Stage 1 of 4) is skipped")
-        best=train_on_full_data(X,Y,modelsList,modelsList)
-    modelResult = Tuner.tune_model(dataframe,target,best,modelsList,ptype,accuracy=accuracy_criteria)
+        best=train_on_full_data(X,Y,modelsList,modelsList,DictClass)
+    modelResult = Tuner.tune_model(dataframe,target,best,modelsList,ptype,accuracy_criteria,DictClass)
     modelData=Model()
     if ptype=="Classification":modelData.target_encode=DictClass.get_encoded_label()
     modelData.featureList=dataframe.drop(target,axis=1).columns.to_list()
@@ -240,5 +243,7 @@ def model_search(dataframe,target,DictClass,use_neural=False,accuracy_criteria=0
         DictClass.addKeyValue('model',{'type': modelData.model.__class__.__name__})
         DictClass.UpdateNestedKeyValue('model','parameters',modelResult[1])
         class_name=modelData.model.__class__.__name__
+    if not disable_colinearity:
+        if acc< 0.8:  print("Recommendation: Disable Colinearity in train function")
     print("{} CV Score : {:.2f}".format(class_name,acc))
     return modelData

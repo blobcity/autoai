@@ -67,6 +67,16 @@ class SourceCode:
                 "\tprint('Encoded Target: {} to {}'.format(actual_target,encoded_target))\r"+
                 "\treturn Y\r"+
                 "Y=EncodeY(Y)\r\n"
+        },
+        'rescale':{
+            'StandardScaler':"columns=X.columns\rX=StandardScaler().fit_transform(X)\r"+
+            "X=pd.DataFrame(data = X,columns = columns)\rX.head()\r",
+            'MinMaxScaler':"columns=X.columnsX=MinMaxScaler().fit_transform(X)\r"+
+            "X=pd.DataFrame(data = X,columns = columns)\rX.head()\r"
+        },
+        'rescale_import':{
+            'StandardScaler':"from sklearn.preprocessing import StandardScaler\r",
+            'MinMaxScaler':"from sklearn.preprocessing import StandardScaler\r"
         }
     }
 

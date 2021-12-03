@@ -132,7 +132,7 @@ class AutoFeatureSelection:
         dict_class.feature_importance=imp_dict
         return result_df
 
-    def FeatureSelection(dataframe,target,dict_class):
+    def FeatureSelection(dataframe,target,dict_class,disable_colinearity):
         """
         param1: pandas DataFrame
         param2: target column name
@@ -155,7 +155,7 @@ class AutoFeatureSelection:
         Y=df[target]
         
         X=AutoFeatureSelection.dropConstantFeatures(X)
-        X=AutoFeatureSelection.dropHighCorrelationFeatures(X)
+        X=AutoFeatureSelection.dropHighCorrelationFeatures(X) if not disable_colinearity else X
         X=AutoFeatureSelection.get_feature_importance(X,Y,score_func,dict_class)
         featureList=AutoFeatureSelection.getOriginalFeatures(X.columns.to_list(),dict_class)
         dict_class.addKeyValue('features',{'X_values':featureList,'Y_values':target})

@@ -18,6 +18,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler,MinMaxScaler
 from blobcity.utils import get_dataframe_type,Progress,write_dataframe
 from blobcity.code_gen import code_generator
 import yaml
@@ -91,7 +92,8 @@ class Model:
         param3: string : file path to store output pd.DataFrame,supported file types {'csv','json','xlsx'} 
         return: List or pd.DataFrame
 
-        Function returns List/Array for predicted value from the trained model.
+        Function returns List/Array for predicted value from the trained model. First the function perform minimal data preprocessing required to match the input data utilized to train the model then feed it to predict function.
+        On predicted data it perform target manipulation to return original target label if any exists 
         """
         if type(test)==str:test=get_dataframe_type(test)
         if isinstance(test,pd.DataFrame):test=Model().__quick_clean(test[self.yamldata['features']['X_values']])
@@ -99,11 +101,14 @@ class Model:
             if list(test.keys())==self.yamldata['features']['X_values']:test=Model().__json_to_df(test)
             else: raise ValueError(f"Model is trained on {len(self.yamldata['features']['X_values'])} features,provided {len(test.keys())} features")
         test=Model().__check_columns(test,self.featureList)
+        if "cleaning" in self.yamldata.keys() and "rescale" in self.yamldata['cleaning'].keys():
+            scaler = StandardScaler() if self.yamldata['cleaning']['rescale']=="StandardScaler" else MinMaxScaler()
+            test=pd.DataFrame(scaler.fit_transform(test),columns=test.columns)
         if self.model.__class__.__name__ not in ['XGBClassifier','XGBRegressor']:result=self.model.predict(test)
         else:
             if type(test)=="list":
-                test_df=pd.DataFrame(test, columns=self.featureList)
-                result=self.model.predict(test_df)  
+                test=pd.DataFrame(test, columns=self.featureList)
+                result=self.model.predict(test)  
             else:
                 result=self.model.predict(test) 
         if self.yamldata['problem']["type"]=='Classification':

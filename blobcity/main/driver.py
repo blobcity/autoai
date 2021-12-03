@@ -25,7 +25,7 @@ from blobcity.main.modelSelection import model_search
 from blobcity.code_gen import yml_reader,code_generator
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.feature_selection import SelectKBest,f_regression,f_classif
-def train(file=None, df=None, target=None,features=None,use_neural=False,accuracy_criteria=0.99):
+def train(file=None, df=None, target=None,features=None,use_neural=False,accuracy_criteria=0.99,disable_colinearity=False):
     """
     param1: string: dataset file path 
 
@@ -35,7 +35,9 @@ def train(file=None, df=None, target=None,features=None,use_neural=False,accurac
 
     param4: boolean: whether to train tensorflow models
 
-    param5: float: range[0.1,1.0] 
+    param5: float: range[0.1,1.0]
+    
+    param6: boolean: whether to consider Multicolinearity check in Auto Feature Selection
 
     return: Model Class Object
     Performs a model search on the data proivded. A yaml file is generated once the best fit model configuration
@@ -54,13 +56,13 @@ def train(file=None, df=None, target=None,features=None,use_neural=False,accurac
         dict_class.addKeyValue('data_read',{"type":"df","class":"df"})
         
     if(features==None):
-        featureList=AFS.FeatureSelection(dataframe,target,dict_class)
+        featureList=AFS.FeatureSelection(dataframe,target,dict_class,disable_colinearity)
         CleanedDF=dataCleaner(dataframe,featureList,target,dict_class)
     else:
         CleanedDF=dataCleaner(dataframe,features,target,dict_class)
     #model search space
     accuracy_criteria= accuracy_criteria if accuracy_criteria<=1.0 else (accuracy_criteria/100)
-    modelClass = model_search(CleanedDF,target,dict_class,use_neural=use_neural,accuracy_criteria=accuracy_criteria)
+    modelClass = model_search(CleanedDF,target,dict_class,disable_colinearity,use_neural=use_neural,accuracy_criteria=accuracy_criteria)
     modelClass.yamldata=dict_class.getdict()
     modelClass.feature_importance_=dict_class.feature_importance if(features==None) else calculate_feature_importance(CleanedDF.drop(target,axis=1),CleanedDF[target],dict_class)
     dict_class.resetVar()

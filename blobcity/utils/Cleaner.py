@@ -20,7 +20,7 @@ Functions includes, Removal of Unique COlumns,High Null value ratio, Missing Val
 
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder,MinMaxScaler,StandardScaler
 from blobcity.utils.ProblemType import ProType
 import warnings
 warnings.filterwarnings("ignore")
@@ -185,3 +185,19 @@ def RemoveRowsWithHighNans(dataframe):
     dataframe = dataframe.dropna( axis=0, 
                     thresh=min_count)
     return dataframe
+
+def scaling_data(dataframe,DictionaryClass,update=False):
+    """
+    param1: pandas.DataFrame
+    param2: Class object
+    param3: boolean
+    return: pandas.DataFrame
+
+    Function applies StandardScaler or MinMaxScaler on provided dataframe depending on existence of Object type feature.
+    """
+    
+    scaler=MinMaxScaler() if DictionaryClass.ObjectExist else StandardScaler()
+    X=scaler.fit_transform(dataframe)
+    X=pd.DataFrame(data = X,columns = dataframe.columns)
+    if update:DictionaryClass.UpdateNestedKeyValue('cleaning','rescale',scaler.__class__.__name__)
+    return X

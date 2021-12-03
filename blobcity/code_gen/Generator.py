@@ -186,7 +186,32 @@ def add_corr_matrix(codes="",nb=None,with_doc=False):
         nb['cells'].append(nbf.v4.new_code_cell(SourceCode.cor_matrix))
         return nb
     else:
-        return codes+SourceCode.cor_matrix
+        return codes+"\n# Correlation Matrix\n"+SourceCode.cor_matrix
+def data_scaling(yml_data,codes="",nb=None,with_doc=False):
+    """
+    param1:string
+    param2:notebook object
+    param3:boolean
+    return: string/notebook object
+    """
+    if 'cleaning' in yml_data.keys():
+        if 'rescale' in yml_data['cleaning'].keys():
+            rescale_type=yml_data['cleaning']['rescale']
+            imports=SourceCode.cleaning['rescale_import'][rescale_type]
+            if with_doc: 
+                if nb!=None: nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['rescale']))
+                else:codes=codes+PyComments.procedure['rescale']
+            if nb!=None and codes=="": 
+                nb['cells'][1]['source']=nb['cells'][1]['source']+imports
+                nb['cells'].append(nbf.v4.new_code_cell(SourceCode.cleaning['rescale'][rescale_type]))
+                return nb
+            else:
+                idx = codes.index("warnings.filterwarnings('ignore')")
+                codes = codes[:idx]+imports+codes[idx:]
+                return codes+SourceCode.cleaning['rescale'][rescale_type]
+        else: return nb if nb!=None and codes=="" else codes
+    else: return nb if nb!=None and codes=="" else codes
+        
 
 def splits(codes="",nb=None,with_doc=False):
 
@@ -284,6 +309,7 @@ def pycoder(yml_data,CGpath,doc=False):
     codes=features_selection(yml_data,codes=codes,with_doc=doc)
     codes=cleaning(yml_data,codes=codes,with_doc=doc)
     codes=add_corr_matrix(codes=codes,with_doc=doc)
+    codes=data_scaling(yml_data,codes=codes,with_doc=doc)
     codes=splits(codes=codes,with_doc=doc)
     codes=modeler(yml_data,key,doc,codes=codes)
     codes=model_metrics(yml_data,key,codes=codes,with_doc=doc)
@@ -306,6 +332,7 @@ def ipynbcoder(yml_data,CGpath,doc=True):
     nb=features_selection(yml_data,nb=nb,with_doc=doc) 
     nb=cleaning(yml_data,nb=nb,with_doc=doc)
     nb=add_corr_matrix(nb=nb,with_doc=doc)
+    nb=data_scaling(yml_data,nb=nb,with_doc=doc)
     nb=splits(nb=nb,with_doc=doc)
     nb=modeler(yml_data,key,doc,nb=nb) 
     nb=model_metrics(yml_data,key,nb=nb,with_doc=doc)
