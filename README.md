@@ -55,7 +55,7 @@ model = bc.train(df=my_df, target="Y_column") #DataFrame
 
 # Bug Bounty
 ![Bug Bounty](https://cdn.blobcity.com/img/bug-bounty.gif)
-Found a bug? Report a bug by creating a new [issue](https://github.com/blobcity/autoai/issues) and win a BlobCity T-Shirt. Valid till 30 Nov 2021.
+Found a bug? Report a bug by creating a new [issue](https://github.com/blobcity/autoai/issues) and win a BlobCity T-Shirt.
 
 *Availability:* Currently, we can ship a T-Shirt to only the following countries: Australia, Brazil, Canada, Denmark, Deutschland, Finland, France, India, Ireland, Italy, Japan, Netherlands, New Zealand, Norway, Portugal, Singapore, Sweden, Switzerland, United Kingdom, and the United States. For all others, we thank you for helping us discover bugs. We will be happy to acknowledge your contribution by tagging you in a post on our official social media handles.
 
