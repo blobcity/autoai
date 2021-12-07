@@ -41,7 +41,7 @@ class classifier_config:
         "NuSVC":[
             svm.NuSVC,
             {
-                "nu":{'float':[0.1,1.0]},
+                "nu":{'float':[0.1,0.9]},
                 "gamma":{"str":['auto','scale']},
                 "degree":{"int":[1,3]},
                 "kernel":{"str":['rbf','poly','linear','sigmoid']}
@@ -161,7 +161,7 @@ class classifier_config:
         "HistGradientBoostingClassifier":[
             ensemble.HistGradientBoostingClassifier,
             {
-                "loss":{"str":['binary_crossentropy', 'categorical_crossentropy', 'auto']},
+                "loss":{"str":['auto']},
                 "learning_rate":{'float':[1e-3,0.1]},
                 "max_iter":{"int":[1000,5000]},
                 "max_depth":{"int":[3,50]},
