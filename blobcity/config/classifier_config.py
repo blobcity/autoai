@@ -32,25 +32,25 @@ class classifier_config:
         "SVC":[
             svm.SVC,
             {
-                "C":{"int":[1,3]},
+                "C":{"int":[1,5]},
                 "gamma":{"str":['auto','scale']},
-                "degree":{"int":[1,3]},
+                "degree":{"int":[1,4]},
                 "kernel":{"str":['rbf','poly','linear','sigmoid']}
             }
         ],
         "NuSVC":[
             svm.NuSVC,
             {
-                "nu":{'float':[0.1,0.9]},
+                "nu":{'float':[1e-2,0.9]},
                 "gamma":{"str":['auto','scale']},
-                "degree":{"int":[1,3]},
+                "degree":{"int":[1,4]},
                 "kernel":{"str":['rbf','poly','linear','sigmoid']}
             }
         ],
         "LinearSVC":[
             svm.LinearSVC,
             {
-                "C":{"int":[1,3]},
+                "C":{"int":[1,5]},
                 "loss":{'str':['hinge', 'squared_hinge']},
                 'tol':{'float':[1e-3,0.1]},
                 "penalty":{'str':['l2']},
