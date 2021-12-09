@@ -54,11 +54,12 @@ def getKFold(X):
 
     Function returns number of kfold to consider for Cross validation on the basis of dataset row counts
     """
-    k=2
+    k=3
     rows=X.shape[0]
-    if(rows>300 and rows<=500): k=2
+    if(rows>300 and rows<=500): k=4
     elif(rows>500 and rows <=5000 ):k=5
-    elif rows>5000 : k=10
+    elif(rows>5000 and rows <=10000): k=10
+    elif(rows>10000): k=15
     return k
 
 def cv_score(model,X,Y,k):
@@ -229,6 +230,9 @@ def model_search(dataframe,target,DictClass,disable_colinearity,use_neural=False
         else:
             modelData.model,acc,modelData.metrics,modelData.plot_data = neural_network
             DictClass.addKeyValue('model',{'type':'TF'})
+            if 'cleaning' in DictClass.YAML.keys():
+                    if 'rescale' in DictClass.YAML['cleaning'].keys():
+                        del DictClass.YAML['cleaning']['rescale']
             if ptype=="Classification":
                 n_labels=dataframe[target].nunique(dropna=False)
                 cls_type='binary' if n_labels<=2 else 'multiclass'

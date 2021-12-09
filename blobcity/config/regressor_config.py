@@ -33,9 +33,9 @@ class regressor_config:
         "SVR":[
             svm.SVR,
             {
-                "C":{"int":[1,3]},
+                "C":{"int":[1,5]},
                 "gamma":{"str":['auto','scale']},
-                "degree":{"int":[1,3]},
+                "degree":{"int":[1,4]},
                 "kernel":{"str":['rbf','poly','linear']}
             }  
         ],
@@ -44,15 +44,15 @@ class regressor_config:
             {
                 "nu":{'float':[0.1,1.0]},
                 "gamma":{"str":['auto','scale']},
-                "degree":{"int":[1,3]},
+                "degree":{"int":[1,4]},
                 "kernel":{"str":['rbf','poly','linear']}
             }
         ],
         "LinearSVR":[
             svm.LinearSVR,
             {
-                "C":{"int":[1,3]},
-                "epsilon":{'float':[1e-3,1]},
+                "C":{"int":[1,5]},
+                "epsilon":{'float':[1e-2,1]},
                 "loss":{'str':['epsilon_insensitive', 'squared_epsilon_insensitive']},
                 'tol':{'float':[1e-3,0.1]},
             }
