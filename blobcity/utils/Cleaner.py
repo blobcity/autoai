@@ -20,8 +20,13 @@ Functions includes, Removal of Unique COlumns,High Null value ratio, Missing Val
 
 import numpy as np
 import pandas as pd
+from tqdm.auto import tqdm
+from tarfile import is_tarfile
+import os,tarfile,requests,warnings
+from zipfile import ZipFile, is_zipfile
 from sklearn.preprocessing import LabelEncoder,MinMaxScaler,StandardScaler
 from blobcity.utils.ProblemType import ProType
+from blobcity.utils.progress_bar import Progress
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -44,9 +49,8 @@ def dataCleaner(df,features,target,DictionaryClass=None):
     for each columns with missing data call Cleaner function to Handle missing value with appropriate missing value handling strategy.
     Once Missing values are handled perform categorical value handling operation by calling Encoder() function with appropriate arguments
     """
-    problemtype=ProType()
     missingdict=dict()
-    if DictionaryClass!=None:DictionaryClass.addKeyValue('problem',problemtype.checkType(df[target]))
+    if DictionaryClass!=None:DictionaryClass.addKeyValue('problem',ProType.checkType(df[target]))
     updateddf=df[features].copy(deep=True)
     if target in df.columns.to_list(): updateddf[target]=df[target].copy(deep=True)
     updateddf=RemoveRowsWithHighNans(updateddf)
@@ -201,3 +205,64 @@ def scaling_data(dataframe,DictionaryClass,update=False):
     X=pd.DataFrame(data = X,columns = dataframe.columns)
     if update:DictionaryClass.UpdateNestedKeyValue('cleaning','rescale',scaler.__class__.__name__)
     return X
+
+def uncompress_file(file):
+    if os.path.isfile(file):
+        return decompress(file)
+    else:
+        raise FileNotFoundError(f"provided path {file} does not exist")
+    
+def decompress(file):
+    try:
+        ogpath=os.path.splitext(file)
+        extract_dir="./"+os.path.basename(ogpath[0])
+        prog=Progress()
+        if is_zipfile(file):
+            with ZipFile(file,"r") as zip_ref:
+                members=zip_ref.namelist()
+                prog.create_progressbar(n_counters=len(members),desc="Decompressing :")
+                for file in members:
+                    zip_ref.extract(member=file,path=extract_dir)
+                    prog.update_progressbar(1)
+                prog.close_progressbar()
+        elif is_tarfile(file):
+            tar = tarfile.open(file, mode="r:gz")
+            members=tar.getmembers()
+            prog.create_progressbar(n_counters=len(members),desc="Decompressing :")
+            for member in members:
+                tar.extract(member=member,path=extract_dir)
+                prog.update_progressbar(1)
+            prog.close_progressbar()
+        print(f"file has been decompressed to folder {extract_dir}")
+    except Exception as e:print(e)
+    return extract_dir
+
+def file_from_url(url):
+    try:
+        ogpath=os.path.splitext(url)
+        download_path="./"+os.path.basename(ogpath[0])+ogpath[-1]
+        response = requests.get(url, stream=True)
+        total = int(response.headers.get('content-length', 0))
+        with tqdm.wrapattr(open(download_path, "wb"), "write", miniters=1,total=total,desc="Downloading :") as fout:
+            for chunk in response.iter_content(chunk_size=4096):
+                fout.write(chunk)
+        return download_path
+    except Exception as e: print(e)
+
+def check_subfolder_data(file):
+    targets = os.listdir(file)
+    print(f"identified target are :{targets}")
+    check_status=True
+    for category in targets:
+        path=os.path.join(file, category)
+        if not os.path.isfile(path):
+            for img in os.listdir(path):
+                try:
+                    extension = os.path.splitext(img)[1]
+                    check_status= check_status if extension in ['.png',".PNG",".jpg",".jpeg",'.JPEG'] else False 
+                    if not check_status:break
+                except Exception as e:print(e)
+        else: check_status=False
+        if not check_status:break
+    if not check_status: raise TypeError("some files have different formats")
+    return (file,targets)

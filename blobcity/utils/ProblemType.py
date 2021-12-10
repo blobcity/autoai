@@ -15,13 +15,11 @@
 """
 This Python file consists of Function to identify the problem type either Classification or Regression Type.
 """
-
-import numpy as np
+import os
+import uuid
 class ProType:
 
-    def __init__(self):
-        pass
-    def checkType(self,data):
+    def checkType(data):
 
         """
          param1: class
@@ -43,3 +41,15 @@ class ProType:
                 return dict({'type':'Classification'})
             else:
                 return dict({'type':'Regression'})
+    
+    def generate_uuid():
+        """
+        return : string 
+        Function generates Universal Unique identifier for each experiment executed by the train function
+        """
+        try:
+            uid=str(uuid.uuid4())
+            os.environ['EXPID']=uid
+        except  Exception as e:
+            print(e)
+        return uid

@@ -17,10 +17,13 @@ This Python File consists of function to fetch and read dataset from various dat
 """
 
 
-import os.path
-import pandas as pd
 import io
+import re 
+import urllib
+import os.path
 import requests
+import httplib2
+import pandas as pd
 from requests.models import HTTPError
 def get_dataframe_type(file_path,dc=None):
 
@@ -114,3 +117,37 @@ def save_dataframe(dataframe,path,ftype):
         print("saved at path {}".format(path))
     except Exception as e:
         print(e)
+
+def validate_url(url: str):
+    DOMAIN_FORMAT = re.compile(
+        r"(?:^(\w{1,255}):(.{1,255})@|^)" # http basic authentication [optional]
+        r"(?:(?:(?=\S{0,253}(?:$|:))" # check full domain length to be less than or equal to 253 (starting after http basic auth, stopping before port)
+        r"((?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+" # check for at least one subdomain (maximum length per subdomain: 63 characters), dashes in between allowed
+        r"(?:[a-z0-9]{1,63})))" # check for top level domain, no dashes allowed
+        r"|localhost)" # accept also "localhost" only
+        r"(:\d{1,5})?", # port [optional]
+        re.IGNORECASE
+    )
+    SCHEME_FORMAT = re.compile(
+        r"^(http|hxxp|ftp|fxp)s?$", # scheme: http(s) or ftp(s)
+        re.IGNORECASE
+    )
+    url = url.strip()
+    try:
+        if not url:raise Exception("No URL specified")
+        result = urllib.parse.urlparse(url)
+        scheme = result.scheme
+        domain = result.netloc
+        if not scheme:raise Exception("No URL scheme specified")
+        if not re.fullmatch(SCHEME_FORMAT, scheme):raise Exception("URL scheme must either be http(s) or ftp(s) (given scheme={})".format(scheme))
+        if not domain:raise Exception("No URL domain specified")
+        if not re.fullmatch(DOMAIN_FORMAT, domain):raise Exception("URL domain malformed (domain={})".format(domain))
+        return check_url_existence(url)
+    except Exception:return False
+
+def check_url_existence(url):
+    h = httplib2.Http()
+    resp = h.request(url, 'HEAD')
+    if int(resp[0]['status']) < 400:
+        return True
+    else: raise HTTPError(f"{url} does not exist")

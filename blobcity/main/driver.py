@@ -12,20 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import dill
+import os,dill
 import numpy as np
 import pandas as pd
-import autokeras as ak
-import tensorflow as tf
+import warnings,copy
 from blobcity.store import DictClass
-from blobcity.utils import get_dataframe_type,dataCleaner
-from blobcity.utils import AutoFeatureSelection as AFS
+from sklearn.preprocessing import MinMaxScaler 
 from blobcity.main.modelSelection import model_search
 from blobcity.code_gen import yml_reader,code_generator
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.feature_selection import SelectKBest,f_regression,f_classif
-def train(file=None, df=None, target=None,features=None,use_neural=False,accuracy_criteria=0.99,disable_colinearity=False):
+from blobcity.utils import ProType, AutoFeatureSelection,get_dataframe_type,dataCleaner
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore")
+    os.environ["PYTHONWARNINGS"] = "ignore"
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'    
+    import autokeras as ak
+    import tensorflow as tf
+    tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+
+def train(file=None, df=None, target=None,features=None,model_types='all',accuracy_criteria=0.99,disable_colinearity=False):
     """
     param1: string: dataset file path 
 
@@ -48,7 +53,7 @@ def train(file=None, df=None, target=None,features=None,use_neural=False,accurac
     """
     dict_class=DictClass()
     dict_class.resetVar()
-    #data read
+    exp_id=ProType.generate_uuid()
     if file!=None:
         dataframe= get_dataframe_type(file, dict_class)
     else: 
@@ -56,15 +61,19 @@ def train(file=None, df=None, target=None,features=None,use_neural=False,accurac
         dict_class.addKeyValue('data_read',{"type":"df","class":"df"})
         
     if(features==None):
-        featureList=AFS.FeatureSelection(dataframe,target,dict_class,disable_colinearity)
+        featureList=AutoFeatureSelection.FeatureSelection(dataframe,target,dict_class,disable_colinearity)
         CleanedDF=dataCleaner(dataframe,featureList,target,dict_class)
     else:
         CleanedDF=dataCleaner(dataframe,features,target,dict_class)
-    #model search space
+
     accuracy_criteria= accuracy_criteria if accuracy_criteria<=1.0 else (accuracy_criteria/100)
-    modelClass = model_search(CleanedDF,target,dict_class,disable_colinearity,use_neural=use_neural,accuracy_criteria=accuracy_criteria)
+    modelClass = model_search(CleanedDF,target,dict_class,disable_colinearity,model_types=model_types,accuracy_criteria=accuracy_criteria)
     modelClass.yamldata=dict_class.getdict()
     modelClass.feature_importance_=dict_class.feature_importance if(features==None) else calculate_feature_importance(CleanedDF.drop(target,axis=1),CleanedDF[target],dict_class)
+    metrics=copy.deepcopy(modelClass.metrics)
+    if modelClass.yamldata['model']['type'] in ['TF','tf','Tensorflow']:metrics['Accuracy']=dict_class.accuracy
+    else:metrics['CVSCORE']=dict_class.accuracy
+    post_data={'autoAIID':exp_id,'yaml':modelClass.yamldata,'metrics':metrics}
     dict_class.resetVar()
     return modelClass
 
@@ -127,7 +136,7 @@ def calculate_feature_importance(X,Y,dict_class):
         df = pd.concat([dfcolumns,dfscores],axis=1)
         df.columns = ['features','Score']
         df['Score']=MinMaxScaler().fit_transform(np.array(df['Score']).reshape(-1,1))
-        imp=AFS.MainScore(dict(df.values),dict_class)
+        imp=AutoFeatureSelection.MainScore(dict(df.values),dict_class)
         return imp
     else:
         print('Dataset has only {} features, required atleast 2 for feature importances'.format(X.shape[1]))

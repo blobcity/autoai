@@ -76,10 +76,10 @@ def regression_metrics(y_true,y_pred):
     
     """
     result=dict()
-    result['R2']=r2_score(y_true, y_pred)
-    result['MAE']=mean_absolute_error(y_true, y_pred)
-    result['MSE']=mean_squared_error(y_true, y_pred)
-    result['RMSE']=mean_squared_error(y_true, y_pred,squared=False)
+    result['R2']=round(r2_score(y_true, y_pred),3)
+    result['MAE']=round(mean_absolute_error(y_true, y_pred),3)
+    result['MSE']=round(mean_squared_error(y_true, y_pred),3)
+    result['RMSE']=round(mean_squared_error(y_true, y_pred,squared=False),3)
     return result
 
 def classification_metrics(y_true,y_pred):
@@ -94,9 +94,9 @@ def classification_metrics(y_true,y_pred):
     return them in a dictionary
     """
     result=dict()
-    result['F1-Score']=f1_score(y_true, y_pred, average="weighted")
-    result['Precision']=precision_score(y_true, y_pred,average="weighted")
-    result['Recall']=recall_score(y_true, y_pred,average="weighted")
+    result['F1-Score']=round(f1_score(y_true, y_pred, average="weighted"),3)
+    result['Precision']=round(precision_score(y_true, y_pred,average="weighted"),3)
+    result['Recall']=round(recall_score(y_true, y_pred,average="weighted"),3)
     return result
 
 def metricResults(y_true,y_pred,ptype):
@@ -179,7 +179,7 @@ def prediction_data(y_true,y_pred,ptype):
         data_pred=[y_true.values,y_pred]
         return data_pred        
 
-def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy,DictionaryClass):
+def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy,DictionaryClass,stages):
     """
     param1: pandas.DataFrame
     param2: string : target column name
@@ -209,8 +209,8 @@ def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy,DictionaryClas
         if modelName().__class__.__name__ in ['SVC','NuSVC','LinearSVC','SVR','NuSVR','LinearSVR','KNeighborsClassifier','KNeighborsRegressor','RadiusNeighborsClassifier','RadiusNeighborsRegressor']:
             X = scaling_data(X,DictionaryClass,update=True)
             
-        n_jobs= 1 if modelName().__class__.__name__ in ['XGBClassifier','XGBRegressor','LGBMRegressor','LGBMClassifier','CatBoostRegressor','CatBoostClassifier'] else -1
-        prog.create_progressbar(n_trials,"Tuning {} (Stage 3 of 4) :".format(modelName().__class__.__name__))
+        n_jobs= 1 if modelName().__class__.__name__ in ['XGBClassifier','XGBRegressor','LGBMRegressor','LGBMClassifier','CatBoostRegressor','CatBoostClassifier','GradientBoostingClassifier','GradientBoostingRegressor'] else -1
+        prog.create_progressbar(n_trials,"Tuning {} (Stage 3 of {}) :".format(modelName().__class__.__name__,stages))
         study = optuna.create_study(direction="maximize")
         study.optimize(objective,n_trials=n_trials,n_jobs=n_jobs,callbacks=[early_stopping_opt])
         model = modelName(**study.best_params).fit(X,Y)

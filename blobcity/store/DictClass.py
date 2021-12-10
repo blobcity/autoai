@@ -19,12 +19,13 @@ This is a Custom Class to store Class reference data for YAML generation and pro
 """
 class DictClass:
 
-    def __init__(self,ObjectExist=False,ObjectList=None,YAML=dict(),feature_importance=dict(),original_label=dict()):
+    def __init__(self,ObjectExist=False,ObjectList=None,YAML=dict(),feature_importance=dict(),original_label=dict(),accuracy=0.0):
         self.ObjectExist=ObjectExist
         self.ObjectList=ObjectList
         self.YAML=YAML
         self.feature_importance=feature_importance
         self.original_label=original_label
+        self.accuracy=accuracy
 
     def get_encoded_label(self):
         """

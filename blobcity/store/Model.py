@@ -22,6 +22,7 @@ from sklearn.preprocessing import StandardScaler,MinMaxScaler
 from blobcity.utils import get_dataframe_type,Progress,write_dataframe
 from blobcity.code_gen import code_generator
 import yaml
+
 """
 Python file consists of Class Model to initialize/store and retrive data associated to trained machine learning model.
 """
