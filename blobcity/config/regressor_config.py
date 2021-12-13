@@ -82,7 +82,7 @@ class regressor_config:
                 "criterion":{'str':['squared_error','absolute_error']},
                 "n_estimators":{'int':[100,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
-                "max_depth":{'int':[3,50]},
+                "max_depth":{'int':[3,20]},
                 'n_jobs':{'str':[-1]}
             }
         ],

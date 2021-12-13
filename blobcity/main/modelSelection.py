@@ -38,10 +38,8 @@ This python file consists of function to get best performing model for a given d
 
 class CustomCallback(tf.keras.callbacks.Callback):
     def on_train_end(self, logs=None):
-        prog.trials=prog.trials-1
         prog.update_progressbar(1)
     def on_epoch_end(self, epoch, logs=None):
-        prog.trials=prog.trials-1
         prog.update_progressbar(1)
 
 def getKFold(X):
@@ -101,10 +99,12 @@ def eval_model(models,m,X,Y,k,DictionaryClass):
     If the model/algorithm belong to distance based prediction and training scale the data to speedup the training.
     """
     X = X if m not in ['SVC','NuSVC','LinearSVC','SVR','NuSVR','LinearSVR','KNeighborsClassifier','KNeighborsRegressor','RadiusNeighborsClassifier','RadiusNeighborsRegressor'] else scaling_data(X,DictionaryClass)
-    if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0,n_jobs=1)
+    if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0)
     elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
-    elif m in ['LGBMClassifier','LGBMRegressor']: model=models[m][0](verbose=-1,n_jobs=1)
-    else: model=models[m][0]()
+    elif m in ['LGBMClassifier','LGBMRegressor']: model=models[m][0](verbose=-1)
+    else: 
+        try:model=models[m][0](n_jobs=-1)
+        except:model=models[m][0]()
     return cv_score(model,X,Y,k)
 
 def train_on_sample_data(dataframe,target,models,DictionaryClass,stages):
@@ -128,7 +128,6 @@ def train_on_sample_data(dataframe,target,models,DictionaryClass,stages):
     prog.create_progressbar(len(models),"Quick Search (Stage 1 of {}) :".format(stages))
     for m in models:
         modelScore[m]=eval_model(models,m,X,Y,k,DictionaryClass)
-        prog.trials=prog.trials-1
         prog.update_progressbar(1)
     prog.update_progressbar(prog.trials)
     prog.close_progressbar()
@@ -152,7 +151,6 @@ def train_on_full_data(X,Y,models,best,DictionaryClass,stages):
     prog.create_progressbar(len(best),"Deep Search (Stage 2 of {}) :".format(stages))
     for m in best:
         modelScore[m]=eval_model(models,m,X,Y,k,DictionaryClass)
-        prog.trials=prog.trials-1
         prog.update_progressbar(1)
     prog.update_progressbar(prog.trials)
     prog.close_progressbar()
@@ -283,7 +281,7 @@ def model_search(dataframe,target,DictClass,disable_colinearity,model_types="all
 
     elif model_types=='neural':
         gpu_num=tf.config.list_physical_devices('GPU')
-        if len(gpu_num)==0: print("GPU was not found on your system, Use AI Cloud with GPU starting at 25$/Month")
+        if len(gpu_num)==0: print("No GPU was detected on your system. Defaulting to CPU. Consider running on a GPU plan on BlobCity AI Cloud for faster training. https://cloud.blobcity.com")
         neural_network=train_on_neural(X,Y,ptype,1,1)
         DictClass.accuracy=neural_network[1]
         modelData=neural_model_records(modelData,neural_network,DictClass,ptype,dataframe,target)
@@ -293,7 +291,7 @@ def model_search(dataframe,target,DictClass,disable_colinearity,model_types="all
         modelResult=classic_model(ptype,dataframe,target,X,Y,DictClass,modelsList,accuracy_criteria,4)
         if modelResult[2]<accuracy_criteria:
             gpu_num=tf.config.list_physical_devices('GPU')
-            if len(gpu_num)==0: print("GPU was not found on your system, Use AI Cloud with GPU starting at 25$/Month")
+            if len(gpu_num)==0: print("No GPU was detected on your system. Defaulting to CPU. Consider running on a GPU plan on BlobCity AI Cloud for faster training. https://cloud.blobcity.com")
             neural_network=train_on_neural(X,Y,ptype,4,4)
             if modelResult[2]>neural_network[1]:
                 DictClass.accuracy=round(modelResult[2],3)

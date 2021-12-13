@@ -59,13 +59,13 @@ def train(file=None, df=None, target=None,features=None,model_types='all',accura
     else: 
         dataframe = df
         dict_class.addKeyValue('data_read',{"type":"df","class":"df"})
-        
+                
     if(features==None):
         featureList=AutoFeatureSelection.FeatureSelection(dataframe,target,dict_class,disable_colinearity)
         CleanedDF=dataCleaner(dataframe,featureList,target,dict_class)
     else:
-        CleanedDF=dataCleaner(dataframe,features,target,dict_class)
-
+        CleanedDF=dataCleaner(dataframe,features,target,dict_class)   
+  
     accuracy_criteria= accuracy_criteria if accuracy_criteria<=1.0 else (accuracy_criteria/100)
     modelClass = model_search(CleanedDF,target,dict_class,disable_colinearity,model_types=model_types,accuracy_criteria=accuracy_criteria)
     modelClass.yamldata=dict_class.getdict()

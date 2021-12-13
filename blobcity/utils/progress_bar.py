@@ -61,6 +61,7 @@ class Progress():
 
         Function updates a tqdm_notebook progress bar with specified integer count.
         """
+        self.trials=self.trials-1
         self.pbar.update(i)
 
     def close_progressbar(self):
