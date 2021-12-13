@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 import warnings,copy
 from blobcity.store import DictClass
+from blobcity.aicloud import send_yaml_to_cloud
 from sklearn.preprocessing import MinMaxScaler 
 from blobcity.main.modelSelection import model_search
 from blobcity.code_gen import yml_reader,code_generator
@@ -38,11 +39,13 @@ def train(file=None, df=None, target=None,features=None,model_types='all',accura
 
     param3: string: target/dependent column name.
 
-    param4: boolean: whether to train tensorflow models
+    param4: list: List of features to consider for training
 
-    param5: float: range[0.1,1.0]
+    param5: string:  whether to train on GOFAI algorithms or Neural Network, available options are ['classic','neural','all']
+
+    param6: float: range[0.1,1.0]
     
-    param6: boolean: whether to consider Multicolinearity check in Auto Feature Selection
+    param7: boolean: whether to consider Multicolinearity check in Auto Feature Selection
 
     return: Model Class Object
     Performs a model search on the data proivded. A yaml file is generated once the best fit model configuration
@@ -74,6 +77,7 @@ def train(file=None, df=None, target=None,features=None,model_types='all',accura
     if modelClass.yamldata['model']['type'] in ['TF','tf','Tensorflow']:metrics['Accuracy']=dict_class.accuracy
     else:metrics['CVSCORE']=dict_class.accuracy
     post_data={'autoAIID':exp_id,'yaml':modelClass.yamldata,'metrics':metrics}
+    send_yaml_to_cloud(post_data)
     dict_class.resetVar()
     return modelClass
 
