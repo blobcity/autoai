@@ -69,9 +69,9 @@ class classifier_config:
             ensemble.RandomForestClassifier,
             {
                 "criterion":{'str':['gini','entropy']},
-                "n_estimators":{'int':[100,1000]},
+                "n_estimators":{'int':[50,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
-                "max_depth":{'int':[3,50]},
+                "max_depth":{'int':[3,18]},
                 'n_jobs':{'str':[-1]}
             }
         ],
@@ -79,9 +79,9 @@ class classifier_config:
             ensemble.ExtraTreesClassifier,
             {
                 "criterion":{'str':['gini','entropy']},
-                "n_estimators":{'int':[100,1000]},
+                "n_estimators":{'int':[50,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
-                "max_depth":{'int':[3,50]},
+                "max_depth":{'int':[3,18]},
                 'n_jobs':{'str':[-1]}
             }
         ],
@@ -89,9 +89,9 @@ class classifier_config:
             ensemble.GradientBoostingClassifier,
             {
                 "criterion":{'str':['squared_error','friedman_mse']},
-                "n_estimators":{'int':[100,1000]},
+                "n_estimators":{'int':[50,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
-                "max_depth":{'int':[3,50]},
+                "max_depth":{'int':[3,18]},
                 "loss":{'str':['deviance','exponential']},
                 "learning_rate":{'float':[1e-3,0.1]}
             }
@@ -101,7 +101,7 @@ class classifier_config:
             {
                 "penalty":{'str':['l1','l2','elasticnet']},
                 'tol':{'float':[1e-3,0.1]},
-                "C":{"int":[1,3]},
+                "C":{"int":[1,5]},
                 "solver":{'str':['newton-cg','liblinear','lbfgs', 'sag', 'saga']},
                 'n_jobs':{'str':[-1]}
             }
@@ -129,8 +129,8 @@ class classifier_config:
             xgboost.XGBClassifier,
             {
                 'use_label_encoder':{'bool':[False]},
-                'max_depth': {'int':[3,20]},
-                'n_estimators': {'int':[100,1000]},
+                'max_depth': {'int':[3,16]},
+                'n_estimators': {'int':[100, 5000]},
                 'learning_rate': {'float':[1e-3,0.1]},
                 'reg_alpha': {'float':[1e-3,0.1]},
                 'reg_lambda': {'float':[1e-3,0.1]},
@@ -163,8 +163,8 @@ class classifier_config:
             {
                 "loss":{"str":['auto']},
                 "learning_rate":{'float':[1e-3,0.1]},
-                "max_iter":{"int":[1000,5000]},
-                "max_depth":{"int":[3,50]},
+                "max_iter":{"int":[50,5000]},
+                "max_depth":{"int":[3,18]},
                 "l2_regularization":{"float":[1e-3,0.1]},
                 "tol":{"float":[1e-7,0.1]},
                 "scoring":{"str":["accuracy", "precision", "loss"]},

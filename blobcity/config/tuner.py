@@ -99,7 +99,7 @@ def classification_metrics(y_true,y_pred):
     result['Recall']=round(recall_score(y_true, y_pred,average="weighted"),3)
     return result
 
-def metricResults(y_true,y_pred,ptype):
+def metricResults(y_true,y_pred,ptype,prog):
     """
     param1: model object (keras/sklearn/xgboost/catboost/lightgbm)
     param2: pandas.DataFrame
@@ -113,6 +113,7 @@ def metricResults(y_true,y_pred,ptype):
     return the resulting output(Dictionary).
     """
     results = classification_metrics(y_true,y_pred) if ptype =="Classification" else regression_metrics(y_true,y_pred)
+    prog.update_progressbar(1)
     return results
 
 def get_param_list(modelkey,modelList):
@@ -155,13 +156,12 @@ def objective(trial):
     """
     params=get_params(trial)
     model=modelName(**params)
-    n_jobs= 1 if model.__class__.__name__ in ['XGBClassifier','XGBRegressor','LGBMRegressor','LGBMClassifier','CatBoostRegressor','CatBoostClassifier'] else -1
-    score = cross_val_score(model, X, Y, n_jobs=n_jobs, cv=cv)
+    score = cross_val_score(model, X, Y, cv=cv)
     accuracy = score.mean()
     prog.update_progressbar(1)
     return accuracy   
 
-def prediction_data(y_true,y_pred,ptype):
+def prediction_data(y_true,y_pred,ptype,prog):
     """
     param1:pandas.Series/numpy.darray
     param2:pandas.Series/numpy.darray
@@ -173,9 +173,11 @@ def prediction_data(y_true,y_pred,ptype):
     """
     if ptype=='Classification':
         cm=confusion_matrix(y_true,y_pred)
+        prog.update_progressbar(1)
         return cm
     else:
         data_pred=[y_true.values,y_pred]
+        prog.update_progressbar(1)
         return data_pred        
 
 def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy,DictionaryClass,stages):
@@ -198,13 +200,13 @@ def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy,DictionaryClas
     global Y
     global cv
     global prog
+    prog=Progress()
     X,Y=dataframe.drop(target,axis=1),dataframe[target]
     cv=modelSelection.getKFold(X)
     get_param_list(modelkey,modelList)
     EarlyStopper.criterion=accuracy
     n_trials=50
     try:
-        prog=Progress()
         if modelName().__class__.__name__ in ['SVC','NuSVC','LinearSVC','SVR','NuSVR','LinearSVR','KNeighborsClassifier','KNeighborsRegressor','RadiusNeighborsClassifier','RadiusNeighborsRegressor']:
             X = scaling_data(X,DictionaryClass,update=True)
                  
@@ -212,8 +214,8 @@ def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy,DictionaryClas
         study = optuna.create_study(direction="maximize")
         study.optimize(objective,n_trials=n_trials,callbacks=[early_stopping_opt])
         model = modelName(**study.best_params).fit(X,Y)
-        metric_result=metricResults(Y,model.predict(X),ptype)
-        plots=prediction_data(Y,model.predict(X),ptype)
+        metric_result=metricResults(Y,model.predict(X),ptype,prog)
+        plots=prediction_data(Y,model.predict(X),ptype,prog)
         prog.update_progressbar(prog.trials)
         prog.close_progressbar()
         return (model,study.best_params,study.best_value,metric_result,plots)
