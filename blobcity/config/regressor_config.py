@@ -69,20 +69,20 @@ class regressor_config:
         "RandomForestRegressor":[
             ensemble.RandomForestRegressor,
             {
-                "criterion":{'str':['absolute_error','squared_error']},
-                "n_estimators":{'int':[100,1000]},
+                "criterion":{'str':['squared_error']},
+                "n_estimators":{'int':[50,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
-                "max_depth":{'int':[3,50]},
+                "max_depth":{'int':[3,18]},
                 'n_jobs':{'str':[-1]}
             }
         ],
         "ExtraTreesRegressor":[
             ensemble.ExtraTreesRegressor,
             {
-                "criterion":{'str':['squared_error','absolute_error']},
-                "n_estimators":{'int':[100,1000]},
-                "max_features":{"str":["auto", "sqrt", "log2"]},
-                "max_depth":{'int':[3,20]},
+                "criterion":{'str':['squared_error']},
+                "n_estimators":{'int':[50,1000]},
+                "max_features":{"str":["auto","sqrt", "log2"]},
+                "max_depth":{'int':[3,18]},
                 'n_jobs':{'str':[-1]}
             }
         ],
@@ -90,9 +90,9 @@ class regressor_config:
             ensemble.GradientBoostingRegressor,
             {
                 "criterion":{'str':['squared_error','friedman_mse']},
-                "n_estimators":{'int':[100,1000]},
+                "n_estimators":{'int':[50,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
-                "max_depth":{'int':[3,50]},
+                "max_depth":{'int':[3,18]},
                 "loss":{'str':['ls','lad','huber']},
                 "learning_rate":{'float':[1e-3,0.1]}
             }
@@ -214,7 +214,7 @@ class regressor_config:
         "XGBRegressor":[
             XGBRegressor,
             {
-                "n_estimators":{'int':[500, 5000]},
+                "n_estimators":{'int':[100, 5000]},
                 "max_depth":{'int':[3,16]},
                 "learning_rate":{'float':[1e-3,0.1]},
                 "booster":{'str':['gbtree', 'gblinear', 'dart']},
@@ -290,7 +290,8 @@ class regressor_config:
             {
                 "loss":{'str':['least_squares', 'least_absolute_deviation', 'poisson']},
                 "learning_rate":{'float':[1e-3,0.1]},
-                "max_depth":{'int':[3,30]},
+                "max_iter":{"int":[50,5000]},
+                "max_depth":{'int':[3,18]},
                 "tol":{'float':[1e-3,0.1]}
             }
         ],

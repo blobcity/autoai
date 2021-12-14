@@ -26,7 +26,7 @@ def send_yaml_to_cloud(yaml_data):
     if token!=404:
         head={'Authorization':'Bearer '+token}
         try:
-            API_ENDPOINT=""
+            API_ENDPOINT="http://sb-api.blobcity.net/rest/v1/user/submit-autoAI"
             res=requests.post(API_ENDPOINT,json=yaml_data,headers=head)
             if res.status_code==200:
                 if res.json()['ack']==1:print("AutoAI YAML configuration uploaded to BlobCity AI Cloud")

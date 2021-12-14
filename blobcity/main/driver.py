@@ -31,7 +31,7 @@ with warnings.catch_warnings():
     import tensorflow as tf
     tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
-def train(file=None, df=None, target=None,features=None,model_types='all',accuracy_criteria=0.99,disable_colinearity=False):
+def train(file=None, df=None, target=None,features=None,model_types='all',accuracy_criteria=0.99,disable_colinearity=False,epochs=20,max_neural_search=10):
     """
     param1: string: dataset file path 
 
@@ -47,7 +47,12 @@ def train(file=None, df=None, target=None,features=None,model_types='all',accura
     
     param7: boolean: whether to consider Multicolinearity check in Auto Feature Selection
 
+    param8: int :  Number of epoches for Neural Network training
+
+    param9: int :  Max number of Neural Network Models to try.
+
     return: Model Class Object
+
     Performs a model search on the data proivded. A yaml file is generated once the best fit model configuration
     is discovered. The yaml file is later used for generating source code. 
 
@@ -70,7 +75,7 @@ def train(file=None, df=None, target=None,features=None,model_types='all',accura
         CleanedDF=dataCleaner(dataframe,features,target,dict_class)   
   
     accuracy_criteria= accuracy_criteria if accuracy_criteria<=1.0 else (accuracy_criteria/100)
-    modelClass = model_search(CleanedDF,target,dict_class,disable_colinearity,model_types=model_types,accuracy_criteria=accuracy_criteria)
+    modelClass = model_search(dataframe=CleanedDF,target=target,DictClass=dict_class,disable_colinearity=disable_colinearity,model_types=model_types,accuracy_criteria=accuracy_criteria,epochs=epochs,max_neural_search=max_neural_search)
     modelClass.yamldata=dict_class.getdict()
     modelClass.feature_importance_=dict_class.feature_importance if(features==None) else calculate_feature_importance(CleanedDF.drop(target,axis=1),CleanedDF[target],dict_class)
     metrics=copy.deepcopy(modelClass.metrics)
@@ -84,6 +89,7 @@ def train(file=None, df=None, target=None,features=None,model_types='all',accura
 def load(model_path=None):
         """
         param1: string: (required) the filepath to the stored model. Supports .pkl models.
+
         returns: Model file
 
         function loads the serialized model from .pkl format to usable format.
@@ -114,7 +120,9 @@ def load(model_path=None):
 def spill(filepath=None,yaml_data=None,doc=None):
     """
     param1:string : filepath and format of generated file to store. either .py or .ipynb
+
     param2:string : filepath of already generated YAML file or dictionary object.
+    
     param3:boolean : whether generate code along with documentation
 
     Function calls generator functions to generate source code for the AutoAI Procedure

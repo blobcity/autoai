@@ -56,8 +56,7 @@ def getKFold(X):
     if(rows>100 and rows<300):k=2
     elif(rows>300 and rows<=500): k=4
     elif(rows>500 and rows <=5000 ):k=5
-    elif(rows>5000 and rows <=10000): k=10
-    elif(rows>10000): k=15
+    elif(rows>5000):k=10 
     return k
 
 def cv_score(model,X,Y,k):
@@ -157,7 +156,7 @@ def train_on_full_data(X,Y,models,best,DictionaryClass,stages):
     clean_dict = {k: modelScore[k] for k in modelScore if not isnan(modelScore[k])}
     return dict(itertools.islice(sort_score(clean_dict).items(), 1))
 
-def train_on_neural(X,Y,ptype,stage,ofstage):
+def train_on_neural(X,Y,ptype,epochs,max_neural_search,stage,ofstage):
     """
     param1: pandas.DataFrame
     param2: pandas.Series/Pandas.DataFrame
@@ -166,10 +165,9 @@ def train_on_neural(X,Y,ptype,stage,ofstage):
 
     Function perform neural network model search and tuning using autokeras api and finally returns selected keras model.
     """
-    max_trials,n_epochs=10,20
-    prog.create_progressbar(n_counters=((max_trials+2)*n_epochs),desc="Neural Networks (stage {} of {})".format(stage,ofstage))
-    clf = ak.StructuredDataClassifier(overwrite=True,max_trials=max_trials) if ptype=='Classification' else ak.StructuredDataRegressor(overwrite=True,max_trials=max_trials) 
-    clf.fit(X,Y, epochs=n_epochs,verbose=0,callbacks=[CustomCallback()])
+    prog.create_progressbar(n_counters=((max_neural_search+2)*epochs),desc="Neural Networks (stage {} of {})".format(stage,ofstage))
+    clf = ak.StructuredDataClassifier(overwrite=True,max_trials=max_neural_search) if ptype=='Classification' else ak.StructuredDataRegressor(overwrite=True,max_trials=max_neural_search) 
+    clf.fit(X,Y, epochs=epochs,verbose=0,callbacks=[CustomCallback()])
     loss,acc=clf.evaluate(X,Y,verbose=0)
     y_pred=clf.predict(X,verbose=0)
     if ptype=="Classification": 
@@ -179,8 +177,8 @@ def train_on_neural(X,Y,ptype,stage,ofstage):
         print("Loss: {}, Accuracy: {:.2f}".format(loss,acc))
     else:
         print("Loss: {}, Accuracy: {:.2f}".format(loss,acc))
-    results= Tuner.metricResults(Y,y_pred,ptype)
-    plot_data=Tuner.prediction_data(Y, y_pred, ptype)
+    results= Tuner.metricResults(Y,y_pred,ptype,prog)
+    plot_data=Tuner.prediction_data(Y, y_pred, ptype,prog)
     prog.update_progressbar(prog.trials)
     prog.close_progressbar()
     return (clf,acc,results,plot_data)
@@ -248,14 +246,16 @@ def neural_model_records(modelData,neural_network,DictClass,ptype,dataframe,targ
     if ptype=='Regression':DictClass.UpdateNestedKeyValue('model','save_type',"pb")
     return modelData
 
-def model_search(dataframe,target,DictClass,disable_colinearity,model_types="all",accuracy_criteria=0.99):
+def model_search(dataframe=None,target=None,DictClass=None,disable_colinearity=False,model_types="all",accuracy_criteria=0.99,epochs=20,max_neural_search=10):
     """
     param1: pandas.DataFrame
     param2: string
     param3: Class object
     param4: boolean
-    param5: string : option to selection model selection on either neural networks or Classic GOFAI models
-    param6: float : ranges between 0.1 to 1.0
+    param5: string : Option to selection model selection on either neural networks or Classic GOFAI models
+    param6: float : Ranges between 0.1 to 1.0
+    param7: int: Number of epoches for Neural Network training
+    param8: int: Max number of Neural Network Models to try on.
     return: Class object
 
     Function first fetches model dictionary which consists of model object and required parameter,
@@ -282,8 +282,8 @@ def model_search(dataframe,target,DictClass,disable_colinearity,model_types="all
     elif model_types=='neural':
         gpu_num=tf.config.list_physical_devices('GPU')
         if len(gpu_num)==0: print("No GPU was detected on your system. Defaulting to CPU. Consider running on a GPU plan on BlobCity AI Cloud for faster training. https://cloud.blobcity.com")
-        neural_network=train_on_neural(X,Y,ptype,1,1)
-        DictClass.accuracy=neural_network[1]
+        neural_network=train_on_neural(X,Y,ptype,epochs,max_neural_search,1,1)
+        DictClass.accuracy=round(neural_network[1],3)
         modelData=neural_model_records(modelData,neural_network,DictClass,ptype,dataframe,target)
         class_name="Neural Network"
 
