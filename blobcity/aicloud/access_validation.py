@@ -22,8 +22,9 @@ def set_token(token):
 
     Function validated access token set by user with the AI Cloud server api
     """
-    API_ENDPOINT="http://sb-api.blobcity.net/rest/v1/user/validate-access-key"
+    API_ENDPOINT="https://cloud-api.blobcity.com/rest/v1/user/validate-access-key"
     res=requests.post(url=API_ENDPOINT,headers={'Authorization':"Bearer "+token})
+    print(res.json())
     if res.status_code==200:
         if res.json()['ack']==1:
             os.environ['TOKEN']=token
