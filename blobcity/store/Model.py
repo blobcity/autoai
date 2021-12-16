@@ -233,6 +233,9 @@ class Model:
             plt.figure(figsize = (12, 6))
             plt.barh(range(len(val)), list(val.values()), align='center')
             plt.yticks(range(len(val)),list(val.keys()))
+            plt.xlabel("Importance")
+            plt.ylabel("Feature")
+            plt.tight_layout()
             plt.show()
         else:
             print("Feature importance not available for dataset with less then 2 columns") 
