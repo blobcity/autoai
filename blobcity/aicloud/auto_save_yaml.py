@@ -31,6 +31,6 @@ def send_yaml_to_cloud(yaml_data):
             if res.status_code==200:
                 if res.json()['ack']==1:print("AutoAI YAML configuration uploaded to BlobCity AI Cloud")
                 elif res.json()['ack']==0:print("Not able to save the YAML config to the BlobCity AI Cloud currently")
-            else:print("some error occurred while sending yaml data")
+            else:print("Some error occurred while sending yaml data")
         except Exception as e:
             print(e)

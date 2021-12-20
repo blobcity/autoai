@@ -24,7 +24,6 @@ def set_token(token):
     """
     API_ENDPOINT="https://cloud-api.blobcity.com/rest/v1/user/validate-access-key"
     res=requests.post(url=API_ENDPOINT,headers={'Authorization':"Bearer "+token})
-    print(res.json())
     if res.status_code==200:
         if res.json()['ack']==1:
             os.environ['TOKEN']=token
