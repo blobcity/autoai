@@ -112,7 +112,7 @@ def metricResults(y_true,y_pred,ptype,prog):
     on training set. based on problem type call appropriate metric function either regression_metrics() or classification_metrics()
     return the resulting output(Dictionary).
     """
-    results = classification_metrics(y_true,y_pred) if ptype =="Classification" else regression_metrics(y_true,y_pred)
+    results = classification_metrics(y_true,y_pred) if ptype in ["Classification","Image Classification"] else regression_metrics(y_true,y_pred)
     prog.update_progressbar(1)
     return results
 
@@ -171,7 +171,7 @@ def prediction_data(y_true,y_pred,ptype,prog):
 
     Function generate data for ploting appropriate graph/diagram on the basis of problem type.
     """
-    if ptype=='Classification':
+    if ptype in ['Classification','Image Classification']:
         cm=confusion_matrix(y_true,y_pred)
         prog.update_progressbar(1)
         return cm
@@ -201,13 +201,14 @@ def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy,DictionaryClas
     global cv
     global prog
     prog=Progress()
-    X,Y=dataframe.drop(target,axis=1),dataframe[target]
-    cv=modelSelection.getKFold(X)
+    if ptype!="Image Classification":X,Y=dataframe.drop(target,axis=1),dataframe[target]
+    else: X,Y=dataframe,target
+    cv=modelSelection.getKFold(X.shape[0])
     get_param_list(modelkey,modelList)
     EarlyStopper.criterion=accuracy
     n_trials=50
     try:
-        if modelName().__class__.__name__ in ['SVC','NuSVC','LinearSVC','SVR','NuSVR','LinearSVR','KNeighborsClassifier','KNeighborsRegressor','RadiusNeighborsClassifier','RadiusNeighborsRegressor']:
+        if modelName().__class__.__name__ in ['SVC','NuSVC','LinearSVC','SVR','NuSVR','LinearSVR','KNeighborsClassifier','KNeighborsRegressor','RadiusNeighborsClassifier','RadiusNeighborsRegressor','NearestCentroid']:
             X = scaling_data(X,DictionaryClass,update=True)
                  
         prog.create_progressbar(n_trials,"Tuning {} (Stage 3 of {}) :".format(modelName().__class__.__name__,stages))

@@ -12,15 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
+import os,copy
 from blobcity.store import DictClass
+from blobcity.main.modelSelection import model_search
 from blobcity.utils import get_dataframe_type,check_subfolder_data
-from blobcity.utils import uncompress_file,validate_url,file_from_url
+from blobcity.utils import uncompress_file,validate_url,file_from_url,AutoFeatureSelection
 
 """
 This file consists of Function to deal with Image Classification problem in python.
 """
-def train(file=None, df=None, target=None,model_types='classic',accuracy_criteria=0.99):
+def train(file=None, df=None, target=None,model_types='classic',accuracy_criteria=0.99,resize=50):
     """
     param1: string: file path 
 
@@ -31,6 +32,8 @@ def train(file=None, df=None, target=None,model_types='classic',accuracy_criteri
     param4: string: whether to train on classic or tensorflow models options ['all','classic','neural']
 
     param5: float: range[0.1,1.0] 
+
+    param6: int : resolution size to resize the image i.e resize X resize. for example, 50X50
 
     return: Model Class Object
     Performs a model search on the data proivded. A yaml file is generated once the best fit model configuration
@@ -46,15 +49,25 @@ def train(file=None, df=None, target=None,model_types='classic',accuracy_criteri
         root, ext = os.path.splitext(file)
         compress_list=[".zip",".tar",".gz",'.tar.gz','.bz2']
         if not ext and ext not in compress_list and target==None:
-            if validate_url(file): file=file_from_url(file) 
+            if validate_url(file): 
+                file=file_from_url(file) 
             data,target=check_subfolder_data(file)
-            return
         elif ext in compress_list:
             if validate_url(file): 
                 file=file_from_url(file)
             file=uncompress_file(file)
             data,target=check_subfolder_data(file)
-            return
+        dict_class.addKeyValue('problem',{'type':'Image Classification'})
+        data=AutoFeatureSelection.image_processing(data,target,resize,dict_class)
+        
     else: 
         dataframe = df
         dict_class.addKeyValue('data_read',{"type":"df","class":"df"})
+
+    modelClass = model_search(dataframe=data,target='label',DictClass=dict_class,disable_colinearity=True,model_types=model_types,accuracy_criteria=accuracy_criteria,epochs=20,max_neural_search=10)
+    modelClass.yamldata=dict_class.getdict()
+    metrics=copy.deepcopy(modelClass.metrics)
+    if modelClass.yamldata['model']['type'] in ['TF','tf','Tensorflow']:metrics['Accuracy']=dict_class.accuracy
+    else:metrics['CVSCORE']=dict_class.accuracy
+    dict_class.resetVar()
+    return modelClass

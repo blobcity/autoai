@@ -16,7 +16,7 @@
 This Python File Consists of Functions to perform Automatic feature Selection 
 
 """
-
+import os,cv2
 import numpy as np
 import pandas as pd
 from sklearn.feature_selection import VarianceThreshold,SelectKBest,f_regression,f_classif
@@ -183,3 +183,52 @@ class AutoFeatureSelection:
             res3=[i for i in res if i not in res2]
             return res3 
         else: return featureList
+
+    def image_processing(data,targets,resize,dict_class):
+        """
+        param1: String
+        param2: List
+        param3: Class object
+        return: pandas.DataFrame
+        """
+        training_data,label_mapping=AutoFeatureSelection.create_training_data(data,targets,resize)
+        dict_class.original_label=label_mapping
+        dict_class.addKeyValue('cleaning',{"resize":resize})
+        df = pd.DataFrame(training_data, columns=['image', 'label'])
+        return df
+
+    def create_training_data(data,target,resize):
+        """
+        param1: String
+        param2: List
+        return: Tuple : (List,dict)
+        """
+        training_data=[]
+        label_mapping={}
+        for category in target:
+            path=os.path.join(data, category)
+            class_num=target.index(category)
+            label_mapping[class_num]=category
+            for img in os.listdir(path):
+                try:
+                    img_array=cv2.imread(os.path.join(path,img))
+                    img_array=cv2.cvtColor(img_array,cv2.COLOR_BGR2RGB)
+                    img_array=cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
+                    new_array=cv2.resize(img_array,(resize,resize))
+                    training_data.append([new_array,class_num])
+                except Exception as e:
+                    pass
+        return (training_data,label_mapping)
+
+    def get_reshaped_image(training_data):
+        """
+        param1:numpy.array
+        """
+        lenofimage = len(training_data)
+        X, y = [], []
+        for categories, label in training_data:
+            X.append(categories)
+            y.append(label)
+        X = np.array(X).reshape(lenofimage,-1)
+        y = np.array(y)
+        return (X,y)

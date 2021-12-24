@@ -17,9 +17,10 @@
 This Python file consists of function to perform basic data cleaning/data preprocessing operation on most dataset.
 Functions includes, Removal of Unique COlumns,High Null value ratio, Missing Value Handling, String Categorical feature Handling .
 """
-
+import cv2
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from tqdm.auto import tqdm
 from tarfile import is_tarfile
 import os,tarfile,requests,warnings
@@ -201,18 +202,26 @@ def scaling_data(dataframe,DictionaryClass,update=False):
     """
     
     scaler=MinMaxScaler() if DictionaryClass.ObjectExist else StandardScaler()
-    X=scaler.fit_transform(dataframe)
-    X=pd.DataFrame(data = X,columns = dataframe.columns)
+    X=scaler.fit_transform(dataframe) 
+    if isinstance(dataframe,pd.DataFrame):X=pd.DataFrame(data = X,columns = dataframe.columns)
     if update:DictionaryClass.UpdateNestedKeyValue('cleaning','rescale',scaler.__class__.__name__)
     return X
 
 def uncompress_file(file):
+    """
+    param1: string
+    return: string
+    """
     if os.path.isfile(file):
         return decompress(file)
     else:
         raise FileNotFoundError(f"provided path {file} does not exist")
     
 def decompress(file):
+    """
+    param1: string
+    return: string
+    """
     try:
         ogpath=os.path.splitext(file)
         extract_dir="./"+os.path.basename(ogpath[0])
@@ -238,6 +247,10 @@ def decompress(file):
     return extract_dir
 
 def file_from_url(url):
+    """
+    param1: String
+    return: string
+    """
     try:
         ogpath=os.path.splitext(url)
         download_path="./"+os.path.basename(ogpath[0])+ogpath[-1]
@@ -250,6 +263,10 @@ def file_from_url(url):
     except Exception as e: print(e)
 
 def check_subfolder_data(file):
+    """
+    param1:string
+    return: Tuple(string,list)
+    """
     targets = os.listdir(file)
     print(f"identified target are :{targets}")
     check_status=True
@@ -266,3 +283,18 @@ def check_subfolder_data(file):
         if not check_status:break
     if not check_status: raise TypeError("some files have different formats")
     return (file,targets)
+
+def quick_image_processing(path,size):
+    """
+    param1: string: path of image file
+    param2: int: image resize resolution
+    return: numpy.darray
+
+    Function flattens a image appropriate for model prediction
+    """
+    data = cv2.imread(path)
+    data=cv2.cvtColor(data,cv2.COLOR_BGR2RGB)
+    img_array=cv2.cvtColor(data, cv2.COLOR_RGB2GRAY)
+    img_resize=cv2.resize(img_array,(size,size))
+    img_data=[img_resize.flatten()]
+    return (img_data,data)
