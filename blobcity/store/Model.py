@@ -18,7 +18,6 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler,MinMaxScaler
 from blobcity.utils import get_dataframe_type,Progress,write_dataframe,quick_image_processing
 from blobcity.code_gen import code_generator
 import yaml
@@ -28,7 +27,7 @@ Python file consists of Class Model to initialize/store and retrive data associa
 """
 class Model:
     
-    def __init__(self,params=dict(),featureList=[],model=None,metrics=dict(),yamldata=None,feature_importance=dict(),plot_data=None,target_encode=dict()):
+    def __init__(self,params=dict(),featureList=[],model=None,metrics=dict(),yamldata=None,feature_importance=dict(),scaler=None,plot_data=None,target_encode=dict()):
         self.params=params
         self.featureList=featureList
         self.model=model
@@ -37,6 +36,7 @@ class Model:
         self.feature_importance_=feature_importance
         self.plot_data=plot_data
         self.target_encode=target_encode
+        self.scaler=scaler
     
     def __quick_clean(self,test_dataframe):
         """
@@ -134,8 +134,7 @@ class Model:
                 else: raise ValueError(f"Model is trained on {len(self.yamldata['features']['X_values'])} features,provided {len(test.keys())} features")
             test=Model().__check_columns(test,self.featureList)
             if "cleaning" in self.yamldata.keys() and "rescale" in self.yamldata['cleaning'].keys():
-                scaler = StandardScaler() if self.yamldata['cleaning']['rescale']=="StandardScaler" else MinMaxScaler()
-                test=pd.DataFrame(scaler.fit_transform(test),columns=test.columns)
+                test=pd.DataFrame(self.scaler.transform(test),columns=test.columns)
             if self.model.__class__.__name__ not in ['XGBClassifier','XGBRegressor']:result=self.model.predict(test)
             else:
                 if type(test)=="list":
@@ -160,8 +159,7 @@ class Model:
             if extension in ['.png',".PNG",".jpg",".jpeg",'.JPEG']:
                 data=quick_image_processing(test,self.yamldata['cleaning']["resize"])
                 if "cleaning" in self.yamldata.keys() and "rescale" in self.yamldata['cleaning'].keys():
-                    scaler = StandardScaler() if self.yamldata['cleaning']['rescale']=="StandardScaler" else MinMaxScaler()
-                    data_=scaler.fit_transform(data[0])
+                    data_=self.scaler.transform(data[0])
                     result=self.model.predict(data_) 
                 else:
                     result=self.model.predict(data[0]) 

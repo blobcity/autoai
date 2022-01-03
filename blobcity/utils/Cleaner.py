@@ -204,7 +204,9 @@ def scaling_data(dataframe,DictionaryClass,update=False):
     scaler=MinMaxScaler() if DictionaryClass.ObjectExist else StandardScaler()
     X=scaler.fit_transform(dataframe) 
     if isinstance(dataframe,pd.DataFrame):X=pd.DataFrame(data = X,columns = dataframe.columns)
-    if update:DictionaryClass.UpdateNestedKeyValue('cleaning','rescale',scaler.__class__.__name__)
+    if update:
+        DictionaryClass.UpdateNestedKeyValue('cleaning','rescale',scaler.__class__.__name__)
+        DictionaryClass.Scaler=scaler
     return X
 
 def uncompress_file(file):

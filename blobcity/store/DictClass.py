@@ -21,7 +21,7 @@ class DictClass:
 
     def __init__(self,ObjectExist=False,ObjectList=None,YAML=dict(),feature_importance=dict(),
         original_label=dict(),accuracy=0.0,image_models=['SVC','NuSVC','LinearSVC','KNeighborsClassifier','NearestCentroid',
-        'DecisionTreeClassifier','RandomForestClassifier','ExtraTreesClassifier','LogisticRegression','Perceptron']):
+        'DecisionTreeClassifier','RandomForestClassifier','ExtraTreesClassifier','LogisticRegression','Perceptron'],Scaler=None):
         self.ObjectExist=ObjectExist
         self.ObjectList=ObjectList
         self.YAML=YAML
@@ -29,6 +29,7 @@ class DictClass:
         self.original_label=original_label
         self.accuracy=accuracy
         self.image_models=image_models
+        self.Scaler=Scaler
 
     def get_encoded_label(self):
         """

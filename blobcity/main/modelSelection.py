@@ -231,6 +231,7 @@ def classic_model_records(modelData,modelResult,DictClass):
     modelData.model,modelData.params,acc,modelData.metrics,modelData.plot_data = modelResult
     DictClass.addKeyValue('model',{'type': modelData.model.__class__.__name__})
     DictClass.UpdateNestedKeyValue('model','parameters',modelResult[1])
+    modelData.scaler=DictClass.Scaler
     return modelData
 
 def neural_model_records(modelData,neural_network,DictClass,ptype,dataframe,target):
