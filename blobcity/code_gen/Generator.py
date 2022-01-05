@@ -93,17 +93,28 @@ def data_read(ymlData,codes="",nb=None,with_doc=False):
 
     The function adds code syntax related to data fetching using the panda's library.
     """
-    if with_doc and nb!=None:
-        nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['datafetch']))
-    elif with_doc and codes!="":
-        codes=codes+PyComments.procedure['datafetch']
-    rtype=ymlData['data_read']['type']
-    if(rtype!='df'): reader_code=SourceCode.data_read[rtype].replace("PATH", ymlData['data_read']['file'])
-    else: reader_code=SourceCode.data_read[rtype]
-    if nb!=None and codes=="":
-        nb['cells'].append(nbf.v4.new_code_cell(reader_code))
-        return nb
-    else: return codes+reader_code
+    if ymlData['problem']['type'] in ['Classification','Regression']:
+        if with_doc and nb!=None:
+            nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['datafetch']))
+        elif with_doc and codes!="":
+            codes=codes+PyComments.procedure['datafetch']
+        rtype=ymlData['data_read']['type']
+        if(rtype!='df'): reader_code=SourceCode.data_read[rtype].replace("PATH", ymlData['data_read']['file'])
+        else: reader_code=SourceCode.data_read[rtype]
+        if nb!=None and codes=="":
+            nb['cells'].append(nbf.v4.new_code_cell(reader_code))
+            return nb
+        else: return codes+reader_code
+    elif ymlData['problem']['type']=='Image Classification': 
+        paths=SourceCode.image_data['paths'].replace('PATH',str(ymlData['data_read']['file'])).replace('TARGET',str(ymlData['features']['Y_values']))
+        sample_image=SourceCode.image_data['Sample Image']
+        if nb!=None and codes=="":
+            nb['cells'].append(nbf.v4.new_markdown_cell("### Initialization"))
+            nb['cells'].append(nbf.v4.new_code_cell(paths))
+            nb['cells'].append(nbf.v4.new_markdown_cell("### Sample Image"))
+            nb['cells'].append(nbf.v4.new_code_cell(sample_image))
+            return nb
+        else: return codes+paths+sample_image
 
 def features_selection(yml_data,codes="",nb=None,with_doc=False):
     """
@@ -119,14 +130,22 @@ def features_selection(yml_data,codes="",nb=None,with_doc=False):
     elif with_doc and nb==None:
         codes=codes+PyComments.procedure['x&y']
     
-    features=SourceCode.columns['features'].replace("FEATURES", str(yml_data['features']['X_values']))
-    target=SourceCode.columns['target'].replace("TARGET", str(yml_data['features']['Y_values']))
-    data=features+target+SourceCode.selections['X']+SourceCode.selections['Y']
-    if nb!=None and codes=="":
-        nb['cells'].append(nbf.v4.new_code_cell(data))
-        return nb
-    else:
-        return codes+data
+    if yml_data['problem']['type'] in ['Classification','Regression']:
+        features=SourceCode.columns['features'].replace("FEATURES", str(yml_data['features']['X_values']))
+        target=SourceCode.columns['target'].replace("TARGET", str(yml_data['features']['Y_values']))
+        data=features+target+SourceCode.selections['X']+SourceCode.selections['Y']
+        if nb!=None and codes=="":
+            nb['cells'].append(nbf.v4.new_code_cell(data))
+            return nb
+        else:
+            return codes+data
+    elif yml_data['problem']['type']=='Image Classification': 
+        data=SourceCode.image_data['features']
+        if nb!=None and codes=="":
+            nb['cells'].append(nbf.v4.new_code_cell(data))
+            return nb
+        else:
+            return codes+"\r### Feature Selection"+data
 
 def cleaning(yml_data,codes="",nb=None,with_doc=False):
     """
@@ -172,6 +191,19 @@ def cleaning(yml_data,codes="",nb=None,with_doc=False):
     else:
         return nb if nb!=None else codes
 
+def cleaning_image(yml_data,codes="",nb=None,with_doc=False):
+    # if with_doc and nb!=None:
+    #     nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['image_cleaning']))
+    # elif with_doc and codes!="":
+    #     codes=codes+PyComments.procedure['image_cleaning']
+    clean=SourceCode.image_data['cleaning'].replace('SIZE',str(yml_data['cleaning']['resize']))
+    if nb!=None and codes=="":
+        nb['cells'].append(nbf.v4.new_code_cell(clean))
+        return nb
+    else:
+        codes=codes+clean
+        return codes
+
 def add_corr_matrix(codes="",nb=None,with_doc=False):
     """
     param1:string:
@@ -196,19 +228,35 @@ def data_scaling(yml_data,codes="",nb=None,with_doc=False):
     """
     if 'cleaning' in yml_data.keys():
         if 'rescale' in yml_data['cleaning'].keys():
-            rescale_type=yml_data['cleaning']['rescale']
-            imports=SourceCode.cleaning['rescale_import'][rescale_type]
-            if with_doc: 
-                if nb!=None: nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['rescale']))
-                else:codes=codes+PyComments.procedure['rescale']
-            if nb!=None and codes=="": 
-                nb['cells'][1]['source']=nb['cells'][1]['source']+imports
-                nb['cells'].append(nbf.v4.new_code_cell(SourceCode.cleaning['rescale'][rescale_type]))
-                return nb
-            else:
-                idx = codes.index("warnings.filterwarnings('ignore')")
-                codes = codes[:idx]+imports+codes[idx:]
-                return codes+SourceCode.cleaning['rescale'][rescale_type]
+            if yml_data['problem']['type'] in ['Classification','Regression']:
+                rescale_type=yml_data['cleaning']['rescale']
+                imports=SourceCode.cleaning['rescale_import'][rescale_type]
+                if with_doc: 
+                    if nb!=None: nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['rescale']))
+                    else:codes=codes+PyComments.procedure['rescale']
+                if nb!=None and codes=="": 
+                    nb['cells'][1]['source']=nb['cells'][1]['source']+imports
+                    nb['cells'].append(nbf.v4.new_code_cell(SourceCode.cleaning['rescale'][rescale_type]))
+                    return nb
+                else:
+                    idx = codes.index("warnings.filterwarnings('ignore')")
+                    codes = codes[:idx]+imports+codes[idx:]
+                    return codes+SourceCode.cleaning['rescale'][rescale_type]
+            elif yml_data['problem']['type']=='Image Classification':
+                rescale_type=yml_data['cleaning']['rescale']
+                imports=SourceCode.cleaning['rescale_import'][rescale_type]
+                rescaled=SourceCode.cleaning['rescale'][rescale_type].split('\r')[1]
+                if with_doc: 
+                    if nb!=None: nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['rescale']))
+                    else:codes=codes+PyComments.procedure['rescale']
+                if nb!=None and codes=="": 
+                    nb['cells'][1]['source']=nb['cells'][1]['source']+imports
+                    nb['cells'].append(nbf.v4.new_code_cell(rescaled))
+                    return nb
+                else:
+                    idx = codes.index("warnings.filterwarnings('ignore')")
+                    codes = codes[:idx]+imports+codes[idx:]
+                    return codes+rescaled
         else: return nb if nb!=None and codes=="" else codes
     else: return nb if nb!=None and codes=="" else codes
         
@@ -240,6 +288,7 @@ def modeler(yml_data,key,with_doc,codes="",nb=None):
 
     The function adds code syntax related to the Machine learning model initialization and training.
     """
+    if key=='Image Classification': key='Classification'
     if yml_data['model']['type'] not in ['TF','tf','Tensorflow']:
         param=SourceCode.parameters.replace("PARAM", str(yml_data['model']['parameters']))
         model=SourceCode.models_init.replace("MODELNAME", str(yml_data['model']['type']))
@@ -269,6 +318,7 @@ def model_metrics(yml_data,key,codes="",nb=None,with_doc=False):
     The function adds code syntax related to the model evaluation/performance metrics based 
     on problem type, either classification or regression.
     """
+    if key=='Image Classification': key='Classification'
     if with_doc: 
         if nb!=None: nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['metrics']))
         else: codes=codes+PyComments.procedure['metrics']
@@ -291,6 +341,21 @@ def model_metrics(yml_data,key,codes="",nb=None,with_doc=False):
                 return codes+tf_metric_type
             else:
                 return codes+SourceCode.tf_metric[key]
+
+def image_predictor(yml_data,codes="",nb=None,with_doc=False):
+    # if with_doc: 
+    #     if nb!=None: nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['metrics']))
+    #     else: codes=codes+PyComments.procedure['metrics']
+    if yml_data['model']['type'] not in ['TF','tf','Tensorflow']:
+        pred=SourceCode.image_data['Image_prediction']['classic'].replace('SIZE',str(yml_data['cleaning']['resize']))
+    else:
+        pred=SourceCode.image_data['Image_prediction']['tf'].replace('SIZE',str(yml_data['cleaning']['resize']))
+        
+    if nb!=None and codes=="":
+        nb['cells'].append(nbf.v4.new_code_cell(pred))
+        return nb
+    else:
+       return codes+pred
         
 
 def pycoder(yml_data,CGpath,doc=False):
@@ -338,7 +403,76 @@ def ipynbcoder(yml_data,CGpath,doc=True):
     nb=model_metrics(yml_data,key,nb=nb,with_doc=doc)
     write_ipynbcode(CGpath,nb)
 
+def pycoder_image(yml_data,CGpath,doc=False):
+    """
+    param1: dictionary : AutoAI steps data
+    param2: string : filepath to write the code.
+    param3: boolean : Whether to includer documentation/meta description for the following section
+
+    This is the driving function that is responsible for the sequential addition of code syntax into the PY file. 
+    Once codes get generated according to the YAML file(AutoAI procedure), 
+    the code is written into the file using the write_pycode function.
+    """
+    key=yml_data['problem']['type']
+    codes=initialize(key,codes="")
+    codes=data_read(yml_data,codes=codes,with_doc=doc)
+    codes=cleaning_image(yml_data,codes=codes,with_doc=doc)
+    codes=features_selection(yml_data,codes=codes,with_doc=doc)
+    codes=data_scaling(yml_data,codes=codes,with_doc=doc)
+    codes=splits(codes=codes,with_doc=doc)
+    codes=modeler(yml_data,key,doc,codes=codes)
+    codes=model_metrics(yml_data,key,codes=codes,with_doc=doc)
+    codes=image_predictor(yml_data,codes=codes,with_doc=doc)
+    write_pycode(CGpath,codes)
+
+def ipynbcoder_image(yml_data,CGpath,doc=True):
+    """
+    param1: dictionary : AutoAI steps data
+    param2: string : filepath to write the code.
+    param3: boolean : Whether to includer documentation/meta description for the following section
+
+    This is the driving function that is responsible for the sequential addition of code syntax into the IPYNB file. 
+    Once codes get generated according to the YAML file(AutoAI procedure), 
+    the nobebook object is written into the file using the write_ipynbcode function.
+    """
+    nb = nbf.v4.new_notebook()
+    key=yml_data['problem']['type']
+    nb=initialize(key,nb=nb)
+    nb=data_read(yml_data,nb=nb,with_doc=doc)
+    nb=cleaning_image(yml_data,nb=nb,with_doc=doc)
+    nb=features_selection(yml_data,nb=nb,with_doc=doc) 
+    nb=data_scaling(yml_data,nb=nb,with_doc=doc)
+    nb=splits(nb=nb,with_doc=doc)
+    nb=modeler(yml_data,key,doc,nb=nb) 
+    nb=model_metrics(yml_data,key,nb=nb,with_doc=doc)
+    nb=image_predictor(yml_data,nb=nb,with_doc=doc)
+    write_ipynbcode(CGpath,nb)
+
 def code_generator(data,filepath,doc=None):
+    """
+    param1: dictionary : AutoAI steps data
+    param2: string : filepath to write the code.
+    param3: boolean : Whether to includer documentation/meta description for the following section
+
+    """
+    if data['problem']['type'] in ['Classification','Regression']:
+        ftype = "py" if (filepath in ["",None]) else codegen_type(filepath)
+        CGpath= f"CodeGen.{ftype}" if (filepath in ["",None]) else filepath
+        if ftype=="py" and doc in [None,False]:
+            pycoder(data,CGpath,doc=False)
+        elif ftype=="py" and doc==True:
+            pycoder(data,CGpath,doc)
+        elif ftype=="ipynb" and doc==None:
+            ipynbcoder(data,CGpath,doc=True)
+        elif ftype=="ipynb" and doc!=None:
+            ipynbcoder(data,CGpath,doc)
+        else:
+            raise TypeError("file type must be .py or .ipynb")
+    elif data['problem']['type']=="Image Classification":
+        code_generator_image(data,filepath,doc)
+
+
+def code_generator_image(data,filepath,doc=None):
     """
     param1: dictionary : AutoAI steps data
     param2: string : filepath to write the code.
@@ -348,12 +482,12 @@ def code_generator(data,filepath,doc=None):
     ftype = "py" if (filepath in ["",None]) else codegen_type(filepath)
     CGpath= f"CodeGen.{ftype}" if (filepath in ["",None]) else filepath
     if ftype=="py" and doc in [None,False]:
-        pycoder(data,CGpath,doc=False)
+        pycoder_image(data,CGpath,doc=False)
     elif ftype=="py" and doc==True:
-        pycoder(data,CGpath,doc)
+        pycoder_image(data,CGpath,doc)
     elif ftype=="ipynb" and doc==None:
-        ipynbcoder(data,CGpath,doc=True)
+        ipynbcoder_image(data,CGpath,doc=True)
     elif ftype=="ipynb" and doc!=None:
-        ipynbcoder(data,CGpath,doc)
+        ipynbcoder_image(data,CGpath,doc)
     else:
         raise TypeError("file type must be .py or .ipynb")

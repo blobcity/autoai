@@ -284,12 +284,12 @@ def model_search(dataframe=None,target=None,DictClass=None,disable_colinearity=F
     else:
         modelsList= regressor_config().models
 
-    if ptype in ["Classification","Regressor"]: X,Y=dataframe.drop(target,axis=1),dataframe[target]
+    if ptype in ["Classification","Regression"]: X,Y=dataframe.drop(target,axis=1),dataframe[target]
     if ptype =="Image Classification":X,Y=AutoFeatureSelection.get_reshaped_image(dataframe.values)
 
     modelData=Model()
     if ptype in ["Classification","Image Classification"]:modelData.target_encode=DictClass.get_encoded_label()
-    if ptype in ["Classification","Regressor"]: modelData.featureList=dataframe.drop(target,axis=1).columns.to_list()
+    if ptype in ["Classification","Regression"]: modelData.featureList=dataframe.drop(target,axis=1).columns.to_list()
 
     if model_types=='classic':
         modelResult=classic_model(ptype,dataframe,target,X,Y,DictClass,modelsList,accuracy_criteria,3)

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os,copy
+from blobcity.main import load as model_loader
 from blobcity.store import DictClass
 from blobcity.main.modelSelection import model_search
 from blobcity.utils import get_dataframe_type,check_subfolder_data
@@ -46,18 +47,31 @@ def train(file=None, df=None, target=None,model_types='classic',accuracy_criteri
     dict_class.resetVar()
     #data read
     if file!=None:
+        dict_class.addKeyValue('problem',{'type':'Image Classification'})
         root, ext = os.path.splitext(file)
         compress_list=[".zip",".tar",".gz",'.tar.gz','.bz2']
+        data_read={}
+        data_read['file']=file
         if not ext and ext not in compress_list and target==None:
             if validate_url(file): 
-                file=file_from_url(file) 
+                file=file_from_url(file)
+                data_read['from']="URL" 
+            else:
+                data_read['from']="Local"
             data,target=check_subfolder_data(file)
         elif ext in compress_list:
             if validate_url(file): 
                 file=file_from_url(file)
+                data_read['from']="URL" 
+            else:
+                data_read['from']="Local"
             file=uncompress_file(file)
+            data_read['Decompressed_path']=file
+            data_read['Decompress']=ext
             data,target=check_subfolder_data(file)
-        dict_class.addKeyValue('problem',{'type':'Image Classification'})
+            
+        dict_class.addKeyValue('data_read',data_read)
+        dict_class.addKeyValue('features',{'Y_values':target})
         data=AutoFeatureSelection.image_processing(data,target,resize,dict_class)
         
     else: 
@@ -71,3 +85,7 @@ def train(file=None, df=None, target=None,model_types='classic',accuracy_criteri
     else:metrics['CVSCORE']=dict_class.accuracy
     dict_class.resetVar()
     return modelClass
+
+def load(model_path=None):
+    model=model_loader(model_path)
+    return model

@@ -14,7 +14,6 @@
 
 
 import numpy as np
-from sklearn.experimental import enable_hist_gradient_boosting
 from sklearn import tree,ensemble,svm,linear_model,neighbors
 from xgboost import XGBRegressor
 from catboost import CatBoostRegressor

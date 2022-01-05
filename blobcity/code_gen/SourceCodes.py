@@ -25,7 +25,8 @@ class SourceCode:
 
     problem={
         'Classification':'# Classification Problem\r\n',
-        'Regression':'# Regression Problem\r\n'
+        'Regression':'# Regression Problem\r\n',
+        'Image Classification':"# Image Classification\r\n"
     }
 
     imports={
@@ -36,6 +37,10 @@ class SourceCode:
         'Regression':"# imports\r"+'import numpy as np\rimport pandas as pd\rimport matplotlib.pyplot as plt\r'+
                 'import seaborn as se\rimport warnings\rfrom sklearn.model_selection import train_test_split\r'+
                 'from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error\r'
+                +"warnings.filterwarnings('ignore')\r\n",
+        'Image Classification':"# imports\r"+'import os\rimport cv2\rimport numpy as np\rimport matplotlib.pyplot as plt\r'+
+                'import seaborn as se\rimport warnings\rfrom sklearn.model_selection import train_test_split\r'+
+                'from sklearn.metrics import classification_report,plot_confusion_matrix\r'
                 +"warnings.filterwarnings('ignore')\r\n",
     }
 
@@ -165,3 +170,67 @@ class SourceCode:
             'TF':'import blobcity as bc\r\n'
         }
     }
+
+    image_data={
+        'paths':"# Data Path\rfile='PATH'\rtarget=TARGET",
+        'Sample Image':"""# Sample Images\rdef plot_image(data, target):
+  count = 0
+  for category in target:
+      path=os.path.join(data, category)
+      flg,ar =0,[]
+      # storing image paths in an array
+      for img in os.listdir(path):
+          ar.append(os.path.join(path,img)) 
+          flg+= 1
+          if flg==2:
+            break
+      # plotting the images in dataset
+      plt.figure(figsize=(5,5))
+      for i in range(2):
+        img_array = cv2.cvtColor(cv2.imread(ar[i]), cv2.COLOR_BGR2RGB)
+        ax = plt.subplot(1,2,i+1)
+        plt.imshow(img_array)
+        plt.title(category)
+        plt.axis("off")
+      plt.show()
+      count+= 1
+      if count == len(target):
+        break  \rplot_image(file, target)\r""",
+        'cleaning':"""\rdef create_training_data(file,target,resize=SIZE):
+        training_data=[]
+        for category in target:
+            path=os.path.join(file, category)
+            class_num=target.index(category)
+            for img in os.listdir(path):
+                try:
+                    img_array=cv2.imread(os.path.join(path,img))
+                    img_array=cv2.cvtColor(img_array,cv2.COLOR_BGR2RGB)
+                    img_array=cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
+                    new_array=cv2.resize(img_array,(resize,resize))
+                    training_data.append([new_array,class_num])
+                except Exception:
+                    pass
+        return training_data\rtraining_data = create_training_data(file,target)\r""",
+        'features':"""\rlenofimage = len(training_data)
+X, Y = [], []
+for categories, label in training_data:
+    X.append(categories)
+    Y.append(label)
+# Flattening our training feature
+X = np.array(X).reshape(lenofimage,-1)
+Y = np.array(Y)\r""",
+    'Image_prediction':{'classic':"""def image_pred_plot(test_img):
+    img = cv2.imread(test_img)
+    img_array=cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+    plt.imshow(img_array)
+    img_array=cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
+    img_resize=cv2.resize(img_array,(SIZE,SIZE))
+    img_data=[img_resize.flatten()]
+	plt.title("Prediction : {}".format(target[model.predict(img_data)[0]]))
+    plt.show()
+image_pred_plot(PATH)\r"""}
+    }
+
+        
+
+    
