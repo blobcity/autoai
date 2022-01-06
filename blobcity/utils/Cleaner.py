@@ -26,6 +26,7 @@ from tarfile import is_tarfile
 import os,tarfile,requests,warnings
 from zipfile import ZipFile, is_zipfile
 from sklearn.preprocessing import LabelEncoder,MinMaxScaler,StandardScaler
+from blobcity.store.DictClass import DictClass
 from blobcity.utils.ProblemType import ProType
 from blobcity.utils.progress_bar import Progress
 import warnings
@@ -209,20 +210,26 @@ def scaling_data(dataframe,DictionaryClass,update=False):
         DictionaryClass.Scaler=scaler
     return X
 
-def uncompress_file(file):
+def uncompress_file(file,DictionaryClass):
     """
     param1: string
+    param2: Class object
     return: string
+    
+    Function checks if the file exists and call the decompressing functions.
     """
     if os.path.isfile(file):
-        return decompress(file)
+        return decompress(file,DictionaryClass)
     else:
         raise FileNotFoundError(f"provided path {file} does not exist")
     
-def decompress(file):
+def decompress(file,DictionaryClass):
     """
     param1: string
+    param2: Class object
     return: string
+
+    Function decompress file of zip or gz format and return the decompressed file path.
     """
     try:
         ogpath=os.path.splitext(file)
@@ -236,6 +243,7 @@ def decompress(file):
                     zip_ref.extract(member=file,path=extract_dir)
                     prog.update_progressbar(1)
                 prog.close_progressbar()
+            DictionaryClass.UpdateNestedKeyValue('data_read','Decompress','zip')
         elif is_tarfile(file):
             tar = tarfile.open(file, mode="r:gz")
             members=tar.getmembers()
@@ -244,14 +252,19 @@ def decompress(file):
                 tar.extract(member=member,path=extract_dir)
                 prog.update_progressbar(1)
             prog.close_progressbar()
+            DictionaryClass.UpdateNestedKeyValue('data_read','Decompress','gz')
         print(f"file has been decompressed to folder {extract_dir}")
+        DictionaryClass.UpdateNestedKeyValue('data_read','Decompressed_path',extract_dir)
     except Exception as e:print(e)
     return extract_dir
 
-def file_from_url(url):
+def file_from_url(url,DictionaryClass):
     """
     param1: String
+    param2: Class object
     return: string
+
+    Function downloads file from the Network bound files and return the local system path of the downloaded file
     """
     try:
         ogpath=os.path.splitext(url)
@@ -261,13 +274,18 @@ def file_from_url(url):
         with tqdm.wrapattr(open(download_path, "wb"), "write", miniters=1,total=total,desc="Downloading :") as fout:
             for chunk in response.iter_content(chunk_size=4096):
                 fout.write(chunk)
+        DictionaryClass.UpdateKeyValue('data_read','from','URL')
         return download_path
     except Exception as e: print(e)
 
-def check_subfolder_data(file):
+def check_subfolder_data(file,DictionaryClass):
     """
     param1:string
+    param2: Class object
     return: Tuple(string,list)
+
+    Function check individual files in the directory to verify whether all the files are of format image and return target/class
+    identified from it.
     """
     targets = os.listdir(file)
     print(f"identified target are :{targets}")
@@ -283,6 +301,7 @@ def check_subfolder_data(file):
                 except Exception as e:print(e)
         else: check_status=False
         if not check_status:break
+    DictionaryClass.addKeyValue('features',{'Y_values':targets})
     if not check_status: raise TypeError("some files have different formats")
     return (file,targets)
 

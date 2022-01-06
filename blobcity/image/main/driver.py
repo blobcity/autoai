@@ -50,28 +50,20 @@ def train(file=None, df=None, target=None,model_types='classic',accuracy_criteri
         dict_class.addKeyValue('problem',{'type':'Image Classification'})
         root, ext = os.path.splitext(file)
         compress_list=[".zip",".tar",".gz",'.tar.gz','.bz2']
-        data_read={}
-        data_read['file']=file
+        dict_class.addKeyValue('data_read',{'file':file})
         if not ext and ext not in compress_list and target==None:
             if validate_url(file): 
-                file=file_from_url(file)
-                data_read['from']="URL" 
+                file=file_from_url(file,dict_class) 
             else:
-                data_read['from']="Local"
-            data,target=check_subfolder_data(file)
+                dict_class.UpdateNestedKeyValue('data_read','from','Local')
+            data,target=check_subfolder_data(file,dict_class)
         elif ext in compress_list:
             if validate_url(file): 
-                file=file_from_url(file)
-                data_read['from']="URL" 
+                file=file_from_url(file,dict_class) 
             else:
-                data_read['from']="Local"
-            file=uncompress_file(file)
-            data_read['Decompressed_path']=file
-            data_read['Decompress']=ext
-            data,target=check_subfolder_data(file)
-            
-        dict_class.addKeyValue('data_read',data_read)
-        dict_class.addKeyValue('features',{'Y_values':target})
+                dict_class.UpdateNestedKeyValue('data_read','from','Local')
+            file=uncompress_file(file,dict_class)
+            data,target=check_subfolder_data(file,dict_class)
         data=AutoFeatureSelection.image_processing(data,target,resize,dict_class)
         
     else: 
