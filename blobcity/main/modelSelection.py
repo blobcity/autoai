@@ -249,7 +249,7 @@ def neural_model_records(modelData,neural_network,DictClass,ptype,dataframe,targ
 
     modelData.model,acc,modelData.metrics,modelData.plot_data = neural_network
     DictClass.addKeyValue('model',{'type':'TF'})
-    if ptype=="Classification":
+    if ptype in ["Classification", "Image Classification"]:
         n_labels=dataframe[target].nunique(dropna=False)
         cls_type='binary' if n_labels<=2 else 'multiclass'
         DictClass.UpdateNestedKeyValue('model','classification_type',cls_type)
@@ -277,19 +277,17 @@ def model_search(dataframe=None,target=None,DictClass=None,disable_colinearity=F
     """
     global prog
     prog=Progress()
-    ptype=DictClass.getdict()['problem']["type"]
-    
-    if ptype in ["Classification","Image Classification"] :
-        modelsList=classifier_config().models
-    else:
-        modelsList= regressor_config().models
-
-    if ptype in ["Classification","Regression"]: X,Y=dataframe.drop(target,axis=1),dataframe[target]
-    if ptype =="Image Classification":X,Y=AutoFeatureSelection.get_reshaped_image(dataframe.values)
-
     modelData=Model()
-    if ptype in ["Classification","Image Classification"]:modelData.target_encode=DictClass.get_encoded_label()
-    if ptype in ["Classification","Regression"]: modelData.featureList=dataframe.drop(target,axis=1).columns.to_list()
+    ptype=DictClass.getdict()['problem']["type"]
+    cls_types,prob_types= ["Classification","Image Classification"],["Classification","Regression"]
+
+    if ptype in cls_types :modelsList=classifier_config().models
+    else:modelsList= regressor_config().models
+
+    if ptype in prob_types: X,Y=dataframe.drop(target,axis=1),dataframe[target]
+    if ptype =="Image Classification":X,Y=AutoFeatureSelection.get_reshaped_image(dataframe.values)
+    if ptype in cls_types:modelData.target_encode=DictClass.get_encoded_label()
+    if ptype in prob_types: modelData.featureList=dataframe.drop(target,axis=1).columns.to_list()
 
     if model_types=='classic':
         modelResult=classic_model(ptype,dataframe,target,X,Y,DictClass,modelsList,accuracy_criteria,3)
