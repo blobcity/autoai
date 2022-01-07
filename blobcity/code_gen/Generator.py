@@ -89,7 +89,7 @@ def data_read(ymlData,codes="",nb=None,with_doc=False):
     param1: dictionary : AutoAI steps data
     param2: string : Code syntaxs
     param3: boolean : Whether to includer documentation/meta description for the following section
-    return: string : Code syntaxs
+    return: notebook object
 
     The function adds code syntax related to data fetching using the panda's library.
     """
@@ -107,21 +107,30 @@ def data_read(ymlData,codes="",nb=None,with_doc=False):
         else: return codes+reader_code
     elif ymlData['problem']['type']=='Image Classification': 
         paths=SourceCode.image_data['paths'].replace('PATH',str(ymlData['data_read']['file'])).replace('TARGET',str(ymlData['features']['Y_values']))
-        sample_image=SourceCode.image_data['Sample Image']
+        paths=paths.replace('file','PATHZIP')
+        if 'Decompress' in ymlData['data_read'].keys():
+            compression="\rfile='DECOMP'\r".replace('DECOMP',ymlData['data_read']['Decompressed_path'])
+        
         if nb!=None and codes=="":
             nb['cells'].append(nbf.v4.new_markdown_cell("### Initialization"))
-            nb['cells'].append(nbf.v4.new_code_cell(paths))
-            nb['cells'].append(nbf.v4.new_markdown_cell("### Sample Image"))
-            nb['cells'].append(nbf.v4.new_code_cell(sample_image))
+            nb['cells'].append(nbf.v4.new_code_cell(paths+compression))
             return nb
-        else: return codes+paths+sample_image
+        else: return codes+paths+compression
+
+def sample_imager(ymlData,codes="",nb=None,with_doc=False):
+    sample_image=SourceCode.image_data['Sample Image']
+    if nb!=None and codes=="":
+        nb['cells'].append(nbf.v4.new_markdown_cell("### Sample Image"))
+        nb['cells'].append(nbf.v4.new_code_cell(sample_image))
+        return nb
+    else: return codes+sample_image
 
 def features_selection(yml_data,codes="",nb=None,with_doc=False):
     """
     param1: dictionary : AutoAI steps data
     param2: string : Code syntaxs
     param3: boolean : Whether to includer documentation/meta description for the following section
-    return: string : Code syntaxs
+    return: notebook object
 
     The function adds code syntax related to feature selection using dataframe indexing.
     """
@@ -147,12 +156,39 @@ def features_selection(yml_data,codes="",nb=None,with_doc=False):
         else:
             return codes+"\r### Feature Selection"+data
 
+def decompressing_code(yml_data,codes="",nb=None,with_doc=False):
+    """
+    param1: dictionary : AutoAI steps data
+    param2: string : Code syntaxs
+    param3: boolean : Whether to includer documentation/meta description for the following section
+    return: string/notebook object
+    """
+    if 'Decompress' in yml_data['data_read'].keys():
+        if yml_data['data_read']['Decompress']=='gz':
+            import_statement=SourceCode.folder_decompression['gz']['import']
+            code_syntax=SourceCode.folder_decompression['gz']['code'].replace('SAVEZIP','file')
+        elif yml_data['data_read']['Decompress']=='zip':
+            import_statement=SourceCode.folder_decompression['zip']['import']
+            code_syntax=SourceCode.folder_decompression['zip']['code'].replace('SAVEZIP','file')
+        
+        if nb!=None and codes=="":
+            nb['cells'][1]['source']=nb['cells'][1]['source']+import_statement
+            nb['cells'].append(nbf.v4.new_markdown_cell("### Decompressing"))
+            nb['cells'].append(nbf.v4.new_code_cell(code_syntax))
+            return nb
+        else:
+            idx = codes.index("warnings.filterwarnings('ignore')")
+            codes = codes[:idx]+import_statement+codes[idx:]
+            return codes+code_syntax
+    else:
+        return nb if nb!=None else codes
+        
 def cleaning(yml_data,codes="",nb=None,with_doc=False):
     """
     param1: dictionary : AutoAI steps data
     param2: string : Code syntaxs
     param3: boolean : Whether to includer documentation/meta description for the following section
-    return: string : Code syntaxs
+    return: string/notebook object
 
     The function adds code syntax related to the data preprocessing stages,
     such as missing value imputation and string encoding using the panda's and Sci-kit learn library.
@@ -219,6 +255,7 @@ def add_corr_matrix(codes="",nb=None,with_doc=False):
         return nb
     else:
         return codes+"\n# Correlation Matrix\n"+SourceCode.cor_matrix
+
 def data_scaling(yml_data,codes="",nb=None,with_doc=False):
     """
     param1:string
@@ -416,6 +453,8 @@ def pycoder_image(yml_data,CGpath,doc=False):
     key=yml_data['problem']['type']
     codes=initialize(key,codes="")
     codes=data_read(yml_data,codes=codes,with_doc=doc)
+    codes=decompressing_code(yml_data,codes=codes,with_doc=doc)
+    codes=sample_imager(yml_data,codes=codes,with_doc=doc)
     codes=cleaning_image(yml_data,codes=codes,with_doc=doc)
     codes=features_selection(yml_data,codes=codes,with_doc=doc)
     codes=data_scaling(yml_data,codes=codes,with_doc=doc)
@@ -439,6 +478,8 @@ def ipynbcoder_image(yml_data,CGpath,doc=True):
     key=yml_data['problem']['type']
     nb=initialize(key,nb=nb)
     nb=data_read(yml_data,nb=nb,with_doc=doc)
+    nb=decompressing_code(yml_data,nb=nb,with_doc=doc)
+    nb=sample_imager(yml_data,nb=nb,with_doc=doc)
     nb=cleaning_image(yml_data,nb=nb,with_doc=doc)
     nb=features_selection(yml_data,nb=nb,with_doc=doc) 
     nb=data_scaling(yml_data,nb=nb,with_doc=doc)

@@ -231,6 +231,16 @@ Y = np.array(Y)\r""",
 image_pred_plot(PATH)\r"""}
     }
 
+    folder_decompression={
+        'gz':{'import':'import tarfile\r',
+        'code':"""tar = tarfile.open(PATHZIP,mode="r:gz")
+tar.extractall(path=SAVEZIP)
+tar.close()"""},
+        'zip':{'import':'import zipfile\r',
+        'code':"""with zipfile.ZipFile(PATHZIP, 'r') as zip_ref:
+    zip_ref.extractall(SAVEZIP)"""}
+    }
+
         
 
     
