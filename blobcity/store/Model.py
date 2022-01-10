@@ -223,10 +223,20 @@ class Model:
             raise ValueError("model_path cant be None or empty string")
 
 
-    def stats(self):
+    def summary(self):
         """
-        Function to print/log/display all the metrics associated with problem type for the selected trained model. Usally used to check the effectiveness of training, or to assess the model fit. 
+        Function to print/log/display all the metrics associated with problem type for the selected trained model and the model parameters. 
+        Usally used to check the effectiveness of training, or to assess the model fit. 
         """
+        if self.yamldata['model']['type'] in ['TF','tf','Tensorflow']:
+            print("Selected Model Type: Neural Network")
+            tmp=self.model.export_model()
+            tmp.summary()
+        else:
+            print("Selected Model Type: Classic\nSelected Model Name: {}\nModel Tuning Parameter".format(self.model.__class__.__name__))
+            for key, value in self.params.items():
+                print ("{:<10} {:<10}".format(key, value))
+
         print ("\nMetrics on trained data:\n{:<10} {:<10}".format('METRIC', 'VALUE'))
         for key, value in self.metrics.items():
             print ("{:<10} {:<10}".format(key, value))

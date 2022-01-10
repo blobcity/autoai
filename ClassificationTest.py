@@ -23,7 +23,7 @@ features=['radius_mean','texture_mean','smoothness_mean','compactness_mean','con
 
 model=bc.train(file=file_path,target=target,features=None) # function to test AutoAI Process
 
-model.stats() # function to test metrics analysis
+model.summary() # function to log summary about trained model
 
 model.spill("./aicodegen.py") #function to test code generation 
 

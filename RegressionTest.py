@@ -23,7 +23,7 @@ features=['Present_Price', 'Kms_Driven', 'Fuel_Type', 'Seller_Type', 'Transmissi
 
 model=bc.train(file=file_path,target=target,features=None) # function to test AutoAI Process
 
-model.stats() # function to test metrics analysis
+model.summary() # function to log summary about trained model
 
 model.spill("./aicodegen.py") #function to test code generation 
 
