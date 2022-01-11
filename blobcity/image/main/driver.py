@@ -14,6 +14,7 @@
 
 import os,copy
 from blobcity.main import load as model_loader
+from blobcity.main import spill as code_spill
 from blobcity.store import DictClass
 from blobcity.main.modelSelection import model_search
 from blobcity.utils import get_dataframe_type,check_subfolder_data
@@ -79,5 +80,23 @@ def train(file=None, df=None, target=None,model_types='classic',accuracy_criteri
     return modelClass
 
 def load(model_path=None):
+    """
+    param1: string : pickle file path 
+    return: Class object 
+
+    Function returns a de-serialized model file.
+    """
     model=model_loader(model_path)
     return model
+
+def spill(filepath=None,yaml_data=None,doc=None):
+    """
+    param1:string : filepath and format of generated file to store. either .py or .ipynb
+
+    param2:string : filepath of already generated YAML file or dictionary object.
+    
+    param3:boolean : whether generate code along with documentation
+
+    Function calls generator functions to generate source code for the AutoAI Procedure
+    """
+    code_spill(filepath=filepath,yaml_data=yaml_data,doc=doc)

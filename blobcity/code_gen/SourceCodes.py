@@ -219,14 +219,14 @@ for categories, label in training_data:
 # Flattening our training feature
 X = np.array(X).reshape(lenofimage,-1)
 Y = np.array(Y)\r""",
-    'Image_prediction':{'classic':"""def image_pred_plot(test_img):
+    'Image_prediction':{'classic':"""
+def image_pred_plot(test_img):
     img = cv2.imread(test_img)
     img_array=cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
     plt.imshow(img_array)
     img_array=cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
-    img_resize=cv2.resize(img_array,(SIZE,SIZE))
-    img_data=[img_resize.flatten()]
-	plt.title("Prediction : {}".format(target[model.predict(img_data)[0]]))
+    img_data=[cv2.resize(img_array,(SIZE,SIZE)).flatten()]
+    plt.title("Prediction : {}".format(target[model.predict(img_data)[0]]))
     plt.show()
 image_pred_plot(PATH)\r"""}
     }

@@ -190,6 +190,8 @@ class AutoFeatureSelection:
         param2: List
         param3: Class object
         return: pandas.DataFrame
+
+        Function return dataframe object which consist of image data and the target.
         """
         training_data,label_mapping=AutoFeatureSelection.create_training_data(data,targets,resize)
         dict_class.original_label=label_mapping
@@ -202,6 +204,8 @@ class AutoFeatureSelection:
         param1: String
         param2: List
         return: Tuple : (List,dict)
+
+        Function read each image from the provided source and creates a training data whether each image data is mapped with its target label.
         """
         training_data=[]
         label_mapping={}
@@ -223,6 +227,9 @@ class AutoFeatureSelection:
     def get_reshaped_image(training_data):
         """
         param1:numpy.array
+        return: tuple :(numpy.array,numpy.array)
+
+        Function return required feature and target in a flatten image and label for training 
         """
         lenofimage = len(training_data)
         X, y = [], []

@@ -119,6 +119,13 @@ def save_dataframe(dataframe,path,ftype):
         print(e)
 
 def validate_url(url: str):
+    """
+    param1: string
+    
+    return: boolean
+
+    Function perform a symantic check/regular expression check whether the provided string is in format of URL Types
+    """
     DOMAIN_FORMAT = re.compile(
         r"(?:^(\w{1,255}):(.{1,255})@|^)" # http basic authentication [optional]
         r"(?:(?:(?=\S{0,253}(?:$|:))" # check full domain length to be less than or equal to 253 (starting after http basic auth, stopping before port)
@@ -146,6 +153,13 @@ def validate_url(url: str):
     except Exception:return False
 
 def check_url_existence(url):
+    """
+    param1: string
+
+    return: boolean
+
+    Function check whether the provided string url exists over internet or not.
+    """
     h = httplib2.Http()
     resp = h.request(url, 'HEAD')
     if int(resp[0]['status']) < 400:

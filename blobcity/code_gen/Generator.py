@@ -107,15 +107,15 @@ def data_read(ymlData,codes="",nb=None,with_doc=False):
         else: return codes+reader_code
     elif ymlData['problem']['type']=='Image Classification': 
         paths=SourceCode.image_data['paths'].replace('PATH',str(ymlData['data_read']['file'])).replace('TARGET',str(ymlData['features']['Y_values']))
-        paths=paths.replace('file','PATHZIP')
         if 'Decompress' in ymlData['data_read'].keys():
+            paths=paths.replace('file','PATHZIP')
             compression="\rfile='DECOMP'\r".replace('DECOMP',ymlData['data_read']['Decompressed_path'])
-        
+            paths=paths+compression
         if nb!=None and codes=="":
             nb['cells'].append(nbf.v4.new_markdown_cell("### Initialization"))
-            nb['cells'].append(nbf.v4.new_code_cell(paths+compression))
+            nb['cells'].append(nbf.v4.new_code_cell(paths))
             return nb
-        else: return codes+paths+compression
+        else: return codes+paths
 
 def sample_imager(ymlData,codes="",nb=None,with_doc=False):
     sample_image=SourceCode.image_data['Sample Image']
