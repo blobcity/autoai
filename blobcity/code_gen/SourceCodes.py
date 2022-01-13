@@ -241,6 +241,18 @@ tar.close()"""},
     zip_ref.extractall(SAVEZIP)"""}
     }
 
+    file_download={
+        'code':"""\n
+def download_file(url,download_path):
+\tresponse = requests.get(url, stream=True)
+\ttotal = int(response.headers.get('content-length', 0))
+\twith tqdm.wrapattr(open(download_path, "wb"), "write", miniters=1,total=total,desc="Downloading :") as fout:
+\t\tfor chunk in response.iter_content(chunk_size=4096):
+\t\t\tfout.write(chunk)\r
+download_file(url="URL",download_path="DWNPATH")""",
+        'import':"import requests\rfrom tqdm.auto import tqdm\r"
+    }
+
         
 
     

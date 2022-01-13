@@ -252,9 +252,9 @@ def decompress(file,DictionaryClass):
                 tar.extract(member=member,path=extract_dir)
                 prog.update_progressbar(1)
             prog.close_progressbar()
-            DictionaryClass.UpdateNestedKeyValue('data_read','Decompress','gz')
+            DictionaryClass.UpdateNestedKeyValue('data_read','decompress','gz')
         print(f"file has been decompressed to folder {extract_dir}")
-        DictionaryClass.UpdateNestedKeyValue('data_read','Decompressed_path',extract_dir)
+        DictionaryClass.UpdateNestedKeyValue('data_read','decompressed_path',extract_dir)
     except Exception as e:print(e)
     return extract_dir
 
@@ -275,6 +275,7 @@ def file_from_url(url,DictionaryClass):
             for chunk in response.iter_content(chunk_size=4096):
                 fout.write(chunk)
         DictionaryClass.UpdateKeyValue('data_read','from','URL')
+        DictionaryClass.UpdateKeyValue('data_read','downloaded_path',download_path)
         return download_path
     except Exception as e: print(e)
 
