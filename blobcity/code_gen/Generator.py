@@ -107,9 +107,9 @@ def data_read(ymlData,codes="",nb=None,with_doc=False):
         else: return codes+reader_code
     elif ymlData['problem']['type']=='Image Classification': 
         paths=SourceCode.image_data['paths'].replace('PATH',str(ymlData['data_read']['file'])).replace('TARGET',str(ymlData['features']['Y_values']))
-        if 'Decompress' in ymlData['data_read'].keys():
+        if 'decompress' in ymlData['data_read'].keys():
             paths=paths.replace('file','PATHZIP')
-            compression="\rfile='DECOMP'\r".replace('DECOMP',ymlData['data_read']['Decompressed_path'])
+            compression="\rfile='DECOMP'\r".replace('DECOMP',ymlData['data_read']['decompressed_path'])
             paths=paths+compression
         if nb!=None and codes=="":
             nb['cells'].append(nbf.v4.new_markdown_cell("### Initialization"))
@@ -189,7 +189,7 @@ def decompressing_code(yml_data,codes="",nb=None,with_doc=False):
 
     Function added required code syntax for decompressing a archive file
     """
-    if 'Decompress' in yml_data['data_read'].keys():
+    if 'decompress' in yml_data['data_read'].keys():
         if yml_data['data_read']['decompress']=='gz':
             import_statement=SourceCode.folder_decompression['gz']['import']
             code_syntax=SourceCode.folder_decompression['gz']['code'].replace('SAVEZIP','file')
