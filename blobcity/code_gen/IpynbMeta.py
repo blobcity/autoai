@@ -146,6 +146,19 @@ AdaBoost is one of the initial boosting ensemble algorithms to be adapted in sol
 #### Note:
 >For better performance of the Adaboost model, the base estimator (Decision Tree Model) can be fine-tuned.
 """,
+            'GaussianNB':"""### Model
+Gaussian NB is a variant of Naive Bayes that follows Gaussian normal distribution and supports continuous data. An approach to creating a simple model is to assume that the data is described by a Gaussian distribution with no co-variance between features. 
+
+
+#### Model Tuning Parameters
+
+    1. priors : array-like of shape (n_classes,)
+> Prior probabilities of the classes. If specified the priors are not adjusted according to the data.
+
+    2. var_smoothing : float, default=1e-9
+> Portion of the largest variance of all features that is added to variances for calculation stability.
+            
+            """,
             'GradientBoostingClassifier':"""## Model
 **GradientBoostingClassifier**
 

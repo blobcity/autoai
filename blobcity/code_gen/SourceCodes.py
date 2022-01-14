@@ -131,7 +131,8 @@ class SourceCode:
             'LinearDiscriminantAnalysis':'from sklearn.discriminant_analysis import LinearDiscriminantAnalysis\r\n',
             'PassiveAggressiveClassifier':'from sklearn.linear_model import PassiveAggressiveClassifier\r\n',
             'LGBMClassifier':'from lightgbm import LGBMClassifier\r\n',
-            'TF':'import blobcity as bc\r\n'
+            'TF':'import blobcity as bc\r\n',
+            'GaussianNB':'from sklearn.naive_bayes import GaussianNB\r\n'
         },
         'Regression':{
             'OrthogonalMatchingPursuit':'from sklearn.linear_model import OrthogonalMatchingPursuit\r\n',
