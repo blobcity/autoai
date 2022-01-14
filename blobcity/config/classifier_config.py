@@ -12,11 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
-import sklearn as sk
 import xgboost
+from catboost import CatBoostClassifier
 import lightgbm as lgbm
-from sklearn.experimental import enable_hist_gradient_boosting
 from sklearn import tree,ensemble,svm,linear_model,neighbors,naive_bayes,discriminant_analysis
 
 """
@@ -263,6 +261,24 @@ class classifier_config:
             naive_bayes.GaussianNB,
             {
                 'var_smoothing':{'float':[1e-3,0.1]}
+            }
+        ],
+        "CatBoostClassifier":[
+            CatBoostClassifier,
+            {
+                "learning_rate": {'float':[1e-3,1e-2]},
+                "l2_leaf_reg":{'float':[1e-3, 1.0]},
+                "loss_function":{'str': ["Logloss", "CrossEntropy","MultiClass"]},
+                "iterations":{'int':[200, 1000]},
+                "max_depth":{'int':[3,16]},
+                "verbose":{'bool':[False]},
+            }
+        ],
+        "QuadraticDiscriminantAnalysis":[
+            discriminant_analysis.QuadraticDiscriminantAnalysis,
+            {
+                "reg_param":{"float":[0.1,0.5]},
+                "tol":{"float":[1e-4,0.01]}
             }
         ]
     }
