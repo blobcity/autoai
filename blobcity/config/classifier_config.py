@@ -257,6 +257,12 @@ class classifier_config:
                   'n_jobs':{'str':[-1]},
                   "early_stopping":{'bool':[True,False]}
               }
+        ],
+        "GaussianNB":[
+            naive_bayes.GaussianNB,
+            {
+                'var_smoothing':{'float':[1e-3,0.1]}
+            }
         ]
     }
 
