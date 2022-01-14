@@ -170,12 +170,11 @@ model.plot_prediction()
 
 ![AutoAI Generated Code Example](https://cdn.blobcity.com/img/autoai-confusion-matrix.png)
 
-### Numercial Stats
+### Numercial Stats & Model Description
 ``` Python
-model.stats()
+model.summary()
 ```
-
-Print the key model parameters, such as Precision, Recall, F1-Score. The parameters change based on the type of AutoAI problem. 
+Print model configuration/Hyper Parameter tuning along the key model static parameters, such as Precision, Recall, F1-Score,etc. The parameters change based on the type of AutoAI problem. 
 
 # Persistence
 ``` Python
