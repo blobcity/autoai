@@ -18,8 +18,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler,MinMaxScaler
-from blobcity.utils import get_dataframe_type,Progress,write_dataframe
+from blobcity.utils import get_dataframe_type,Progress,write_dataframe,quick_image_processing
 from blobcity.code_gen import code_generator
 import yaml
 
@@ -28,7 +27,7 @@ Python file consists of Class Model to initialize/store and retrive data associa
 """
 class Model:
     
-    def __init__(self,params=dict(),featureList=[],model=None,metrics=dict(),yamldata=None,feature_importance=dict(),plot_data=None,target_encode=dict()):
+    def __init__(self,params=dict(),featureList=[],model=None,metrics=dict(),yamldata=None,feature_importance=dict(),scaler=None,plot_data=None,target_encode=dict()):
         self.params=params
         self.featureList=featureList
         self.model=model
@@ -37,6 +36,7 @@ class Model:
         self.feature_importance_=feature_importance
         self.plot_data=plot_data
         self.target_encode=target_encode
+        self.scaler=scaler
     
     def __quick_clean(self,test_dataframe):
         """
@@ -86,6 +86,35 @@ class Model:
                 n_cols+=1
         return test
 
+    def __encode_result(self,result,target_encode):
+        if isinstance(result,np.ndarray):
+            main_result=[]
+            for i in range(len(result)):
+                for k in target_encode.keys():
+                    if k == result[i]:
+                        main_result.append(target_encode[k])
+            return main_result
+        elif isinstance(result,dict):
+            main_result={}
+            for i in result:
+                for k in target_encode.keys():
+                    if k==result[i]:
+                        main_result[i]=target_encode[k]
+            return main_result
+
+    def __multi_file_prediction(self,model,data,size):
+        result={}
+        for img in os.listdir(data):
+            try:
+                img_path=os.path.join(data, img)
+                extension = os.path.splitext(img_path)[1]
+                if extension in ['.png',".PNG",".jpg",".jpeg",'.JPEG']:
+                    process_img=quick_image_processing(img_path,size)
+                result[img_path]=model.predict(process_img[0])[0]
+            except Exception as e:print(e)
+        
+        return result
+
     def predict(self,test,return_type="list",path=""):
         """
         param1: pd.DataFrame
@@ -96,40 +125,50 @@ class Model:
         Function returns List/Array for predicted value from the trained model. First the function perform minimal data preprocessing required to match the input data utilized to train the model then feed it to predict function.
         On predicted data it perform target manipulation to return original target label if any exists 
         """
-        if type(test)==str:test=get_dataframe_type(test)
-        if isinstance(test,pd.DataFrame):test=Model().__quick_clean(test[self.yamldata['features']['X_values']])
-        if isinstance(test,dict):
-            if list(test.keys())==self.yamldata['features']['X_values']:test=Model().__json_to_df(test)
-            else: raise ValueError(f"Model is trained on {len(self.yamldata['features']['X_values'])} features,provided {len(test.keys())} features")
-        test=Model().__check_columns(test,self.featureList)
-        if "cleaning" in self.yamldata.keys() and "rescale" in self.yamldata['cleaning'].keys():
-            scaler = StandardScaler() if self.yamldata['cleaning']['rescale']=="StandardScaler" else MinMaxScaler()
-            test=pd.DataFrame(scaler.fit_transform(test),columns=test.columns)
-        if self.model.__class__.__name__ not in ['XGBClassifier','XGBRegressor']:result=self.model.predict(test)
-        else:
-            if type(test)=="list":
-                test=pd.DataFrame(test, columns=self.featureList)
-                result=self.model.predict(test)  
+
+        if self.yamldata['problem']["type"]!='Image Classification':
+            if type(test)==str:test=get_dataframe_type(test)
+            if isinstance(test,pd.DataFrame):test=Model().__quick_clean(test[self.yamldata['features']['X_values']])
+            if isinstance(test,dict):
+                if list(test.keys())==self.yamldata['features']['X_values']:test=Model().__json_to_df(test)
+                else: raise ValueError(f"Model is trained on {len(self.yamldata['features']['X_values'])} features,provided {len(test.keys())} features")
+            test=Model().__check_columns(test,self.featureList)
+            if "cleaning" in self.yamldata.keys() and "rescale" in self.yamldata['cleaning'].keys():
+                test=pd.DataFrame(self.scaler.transform(test),columns=test.columns)
+            if self.model.__class__.__name__ not in ['XGBClassifier','XGBRegressor']:result=self.model.predict(test)
             else:
-                result=self.model.predict(test) 
-        if self.yamldata['problem']["type"]=='Classification':
-            if self.yamldata['model']['type']=='TF':
-                if self.yamldata['model']['classification_type']=='binary': result=np.round(result).flatten().astype(np.int)
-                else: result=np.argmax(result,axis=1).flatten().astype(np.int)
-            main_result=[]
-            if self.target_encode!={}:
-                for i in range(len(result)):
-                    for k in self.target_encode.keys():
-                        if k == result[i]:
-                            main_result.append(self.target_encode[k])
-                result= main_result 
-        else:
-            if self.yamldata['model']['type']=='TF': result=result.flatten().astype(np.float)
-        
-        result_dataframe=test.copy(deep=True)
-        result_dataframe['prediction']=result
-        
-        if path!="":write_dataframe(dataframe=result_dataframe,path=path)
+                if type(test)=="list":
+                    test=pd.DataFrame(test, columns=self.featureList)
+                    result=self.model.predict(test)  
+                else:
+                    result=self.model.predict(test) 
+            if self.yamldata['problem']["type"]=='Classification':
+                if self.yamldata['model']['type']=='TF':
+                    if self.yamldata['model']['classification_type']=='binary': result=np.round(result).flatten().astype(np.int)
+                    else: result=np.argmax(result,axis=1).flatten().astype(np.int)
+                
+                if self.target_encode!={}: result= Model().__encode_result(result,self.target_encode) 
+            else:
+                if self.yamldata['model']['type']=='TF': result=result.flatten().astype(np.float)
+            
+            result_dataframe=test.copy(deep=True)
+            result_dataframe['prediction']=result
+
+        elif self.yamldata['problem']["type"]=='Image Classification' :
+            extension = os.path.splitext(test)[1]
+            if extension in ['.png',".PNG",".jpg",".jpeg",'.JPEG']:
+                data=quick_image_processing(test,self.yamldata['cleaning']["resize"])
+                if "cleaning" in self.yamldata.keys() and "rescale" in self.yamldata['cleaning'].keys():
+                    data_=self.scaler.transform(data[0])
+                    result=self.model.predict(data_) 
+                else:
+                    result=self.model.predict(data[0]) 
+                result= Model().__encode_result(result,self.target_encode)
+            elif not extension:
+                result=Model().__multi_file_prediction(self.model,test,self.yamldata['cleaning']["resize"])
+                result= Model().__encode_result(result,self.target_encode)
+
+        if path!="" and self.yamldata['problem']["type"]!='Image Classification':write_dataframe(dataframe=result_dataframe,path=path)
         if return_type=="list": return result
         elif return_type=="df" and isinstance(test,pd.DataFrame):return result_dataframe
 
@@ -270,7 +309,7 @@ class Model:
         """
         
         problem=self.yamldata['problem']["type"]
-        if problem=='Classification':
+        if problem in ['Classification','Image Classification']:
             if self.target_encode!={}: targets=self.target_encode.values()
             cf_matrix=self.plot_data
             group_counts = ['{0:0.0f}'.format(value) for value in cf_matrix.flatten()]

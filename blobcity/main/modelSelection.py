@@ -18,12 +18,12 @@ import pandas as pd
 from math import isnan
 import warnings,itertools
 from blobcity.store import Model
-from blobcity.utils import Progress,scaling_data
 from sklearn.metrics import r2_score
 from blobcity.config import tuner as Tuner
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.model_selection import cross_val_score
 from blobcity.config import classifier_config,regressor_config
+from blobcity.utils import Progress,scaling_data,AutoFeatureSelection
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
     warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -42,7 +42,7 @@ class CustomCallback(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         prog.update_progressbar(1)
 
-def getKFold(X):
+def getKFold(rows):
 
     """
     param1: pandas.DataFrame
@@ -52,7 +52,6 @@ def getKFold(X):
     Function returns number of kfold to consider for Cross validation on the basis of dataset row counts
     """
     k=3
-    rows=X.shape[0]
     if(rows>100 and rows<300):k=2
     elif(rows>300 and rows<=500): k=4
     elif(rows>500 and rows <=5000 ):k=5
@@ -97,7 +96,7 @@ def eval_model(models,m,X,Y,k,DictionaryClass):
     Function to fetch cross validation score for specific models from the dictionary.
     If the model/algorithm belong to distance based prediction and training scale the data to speedup the training.
     """
-    X = X if m not in ['SVC','NuSVC','LinearSVC','SVR','NuSVR','LinearSVR','KNeighborsClassifier','KNeighborsRegressor','RadiusNeighborsClassifier','RadiusNeighborsRegressor'] else scaling_data(X,DictionaryClass)
+    X = X if m not in ['SVC','NuSVC','LinearSVC','SVR','NuSVR','LinearSVR','KNeighborsClassifier','KNeighborsRegressor','RadiusNeighborsClassifier','RadiusNeighborsRegressor','NearestCentroid'] else scaling_data(X,DictionaryClass)
     if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0)
     elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
     elif m in ['LGBMClassifier','LGBMRegressor']: model=models[m][0](verbose=-1)
@@ -120,12 +119,19 @@ def train_on_sample_data(dataframe,target,models,DictionaryClass,stages):
     """
     rows=dataframe.shape[0]
     sample_rate=round((500+(((rows-500)*0.2)))/rows,1)
-    df=dataframe.sample(frac=sample_rate,random_state=123)
-    X,Y=df.drop(target,axis=1),df[target]
-    k=getKFold(X)
+    if DictionaryClass.YAML['problem']['type']=="Image Classification":
+        dataframe=dataframe.sample(frac=1,random_state=123)
+        df=dataframe.sample(frac=sample_rate,random_state=123)
+        X,Y=AutoFeatureSelection.get_reshaped_image(df.values)
+        models_List=DictionaryClass.image_models
+    else:
+        df=dataframe.sample(frac=sample_rate,random_state=123)
+        X,Y=df.drop(target,axis=1),df[target]
+        models_List=models.keys()
+    k=getKFold(rows)
     modelScore={}
-    prog.create_progressbar(len(models),"Quick Search (Stage 1 of {}) :".format(stages))
-    for m in models:
+    prog.create_progressbar(len(models_List),"Quick Search (Stage 1 of {}) :".format(stages))
+    for m in models_List:
         modelScore[m]=eval_model(models,m,X,Y,k,DictionaryClass)
         prog.update_progressbar(1)
     prog.update_progressbar(prog.trials)
@@ -145,7 +151,7 @@ def train_on_full_data(X,Y,models,best,DictionaryClass,stages):
     Function returns single best model with best accuracy in a dictionary. 
     Accuracy is calculated using average cross validation score on specified kfold counts.
     """
-    k=getKFold(X)
+    k=getKFold(X.shape[0])
     modelScore={}
     prog.create_progressbar(len(best),"Deep Search (Stage 2 of {}) :".format(stages))
     for m in best:
@@ -204,8 +210,12 @@ def classic_model(ptype,dataframe,target,X,Y,DictClass,modelsList,accuracy_crite
         best=train_on_full_data(X,Y,modelsList,train_on_sample_data(dataframe,target,modelsList,DictClass,stages),DictClass,stages)
     else:
         print("Quick Search(Stage 1 of {}) is skipped".format(stages))
-        best=train_on_full_data(X,Y,modelsList,modelsList,DictClass,stages)
-    modelResult = Tuner.tune_model(dataframe,target,best,modelsList,ptype,accuracy_criteria,DictClass,stages)
+        best = train_on_full_data(X,Y,modelsList,DictClass.image_models,DictClass,stages)if ptype=="Image Classification" else train_on_full_data(X,Y,modelsList,modelsList,DictClass,stages)
+    
+    if ptype=="Image Classification":
+        modelResult = Tuner.tune_model(X,Y,best,modelsList,ptype,accuracy_criteria,DictClass,stages)
+    else:
+        modelResult = Tuner.tune_model(dataframe,target,best,modelsList,ptype,accuracy_criteria,DictClass,stages)
     return modelResult
 
 def classic_model_records(modelData,modelResult,DictClass):
@@ -221,6 +231,7 @@ def classic_model_records(modelData,modelResult,DictClass):
     modelData.model,modelData.params,acc,modelData.metrics,modelData.plot_data = modelResult
     DictClass.addKeyValue('model',{'type': modelData.model.__class__.__name__})
     DictClass.UpdateNestedKeyValue('model','parameters',modelResult[1])
+    modelData.scaler=DictClass.Scaler
     return modelData
 
 def neural_model_records(modelData,neural_network,DictClass,ptype,dataframe,target):
@@ -238,7 +249,7 @@ def neural_model_records(modelData,neural_network,DictClass,ptype,dataframe,targ
 
     modelData.model,acc,modelData.metrics,modelData.plot_data = neural_network
     DictClass.addKeyValue('model',{'type':'TF'})
-    if ptype=="Classification":
+    if ptype in ["Classification", "Image Classification"]:
         n_labels=dataframe[target].nunique(dropna=False)
         cls_type='binary' if n_labels<=2 else 'multiclass'
         DictClass.UpdateNestedKeyValue('model','classification_type',cls_type)
@@ -266,12 +277,17 @@ def model_search(dataframe=None,target=None,DictClass=None,disable_colinearity=F
     """
     global prog
     prog=Progress()
-    ptype=DictClass.getdict()['problem']["type"]
-    modelsList=classifier_config().models if ptype=="Classification" else regressor_config().models
-    X,Y=dataframe.drop(target,axis=1),dataframe[target]
     modelData=Model()
-    if ptype=="Classification":modelData.target_encode=DictClass.get_encoded_label()
-    modelData.featureList=dataframe.drop(target,axis=1).columns.to_list()
+    ptype=DictClass.getdict()['problem']["type"]
+    cls_types,prob_types= ["Classification","Image Classification"],["Classification","Regression"]
+
+    if ptype in cls_types :modelsList=classifier_config().models
+    else:modelsList= regressor_config().models
+
+    if ptype in prob_types: X,Y=dataframe.drop(target,axis=1),dataframe[target]
+    if ptype =="Image Classification":X,Y=AutoFeatureSelection.get_reshaped_image(dataframe.values)
+    if ptype in cls_types:modelData.target_encode=DictClass.get_encoded_label()
+    if ptype in prob_types: modelData.featureList=dataframe.drop(target,axis=1).columns.to_list()
 
     if model_types=='classic':
         modelResult=classic_model(ptype,dataframe,target,X,Y,DictClass,modelsList,accuracy_criteria,3)
@@ -310,7 +326,7 @@ def model_search(dataframe=None,target=None,DictClass=None,disable_colinearity=F
             modelData=classic_model_records(modelData,modelResult,DictClass)
             class_name=modelData.model.__class__.__name__
 
-    if not disable_colinearity:
+    if not disable_colinearity and ptype!="Image Classification":
         if DictClass.accuracy< 0.8:  print("Recommendation: Disable Colinearity in train function")
         
     print("{} CV Score : {:.2f}".format(class_name,DictClass.accuracy))
