@@ -243,7 +243,7 @@ def decompress(file,DictionaryClass):
                     zip_ref.extract(member=file,path=extract_dir)
                     prog.update_progressbar(1)
                 prog.close_progressbar()
-            DictionaryClass.UpdateNestedKeyValue('data_read','Decompress','zip')
+            DictionaryClass.UpdateNestedKeyValue('data_read','decompress','zip')
         elif is_tarfile(file):
             tar = tarfile.open(file, mode="r:gz")
             members=tar.getmembers()
@@ -274,8 +274,8 @@ def file_from_url(url,DictionaryClass):
         with tqdm.wrapattr(open(download_path, "wb"), "write", miniters=1,total=total,desc="Downloading :") as fout:
             for chunk in response.iter_content(chunk_size=4096):
                 fout.write(chunk)
-        DictionaryClass.UpdateKeyValue('data_read','from','URL')
-        DictionaryClass.UpdateKeyValue('data_read','downloaded_path',download_path)
+        DictionaryClass.UpdateNestedKeyValue('data_read','from','URL')
+        DictionaryClass.UpdateNestedKeyValue('data_read','downloaded_path',download_path)
         return download_path
     except Exception as e: print(e)
 
