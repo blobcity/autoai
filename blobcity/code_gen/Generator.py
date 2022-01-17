@@ -106,11 +106,17 @@ def data_read(ymlData,codes="",nb=None,with_doc=False):
             return nb
         else: return codes+reader_code
     elif ymlData['problem']['type']=='Image Classification': 
-        paths=SourceCode.image_data['paths'].replace('PATH',str(ymlData['data_read']['file'])).replace('TARGET',str(ymlData['features']['Y_values']))
+
+        if 'downloaded_path' in ymlData['data_read'].keys():
+            paths=SourceCode.image_data['paths'].replace('PATH',str(ymlData['data_read']['downloaded_path'])).replace('TARGET',str(ymlData['features']['Y_values']))
+        else:
+            paths=SourceCode.image_data['paths'].replace('PATH',str(ymlData['data_read']['file'])).replace('TARGET',str(ymlData['features']['Y_values']))
+
         if 'decompress' in ymlData['data_read'].keys():
             paths=paths.replace('file','PATHZIP')
             compression="\rfile='DECOMP'\r".replace('DECOMP',ymlData['data_read']['decompressed_path'])
             paths=paths+compression
+        
         if nb!=None and codes=="":
             nb['cells'].append(nbf.v4.new_markdown_cell("### Initialization"))
             nb['cells'].append(nbf.v4.new_code_cell(paths))

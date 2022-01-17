@@ -328,6 +328,6 @@ def model_search(dataframe=None,target=None,DictClass=None,disable_colinearity=F
 
     if not disable_colinearity and ptype!="Image Classification":
         if DictClass.accuracy< 0.8:  print("Recommendation: Disable Colinearity in train function")
-        
-    print("{} CV Score : {:.2f}".format(class_name,DictClass.accuracy))
+
+    print("Selected Model :- {} \nCV Score :- {:.2f}".format(class_name,DictClass.accuracy)) 
     return modelData
