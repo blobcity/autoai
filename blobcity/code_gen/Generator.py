@@ -106,7 +106,6 @@ def data_read(ymlData,codes="",nb=None,with_doc=False):
             return nb
         else: return codes+reader_code
     elif ymlData['problem']['type']=='Image Classification': 
-
         if 'downloaded_path' in ymlData['data_read'].keys():
             paths=SourceCode.image_data['paths'].replace('PATH',str(ymlData['data_read']['downloaded_path'])).replace('TARGET',str(ymlData['features']['Y_values']))
         else:
@@ -118,18 +117,24 @@ def data_read(ymlData,codes="",nb=None,with_doc=False):
             paths=paths+compression
         
         if nb!=None and codes=="":
-            nb['cells'].append(nbf.v4.new_markdown_cell("### Initialization"))
+            if with_doc:nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['image_fetch']))
+            else:nb['cells'].append(nbf.v4.new_markdown_cell("### Initialization"))
             nb['cells'].append(nbf.v4.new_code_cell(paths))
             return nb
-        else: return codes+paths
+        else: 
+            if with_doc:return codes+PyComments.procedure['image_fetch']+paths
+            else:return codes+"### Data Fetch\n"+paths
 
 def sample_imager(ymlData,codes="",nb=None,with_doc=False):
     sample_image=SourceCode.image_data['Sample Image']
     if nb!=None and codes=="":
-        nb['cells'].append(nbf.v4.new_markdown_cell("### Sample Image"))
+        if with_doc:nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['image_sample']))
+        else:nb['cells'].append(nbf.v4.new_markdown_cell("### Sample Image"))
         nb['cells'].append(nbf.v4.new_code_cell(sample_image))
         return nb
-    else: return codes+sample_image
+    else:
+        if with_doc:return codes+PyComments.procedure['image_sample']+sample_image
+        else:return codes+"### Sample Images\n"+sample_image 
 
 def features_selection(yml_data,codes="",nb=None,with_doc=False):
     """
@@ -140,12 +145,9 @@ def features_selection(yml_data,codes="",nb=None,with_doc=False):
 
     The function adds code syntax related to feature selection using dataframe indexing.
     """
-    if with_doc and nb!=None:
-        nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['x&y']))
-    elif with_doc and nb==None:
-        codes=codes+PyComments.procedure['x&y']
-    
     if yml_data['problem']['type'] in ['Classification','Regression']:
+        if with_doc and nb!=None:nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['x&y']))
+        elif with_doc and nb==None:codes=codes+PyComments.procedure['x&y']
         features=SourceCode.columns['features'].replace("FEATURES", str(yml_data['features']['X_values']))
         target=SourceCode.columns['target'].replace("TARGET", str(yml_data['features']['Y_values']))
         data=features+target+SourceCode.selections['X']+SourceCode.selections['Y']
@@ -157,10 +159,13 @@ def features_selection(yml_data,codes="",nb=None,with_doc=False):
     elif yml_data['problem']['type']=='Image Classification': 
         data=SourceCode.image_data['features']
         if nb!=None and codes=="":
+            if with_doc and nb!=None:nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['image_features']))
+            else:nb['cells'].append(nbf.v4.new_markdown_cell("### Feature Selections"))
             nb['cells'].append(nbf.v4.new_code_cell(data))
             return nb
         else:
-            return codes+"\r### Feature Selection"+data
+            if with_doc:return codes+PyComments.procedure['image_features']+data
+            else:return codes+"\r### Feature Selection"+data
 
 def downloading_files(yml_data,codes="",nb=None,with_doc=False):
     """
@@ -175,14 +180,16 @@ def downloading_files(yml_data,codes="",nb=None,with_doc=False):
         import_statement=SourceCode.file_download['import']
         code_syntax=SourceCode.file_download['code'].replace('URL',str(yml_data['data_read']['file'])).replace('DWNPATH',str(yml_data['data_read']['downloaded_path']))
         if nb!=None and codes=="":
+            if with_doc:nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['image_download']))
+            else:nb['cells'].append(nbf.v4.new_markdown_cell("### Download"))
             nb['cells'][1]['source']=nb['cells'][1]['source']+import_statement
-            nb['cells'].append(nbf.v4.new_markdown_cell("### Download"))
             nb['cells'].append(nbf.v4.new_code_cell(code_syntax))
             return nb
         else:
             idx = codes.index("warnings.filterwarnings('ignore')")
             codes = codes[:idx]+import_statement+codes[idx:]
-            return codes+code_syntax
+            if with_doc:return codes+PyComments.procedure['image_download']+code_syntax
+            else:return codes+"### Downloading file\n"+code_syntax 
     else:
         return nb if nb!=None else codes
 
@@ -204,14 +211,16 @@ def decompressing_code(yml_data,codes="",nb=None,with_doc=False):
             code_syntax=SourceCode.folder_decompression['zip']['code'].replace('SAVEZIP','file')
         
         if nb!=None and codes=="":
+            if with_doc:nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['image_decomp']))
+            else:nb['cells'].append(nbf.v4.new_markdown_cell("### Decompressing"))
             nb['cells'][1]['source']=nb['cells'][1]['source']+import_statement
-            nb['cells'].append(nbf.v4.new_markdown_cell("### Decompressing"))
             nb['cells'].append(nbf.v4.new_code_cell(code_syntax))
             return nb
         else:
             idx = codes.index("warnings.filterwarnings('ignore')")
             codes = codes[:idx]+import_statement+codes[idx:]
-            return codes+code_syntax
+            if with_doc:return codes+PyComments.procedure['image_decomp']+code_syntax
+            else:return codes+"### Decompressing\n"+code_syntax
     else:
         return nb if nb!=None else codes
         
@@ -260,10 +269,10 @@ def cleaning(yml_data,codes="",nb=None,with_doc=False):
         return nb if nb!=None else codes
 
 def cleaning_image(yml_data,codes="",nb=None,with_doc=False):
-    # if with_doc and nb!=None:
-    #     nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['image_cleaning']))
-    # elif with_doc and codes!="":
-    #     codes=codes+PyComments.procedure['image_cleaning']
+    if with_doc and nb!=None:
+         nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['image_cleaning']))
+    elif with_doc and codes!="":
+         codes=codes+PyComments.procedure['image_cleaning']
     clean=SourceCode.image_data['cleaning'].replace('SIZE',str(yml_data['cleaning']['resize']))
     if nb!=None and codes=="":
         nb['cells'].append(nbf.v4.new_code_cell(clean))
