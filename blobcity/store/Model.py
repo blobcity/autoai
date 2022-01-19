@@ -206,8 +206,14 @@ class Model:
                 base_path=os.path.splitext(model_path)[0]
                 tmp=self.model
                 if self.yamldata['problem']['type']=="Classification":
-                    tmp.export_model().save(base_path+".h5")
-                    print(f"Stored Tensorflow model at: {base_path}.h5")
+                    try:
+                        tmp.export_model().save(base_path+".h5")
+                        print(f"Stored Tensorflow model at: {base_path}.h5")
+                    except:
+                        if os.path.exists(base_path+".h5"):
+                            os.remove(base_path+".h5")
+                        tmp.export_model().save(base_path, save_format="tf")
+                        print(f"Stored Custom Tensorflow files at : {base_path}")
                 elif self.yamldata['problem']['type']=="Regression":
                     tmp.export_model().save(base_path, save_format="tf")
                     print(f"Stored Custom Tensorflow files at : {base_path}")
@@ -230,8 +236,8 @@ class Model:
         """
         if self.yamldata['model']['type'] in ['TF','tf','Tensorflow']:
             print("Selected Model Type: Neural Network")
-            tmp=self.model.export_model()
-            tmp.summary()
+            try: self.model.summary()
+            except: self.model.export_model().summary()
         else:
             print("Selected Model Type: Classic\nSelected Model Name: {}\nModel Tuning Parameter".format(self.model.__class__.__name__))
             for key, value in self.params.items():

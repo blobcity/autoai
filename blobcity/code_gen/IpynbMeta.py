@@ -817,4 +817,10 @@ Poisson regression is a generalized linear model form of regression used to mode
         'x&y':"### Feature Selection\n It is the process of reducing the number of input variables when developing a predictive model.Used to reduce the number of input variables to reduce the computational cost of modelling and,in some cases,to improve the performance of the model.",
         'cor_matrix': "### Correlation Matrix\n In order to check the correlation between the features, we will plot a correlation matrix. It is effective in summarizing a large amount of data where the goal is to see patterns.",
         'rescale':"### Data Rescaling\n Feature scaling or Data scaling is a method used to normalize the range of independent variables or features of data. In data processing, it is also known as data normalization", 
+        'image_fetch':"### Image Fetch\n Fetching image dataset from local storage or from network.",
+        'image_download':"### Downloading Image\n Downloading Image dataset from the URL using python request library.",
+        'image_decomp':"### File Decompression\n Decompressing the archive file using either zipfile or tarfile library and store it in local directory.",
+        'image_sample':"### Sample Image\n Using OpenCV to display sample images from each available target classes.",
+        'image_features':"### Feature Selection\n Creating X and Y features from the flatten image dataset.",
+        'image_cleaning':"### Image Preprocessing\n Preprocessing Image to appropriate matrix format for Machine learning."
     }

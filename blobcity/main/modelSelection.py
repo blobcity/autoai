@@ -329,5 +329,7 @@ def model_search(dataframe=None,target=None,DictClass=None,disable_colinearity=F
     if not disable_colinearity and ptype!="Image Classification":
         if DictClass.accuracy< 0.8:  print("Recommendation: Disable Colinearity in train function")
 
-    print("Selected Model :- {} \nCV Score :- {:.2f}".format(class_name,DictClass.accuracy)) 
+    if class_name !="Neural Network":print("Selected Model :- {} \nCV Score : {:.2f}".format(class_name,DictClass.accuracy)) 
+    else:print("Selected Model :- {} \nAccuracy Score : {:.2f}".format(class_name,DictClass.accuracy)) 
+    
     return modelData

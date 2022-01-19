@@ -101,13 +101,11 @@ def load(model_path=None):
             if extension == 'pkl':
                 model = dill.load(open(model_path, 'rb'))  
                 if model.yamldata['model']['type'] in ['TF','tf','Tensorflow']:
-                    if model.yamldata['model']['save_type']=='h5':
+                    if model.yamldata['model']['save_type'] in ['h5','pb']:
                         h5_path=base_path+".h5"
                         if os.path.isfile(h5_path):model.model=tf.keras.models.load_model(h5_path)
-                        else: raise FileNotFoundError(f"{h5_path} file doest exists in the directory")
-                    elif model.yamldata['model']['save_type']=='pb':
-                        if os.path.isdir(base_path):model.model=tf.keras.models.load_model(base_path, custom_objects=ak.CUSTOM_OBJECTS)
-                        else: raise FileNotFoundError(f"{base_path} Folder doest exists")
+                        elif os.path.isdir(base_path):model.model=tf.keras.models.load_model(base_path, custom_objects=ak.CUSTOM_OBJECTS)
+                        else: raise FileNotFoundError(f"{h5_path} or {base_path} file doest exists in the directory")
                     else:
                         raise TypeError(f"{model.yamldata['model']['save_type']}, not supported save format")
                 return model
