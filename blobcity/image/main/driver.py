@@ -15,9 +15,10 @@
 import os,copy
 from blobcity.main import load as model_loader
 from blobcity.main import spill as code_spill
+from blobcity.aicloud import send_yaml_to_cloud
 from blobcity.store import DictClass
 from blobcity.main.modelSelection import model_search
-from blobcity.utils import get_dataframe_type,check_subfolder_data
+from blobcity.utils import get_dataframe_type,check_subfolder_data,ProType
 from blobcity.utils import uncompress_file,validate_url,file_from_url,AutoFeatureSelection
 
 """
@@ -46,6 +47,7 @@ def train(file=None, df=None, target=None,model_types='classic',accuracy_criteri
     """
     dict_class=DictClass()
     dict_class.resetVar()
+    exp_id=ProType.generate_uuid()
     #data read
     if file!=None:
         dict_class.addKeyValue('problem',{'type':'Image Classification'})
@@ -76,6 +78,8 @@ def train(file=None, df=None, target=None,model_types='classic',accuracy_criteri
     metrics=copy.deepcopy(modelClass.metrics)
     if modelClass.yamldata['model']['type'] in ['TF','tf','Tensorflow']:metrics['Accuracy']=dict_class.accuracy
     else:metrics['CVSCORE']=dict_class.accuracy
+    post_data={'autoAIID':exp_id,'yaml':modelClass.yamldata,'metrics':metrics}
+    send_yaml_to_cloud(post_data)
     dict_class.resetVar()
     return modelClass
 
