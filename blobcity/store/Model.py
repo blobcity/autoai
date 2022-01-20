@@ -205,20 +205,14 @@ class Model:
             elif extension=='pkl' and self.yamldata['model']['type'] in ['TF','tf','Tensorflow']:
                 base_path=os.path.splitext(model_path)[0]
                 tmp=self.model
-                if self.yamldata['problem']['type']=="Classification":
-                    try:
-                        tmp.export_model().save(base_path+".h5")
-                        print(f"Stored Tensorflow model at: {base_path}.h5")
-                    except:
-                        if os.path.exists(base_path+".h5"):
-                            os.remove(base_path+".h5")
-                        tmp.export_model().save(base_path, save_format="tf")
-                        print(f"Stored Custom Tensorflow files at : {base_path}")
-                elif self.yamldata['problem']['type']=="Regression":
+                try:
+                    tmp.export_model().save(base_path+".h5")
+                    print(f"Stored Tensorflow model at: {base_path}.h5")
+                except:
+                    if os.path.exists(base_path+".h5"):
+                        os.remove(base_path+".h5")
                     tmp.export_model().save(base_path, save_format="tf")
                     print(f"Stored Custom Tensorflow files at : {base_path}")
-                else:
-                    raise TypeError("Wrong problem type identified")
                 self.model=None
                 dill.dump(self, open(model_path, 'wb'))
                 print(f"Stored Model Class at : {base_path}.pkl")
@@ -227,7 +221,6 @@ class Model:
                 raise TypeError(f"{extension} file type must be .pkl")
         else:
             raise ValueError("model_path cant be None or empty string")
-
 
     def summary(self):
         """
