@@ -195,6 +195,9 @@ class AutoFeatureSelection:
         """
         training_data,label_mapping=AutoFeatureSelection.create_training_data(data,targets,resize)
         dict_class.original_label=label_mapping
+        original_shape=[len(training_data)]
+        original_shape.extend(list(training_data[0][0].shape))
+        dict_class.original_shape=original_shape
         dict_class.addKeyValue('cleaning',{"resize":resize})
         df = pd.DataFrame(training_data, columns=['image', 'label'])
         return df
@@ -237,5 +240,6 @@ class AutoFeatureSelection:
             X.append(categories)
             y.append(label)
         X = np.array(X).reshape(lenofimage,-1)
+        #X = X.astype("float") / 255.0
         y = np.array(y)
         return (X,y)
