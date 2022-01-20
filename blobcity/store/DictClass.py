@@ -20,7 +20,7 @@ This is a Custom Class to store Class reference data for YAML generation and pro
 class DictClass:
 
     def __init__(self,ObjectExist=False,ObjectList=None,YAML=dict(),feature_importance=dict(),original_shape=[],
-        original_label=dict(),accuracy=0.0,image_models=['SVC','NuSVC','LinearSVC','KNeighborsClassifier','NearestCentroid',
+        original_label=dict(),accuracy=0.0,image_models=['SVC','NuSVC','LinearSVC','KNeighborsClassifier',
         'DecisionTreeClassifier','RandomForestClassifier','ExtraTreesClassifier','LogisticRegression','Perceptron'],Scaler=None):
         self.ObjectExist=ObjectExist
         self.ObjectList=ObjectList
