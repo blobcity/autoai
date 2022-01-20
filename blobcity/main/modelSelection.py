@@ -176,13 +176,8 @@ def train_on_neural(X,Y,ptype,epochs,max_neural_search,stage,ofstage):
     clf.fit(X,Y, epochs=epochs,verbose=0,callbacks=[CustomCallback()])
     loss,acc=clf.evaluate(X,Y,verbose=0)
     y_pred=clf.predict(X,verbose=0)
-    if ptype=="Classification": 
-        y_pred= y_pred.astype(np.int)
-    if ptype=='Regression':
-        acc=r2_score(Y,y_pred)
-        print("Loss: {}, Accuracy: {:.2f}".format(loss,acc))
-    else:
-        print("Loss: {}, Accuracy: {:.2f}".format(loss,acc))
+    if ptype=="Classification":y_pred= y_pred.astype(np.int)
+    if ptype=='Regression':acc=r2_score(Y,y_pred)
     results= Tuner.metricResults(Y,y_pred,ptype,prog)
     plot_data=Tuner.prediction_data(Y, y_pred, ptype,prog)
     prog.update_progressbar(prog.trials)
