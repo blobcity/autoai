@@ -319,7 +319,7 @@ def data_scaling(yml_data,codes="",nb=None,with_doc=False):
                 else:
                     idx = codes.index("warnings.filterwarnings('ignore')")
                     codes = codes[:idx]+imports+codes[idx:]
-                    return codes+SourceCode.cleaning['rescale'][rescale_type]
+                    return codes+"\n# Data Rescaling\r"+SourceCode.cleaning['rescale'][rescale_type]+"\n"
             elif yml_data['problem']['type']=='Image Classification':
                 rescale_type=yml_data['cleaning']['rescale']
                 imports=SourceCode.cleaning['rescale_import'][rescale_type]
