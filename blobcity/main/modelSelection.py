@@ -51,11 +51,11 @@ def getKFold(rows):
 
     Function returns number of kfold to consider for Cross validation on the basis of dataset row counts
     """
-    k=3
     if(rows>100 and rows<300):k=2
     elif(rows>300 and rows<=500): k=4
     elif(rows>500 and rows <=5000 ):k=5
-    elif(rows>5000):k=10 
+    elif(rows>5000):k=10
+    else:k=2
     return k
 
 def cv_score(model,X,Y,k):
