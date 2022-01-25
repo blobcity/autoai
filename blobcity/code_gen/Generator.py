@@ -49,26 +49,19 @@ def codegen_type(filepath):
         ftype= "py" if extension==".py" else "ipynb"
     return ftype
 
-def write_pycode(CGpath,codes):
+def write_code(CGpath,codes="",nbs=None):
     """
     param1: string : path of file to generate with either .py or .ipynb extension.
     param2: string : Actual code strings to be written into the file.
-
-    The function writes provide code string into the the .py file.
+    param3: notebook object 
+    The function writes provide code string into the the .py file or writes provided notebook data into the the .ipynb file..
     """
-    with open(CGpath,'w') as f:
-        f.write(codes)
-
-def write_ipynbcode(CGpath,nbs):
-    """
-    param1: string : path of file to generate with either .py or .ipynb extension.
-    param2: notebook object 
-
-    The function writes provided notebook data into the the .ipynb file.
-    """
-
-    with open(CGpath, 'w') as f:
-        nbf.write(nbs, f)
+    if nbs!=None:
+        with open(CGpath, 'w') as f:
+            nbf.write(nbs, f)
+    elif codes!="":
+        with open(CGpath,'w') as f:
+            f.write(codes)
 
 def initialize(key,codes="",nb=None):
     """
@@ -456,7 +449,7 @@ def pycoder(yml_data,CGpath,doc=False):
     codes=splits(codes=codes,with_doc=doc)
     codes=modeler(yml_data,key,doc,codes=codes)
     codes=model_metrics(yml_data,key,codes=codes,with_doc=doc)
-    write_pycode(CGpath,codes)
+    write_code(CGpath,codes=codes)
 
 def ipynbcoder(yml_data,CGpath,doc=True):
     """
@@ -479,7 +472,7 @@ def ipynbcoder(yml_data,CGpath,doc=True):
     nb=splits(nb=nb,with_doc=doc)
     nb=modeler(yml_data,key,doc,nb=nb) 
     nb=model_metrics(yml_data,key,nb=nb,with_doc=doc)
-    write_ipynbcode(CGpath,nb)
+    write_code(CGpath,nbs=nb)
 
 def pycoder_image(yml_data,CGpath,doc=False):
     """
@@ -504,7 +497,7 @@ def pycoder_image(yml_data,CGpath,doc=False):
     codes=modeler(yml_data,key,doc,codes=codes)
     codes=model_metrics(yml_data,key,codes=codes,with_doc=doc)
     codes=image_predictor(yml_data,codes=codes,with_doc=doc)
-    write_pycode(CGpath,codes)
+    write_code(CGpath,codes=codes)
 
 def ipynbcoder_image(yml_data,CGpath,doc=True):
     """
@@ -530,7 +523,7 @@ def ipynbcoder_image(yml_data,CGpath,doc=True):
     nb=modeler(yml_data,key,doc,nb=nb) 
     nb=model_metrics(yml_data,key,nb=nb,with_doc=doc)
     nb=image_predictor(yml_data,nb=nb,with_doc=doc)
-    write_ipynbcode(CGpath,nb)
+    write_code(CGpath,nbs=nb)
 
 def code_generator(data,filepath,doc=None):
     """
