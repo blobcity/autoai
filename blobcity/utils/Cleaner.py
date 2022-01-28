@@ -316,7 +316,6 @@ def quick_image_processing(path,size):
     """
     data = cv2.imread(path)
     data=cv2.cvtColor(data,cv2.COLOR_BGR2RGB)
-    img_array=cv2.cvtColor(data, cv2.COLOR_RGB2GRAY)
-    img_resize=cv2.resize(img_array,(size,size))
+    img_resize=cv2.resize(data,(size,size))
     img_data=[img_resize.flatten()]
     return (img_data,data)

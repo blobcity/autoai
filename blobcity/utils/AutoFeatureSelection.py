@@ -220,7 +220,6 @@ class AutoFeatureSelection:
                 try:
                     img_array=cv2.imread(os.path.join(path,img))
                     img_array=cv2.cvtColor(img_array,cv2.COLOR_BGR2RGB)
-                    img_array=cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
                     new_array=cv2.resize(img_array,(resize,resize))
                     training_data.append([new_array,class_num])
                 except Exception as e:
@@ -240,6 +239,5 @@ class AutoFeatureSelection:
             X.append(categories)
             y.append(label)
         X = np.array(X).reshape(lenofimage,-1)
-        #X = X.astype("float") / 255.0
         y = np.array(y)
         return (X,y)

@@ -208,7 +208,6 @@ class SourceCode:
                 try:
                     img_array=cv2.imread(os.path.join(path,img))
                     img_array=cv2.cvtColor(img_array,cv2.COLOR_BGR2RGB)
-                    img_array=cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
                     new_array=cv2.resize(img_array,(resize,resize))
                     training_data.append([new_array,class_num])
                 except Exception:
@@ -227,7 +226,6 @@ def image_pred_plot(test_img):
     img = cv2.imread(test_img)
     img_array=cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
     plt.imshow(img_array)
-    img_array=cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
     img_data=[cv2.resize(img_array,(SIZE,SIZE)).flatten()]
     plt.title("Prediction : {}".format(target[model.predict(img_data)[0]]))
     plt.show()
