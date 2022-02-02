@@ -261,6 +261,16 @@ def cleaning(yml_data,codes="",nb=None,with_doc=False):
         return nb if nb!=None else codes
 
 def cleaning_image(yml_data,codes="",nb=None,with_doc=False):
+    
+    """
+    param1:string:
+    param2:notebook object:
+    param3:boolean:
+    return: string/notebook object
+
+    Function add code syntax for reading and preprocessing of image data to matrix format.
+    """
+    
     if with_doc and nb!=None:
          nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['image_cleaning']))
     elif with_doc and codes!="":
@@ -279,6 +289,8 @@ def add_corr_matrix(codes="",nb=None,with_doc=False):
     param2:notebook object:
     param3:boolean:
     return: string/notebook object
+
+    Function adds code syntax for correlation matrix
     """
     if with_doc: 
         if nb!=None: nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['cor_matrix']))
@@ -413,9 +425,19 @@ def model_metrics(yml_data,key,codes="",nb=None,with_doc=False):
                 return codes+SourceCode.tf_metric[key]
 
 def image_predictor(yml_data,codes="",nb=None,with_doc=False):
-    # if with_doc: 
-    #     if nb!=None: nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['metrics']))
-    #     else: codes=codes+PyComments.procedure['metrics']
+    """
+    param1: dictionary : AutoAI steps data
+    param2: string : Code syntaxs
+    param3: boolean : Whether to includer documentation/meta description for the following section
+    return: string : Code syntaxs
+
+    The function adds code syntax related to the Custom Image Prediction function with 
+    visual representation of image and the predicted output.
+    """
+    if with_doc: 
+        if nb!=None: nb['cells'].append(nbf.v4.new_markdown_cell(IpynbComments.procedure['image_pred']))
+        else: codes=codes+PyComments.procedure['image_pred']
+
     if yml_data['model']['type'] not in ['TF','tf','Tensorflow']:
         pred=SourceCode.image_data['Image_prediction']['classic'].replace('SIZE',str(yml_data['cleaning']['resize']))
     else:

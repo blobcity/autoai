@@ -822,5 +822,6 @@ Poisson regression is a generalized linear model form of regression used to mode
         'image_decomp':"### File Decompression\n Decompressing the archive file using either zipfile or tarfile library and store it in local directory.",
         'image_sample':"### Sample Image\n Using OpenCV to display sample images from each available target classes.",
         'image_features':"### Feature Selection\n Creating X and Y features from the flatten image dataset.",
-        'image_cleaning':"### Image Preprocessing\n Preprocessing Image to appropriate matrix format for Machine learning."
+        'image_cleaning':"### Image Preprocessing\n Preprocessing Image to appropriate matrix format for Machine learning.",
+        'image_pred':"### Image Prediction",
     }
