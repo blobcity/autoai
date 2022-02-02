@@ -16,7 +16,7 @@
 """
 This python file Consist of Function to Generate YAML file from complete process record/log  for OPENSOURCE CODE GENERATION.
 """
-import os
+
 import yaml
 def writeYml(val):
     """

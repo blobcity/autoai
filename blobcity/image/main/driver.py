@@ -18,7 +18,7 @@ from blobcity.main import spill as code_spill
 from blobcity.aicloud import send_yaml_to_cloud
 from blobcity.store import DictClass
 from blobcity.main.modelSelection import model_search
-from blobcity.utils import get_dataframe_type,check_subfolder_data,ProType
+from blobcity.utils import check_subfolder_data,ProType
 from blobcity.utils import uncompress_file,validate_url,file_from_url,AutoFeatureSelection
 
 """

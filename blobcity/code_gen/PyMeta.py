@@ -87,12 +87,13 @@ class PyComments:
         'datasplit':"\n### Train & Test\n# The train-test split is a procedure for evaluating the performance of an algorithm.\n# The procedure involves taking a dataset and dividing it into two subsets.\n# The first subset is utilized to fit/train the model.\n# The second subset is used for prediction.\n# The main motive is to estimate the performance of the model on new data.\n",
         'metrics':"\n### Accuracy Metrics\n# Performance metrics are a part of every machine learning pipeline. \n# They tell you if you're making progress, and put a number on it. All machine learning models,\n# whether it's linear regression, or a SOTA technique like BERT, need a metric to judge performance.\n",
         'x&y':"\n### Feature Selection\n# It is the process of reducing the number of input variables when developing a predictive model.\n# Used to reduce the number of input variables to reduce the computational cost of modelling and,\n# in some cases,to improve the performance of the model.\n",
-        'cor_matrix': "### Correlation Matrix\n# In order to check the correlation between the features, we will plot a correlation matrix.\n# It is effective in summarizing a large amount of data where the goal is to see patterns.\n",
+        'cor_matrix': "\n### Correlation Matrix\n# In order to check the correlation between the features, we will plot a correlation matrix.\n# It is effective in summarizing a large amount of data where the goal is to see patterns.\n",
         'rescale':"\n### Data Rescaling\n # Feature scaling or Data scaling is a method used to normalize the range of independent variables or features of data.\n# In data processing, it is also known as data normalization\n",
         'image_fetch':"\n### Image Fetch\n # Fetching image dataset from local storage or from network.",
         'image_download':"\n### Downloading Image\n # Downloading Image dataset from the URL using python request library.",
         'image_decomp':"\n### File Decompression\n # Decompressing the archive file using either zipfile or tarfile library and store it in local directory.\n",
         'image_sample':"\n### Sample Image\n # Using OpenCV to display sample images from each available target classes.\n",
-        'image_features':"### Feature Selection\n # Creating X and Y features from the flatten image dataset.",
-        'image_cleaning':"### Image Preprocessing\n # Preprocessing Image to appropriate matrix format for Machine learning."
+        'image_features':"\n### Feature Selection\n # Creating X and Y features from the flatten image dataset.",
+        'image_cleaning':"\n### Image Preprocessing\n # Preprocessing Image to appropriate matrix format for Machine learning.",
+        'image_pred':"\n### Image Prediction"
     }
