@@ -17,8 +17,7 @@
 """
 This file consists of functions to deal with the Code generation functionality of AutoAI.
 """
-import yaml
-import os
+import yaml,os
 import nbformat as nbf
 from blobcity.code_gen.PyMeta import PyComments
 from blobcity.code_gen.IpynbMeta import IpynbComments
