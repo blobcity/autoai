@@ -227,6 +227,9 @@ class Model:
         Function to print/log/display all the metrics associated with problem type for the selected trained model and the model parameters. 
         Usally used to check the effectiveness of training, or to assess the model fit. 
         """
+        if 'cleaning' in self.yamldata.keys():
+            print("Preprocessing Strategy Utilized : ",list(self.yamldata['cleaning'].keys()))
+           
         if self.yamldata['model']['type'] in ['TF','tf','Tensorflow']:
             print("Selected Model Type: Neural Network")
             try: self.model.summary()
@@ -266,8 +269,12 @@ class Model:
             filepath = './Process.yaml'
             extension=".yaml"
         if extension in [".yaml",".yml"]:
-            with open(filepath, 'w') as file:
-                yaml.dump(self.yamldata, file,sort_keys=False)
+            try:
+                with open(filepath, 'w') as file:
+                    yaml.dump(self.yamldata, file,sort_keys=False)
+                print("YAML configuration saved at : {filepath}")
+            except Exception as e:
+                print("Error in saving YAML configuration")
         else:
             raise TypeError(f"{extension} file type must be .yml or .yaml")
 
