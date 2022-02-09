@@ -228,8 +228,10 @@ class Model:
         Usally used to check the effectiveness of training, or to assess the model fit. 
         """
         if 'cleaning' in self.yamldata.keys():
-            print("Preprocessing Strategy Utilized : ",list(self.yamldata['cleaning'].keys()))
-           
+            print("\nPreprocessing Strategy Utilized : ")
+            for key, value in self.yamldata['cleaning'].items():
+                print ("{:<10} :- {:<10}".format(key, str(value)))
+            print("")
         if self.yamldata['model']['type'] in ['TF','tf','Tensorflow']:
             print("Selected Model Type: Neural Network")
             try: self.model.summary()
