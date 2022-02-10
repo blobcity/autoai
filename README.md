@@ -164,7 +164,7 @@ model.plot_prediction()
 ``` Python
 model.summary()
 ```
-Print model configuration/Hyper Parameter tuning along the key model static parameters, such as Precision, Recall, F1-Score,etc. The parameters change based on the type of AutoAI problem. 
+Print model configuration/Hyper Parameter tuning along the key model static parameters, such as Precision, Recall, F1-Score,etc. The parameters change based on the type of AutoAI problem. It also provide information on different data preprocessing steps applied during the complete process.
 
 # Persistence
 ``` Python

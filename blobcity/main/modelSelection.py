@@ -152,6 +152,7 @@ def train_on_full_data(X,Y,models,best,DictionaryClass,stages):
     """
     k=getKFold(X.shape[0])
     modelScore={}
+    if DictionaryClass.YAML['problem']['type']=="Image Classification" and len(best)>5:best=DictionaryClass.image_models
     prog.create_progressbar(len(best),"Deep Search (Stage 2 of {}) :".format(stages))
     for m in best:
         modelScore[m]=eval_model(models,m,X,Y,k,DictionaryClass)
