@@ -172,11 +172,13 @@ def train_on_neural(X,Y,ptype,epochs,max_neural_search,stage,ofstage):
     Function perform neural network model search and tuning using autokeras api and finally returns selected keras model.
     """
     prog.create_progressbar(n_counters=((max_neural_search+2)*epochs),desc="Neural Networks (stage {} of {})".format(stage,ofstage))
-    clf = ak.StructuredDataClassifier(overwrite=True,max_trials=max_neural_search) if ptype=='Classification' else ak.StructuredDataRegressor(overwrite=True,max_trials=max_neural_search) 
-    clf.fit(X,Y, epochs=epochs,verbose=0,callbacks=[CustomCallback()])
+    if ptype!="Image Classification":
+        clf = ak.StructuredDataClassifier(overwrite=True,max_trials=max_neural_search) if ptype=='Classification' else ak.StructuredDataRegressor(overwrite=True,max_trials=max_neural_search) 
+    else: clf= ak.ImageClassifier(overwrite=True,max_trials=max_neural_search)
+    clf.fit(X,Y, epochs=epochs,callbacks=[CustomCallback()])
     loss,acc=clf.evaluate(X,Y,verbose=0)
     y_pred=clf.predict(X,verbose=0)
-    if ptype=="Classification":y_pred= y_pred.astype(np.int)
+    if ptype in ["Classification","Image Classification"]:y_pred= y_pred.astype(np.int)
     if ptype=='Regression':acc=r2_score(Y,y_pred)
     results= Tuner.metricResults(Y,y_pred,ptype,prog)
     plot_data=Tuner.prediction_data(Y, y_pred, ptype,prog)
@@ -275,7 +277,6 @@ def model_search(dataframe=None,target=None,DictClass=None,disable_colinearity=F
     modelData=Model()
     ptype=DictClass.getdict()['problem']["type"]
     cls_types,prob_types= ["Classification","Image Classification"],["Classification","Regression"]
-
     if ptype in cls_types :modelsList=classifier_config().models
     else:modelsList= regressor_config().models
 
@@ -291,6 +292,7 @@ def model_search(dataframe=None,target=None,DictClass=None,disable_colinearity=F
         class_name=modelData.model.__class__.__name__
 
     elif model_types=='neural':
+        if ptype =="Image Classification":X=X.reshape(DictClass.original_shape)
         gpu_num=tf.config.list_physical_devices('GPU')
         if len(gpu_num)==0: print("No GPU was detected on your system. Defaulting to CPU. Consider running on a GPU plan on BlobCity AI Cloud for faster training. https://cloud.blobcity.com")
         neural_network=train_on_neural(X,Y,ptype,epochs,max_neural_search,1,1)
@@ -312,6 +314,7 @@ def model_search(dataframe=None,target=None,DictClass=None,disable_colinearity=F
                 if 'cleaning' in DictClass.YAML.keys():
                     if 'rescale' in DictClass.YAML['cleaning'].keys():
                         del DictClass.YAML['cleaning']['rescale']
+                if ptype =="Image Classification":X=X.reshape(DictClass.original_shape)
                 DictClass.accuracy=round(neural_network[1],3)
                 modelData=neural_model_records(modelData,neural_network,DictClass,ptype,dataframe,target)
                 class_name="Neural Network"
