@@ -24,7 +24,7 @@ from blobcity.utils import uncompress_file,validate_url,file_from_url,AutoFeatur
 """
 This file consists of Function to deal with Image Classification problem in python.
 """
-def train(file=None, target=None,model_types='classic',accuracy_criteria=0.99,resize=50):
+def train(file=None, target=None,model_types='classic',accuracy_criteria=0.99,resize=50,epochs=10,max_neural_search=10):
     """
     param1: string: file path 
 
@@ -66,7 +66,7 @@ def train(file=None, target=None,model_types='classic',accuracy_criteria=0.99,re
             data,target=check_subfolder_data(file,dict_class)
         data=AutoFeatureSelection.image_processing(data,target,resize,dict_class)
             
-        modelClass = model_search(dataframe=data,target='label',DictClass=dict_class,disable_colinearity=True,model_types=model_types,accuracy_criteria=accuracy_criteria,epochs=20,max_neural_search=10)
+        modelClass = model_search(dataframe=data,target='label',DictClass=dict_class,disable_colinearity=True,model_types=model_types,accuracy_criteria=accuracy_criteria,epochs=epochs,max_neural_search=max_neural_search)
         modelClass.yamldata=dict_class.getdict()
         metrics=copy.deepcopy(modelClass.metrics)
         if modelClass.yamldata['model']['type'] in ['TF','tf','Tensorflow']:metrics['Accuracy']=dict_class.accuracy
