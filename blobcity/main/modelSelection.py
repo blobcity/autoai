@@ -175,7 +175,7 @@ def train_on_neural(X,Y,ptype,epochs,max_neural_search,stage,ofstage):
     if ptype!="Image Classification":
         clf = ak.StructuredDataClassifier(overwrite=True,max_trials=max_neural_search) if ptype=='Classification' else ak.StructuredDataRegressor(overwrite=True,max_trials=max_neural_search) 
     else: clf= ak.ImageClassifier(overwrite=True,max_trials=max_neural_search)
-    clf.fit(X,Y, epochs=epochs,callbacks=[CustomCallback()])
+    clf.fit(X,Y,verbose=0,epochs=epochs,callbacks=[CustomCallback()])
     loss,acc=clf.evaluate(X,Y,verbose=0)
     y_pred=clf.predict(X,verbose=0)
     if ptype in ["Classification","Image Classification"]:y_pred= y_pred.astype(np.int)
