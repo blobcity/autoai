@@ -274,7 +274,7 @@ class Model:
             try:
                 with open(filepath, 'w') as file:
                     yaml.dump(self.yamldata, file,sort_keys=False)
-                print("YAML configuration saved at : {filepath}")
+                print(f"YAML configuration saved at : {filepath}")
             except Exception as e:
                 print("Error in saving YAML configuration")
         else:
