@@ -27,6 +27,15 @@ from zipfile import ZipFile, is_zipfile
 from sklearn.preprocessing import LabelEncoder,MinMaxScaler,StandardScaler
 from blobcity.utils.ProblemType import ProType
 from blobcity.utils.progress_bar import Progress
+from tkinter import Y
+from turtle import update
+import datetime as dt
+import matplotlib.pyplot as plt
+from sqlalchemy import true
+from blobcity.store.DictClass import DictClass
+from scipy.stats import kruskal
+from statsmodels.tsa.stattools import kpss
+from statsmodels.tsa.stattools import adfuller
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -317,3 +326,121 @@ def quick_image_processing(path,size):
     img_resize=cv2.resize(data,(size,size))
     img_data=[img_resize.flatten()]
     return (img_data,data)
+
+
+def timeseries_cleaner(X,date,target,samplingtype,dictclass):
+
+    X=X.loc[0:X.shape[0],[date,target]].copy(deep=True) 
+    updateddf=RemoveRowsWithHighNans(X)
+    updateddf=RemoveHighNullValues(X)
+    updateddf=parsetime(X,date,dictclass)
+    updateddf=FrequencyChecker(updateddf,date,dictclass)
+    updateddf=frequencysampling(updateddf,date,dictclass,samplingtype) if samplingtype!=None else updateddf
+    
+    X = updateddf[target].values
+    s = StationarityTest()
+    s.results(X)
+    return updateddf
+
+
+def parsetime(df,date,dictclass):
+    try:
+        df[date]= pd.to_datetime(df[date])
+        return df
+    except:
+        try:
+            df[date] = pd.to_datetime(df[date],format="%d.%m.%Y")
+
+        except:
+            raise TypeError("Unsupported Date Format")
+        
+def FrequencyChecker(df,date,dictclass):
+    df_copy=df.copy(deep=True)
+    df['Month']=df[date].dt.month
+    df['Year']=df[date].dt.year
+    df['Hour']=df[date].dt.hour
+    df['Days']=df[date].dt.day_name()
+    hh=df.iloc[0:24,:]
+    
+    dd=df.iloc[0:30,:]
+    d=df.Days.nunique()
+    h=hh.Hour.nunique()
+    m=df.Month.nunique()
+    if(h>1 and h<=24):
+        dictclass.time_frequency="H"
+        
+    elif(d>1 and d<=7):
+        dictclass.time_frequency="D"
+    
+        
+    elif(m>1 and m<=12):
+        dictclass.time_frequency="M"
+        
+    else:
+        dictclass.time_frequency="Y"
+        
+    return df_copy
+
+def frequencysampling(df,date,dictclass,samplingtype):
+    downsample=""
+    df=df.set_index(date)
+    if (samplingtype=="day" and dictclass.time_frequency=="H"):
+        df=df.resample('H').mean()
+        downsample="day"
+        
+    elif(samplingtype=="week" and dictclass.time_frequency in ["H","D"]):
+        df=df.resample("D").mean()
+        downsample="week" 
+    elif (samplingtype=="month" and dictclass.time_frequency in ["H","D"]):
+        df=df.resample('M').mean()
+        downsample="month"    
+        
+    elif (samplingtype=="quarterly" and dictclass.time_frequency in ["H","D","M"]):
+        df=df.resample("Q").mean()
+        downsample="quarterly"
+        
+    elif (samplingtype=="year" and dictclass.time_frequency in ["H","D","M"]):
+        df=df.resample('M').mean()
+        downsample="year"
+
+    elif (samplingtype not in ["year","quaterly"," month","week","day",None]):
+        raise ValueError(f"{samplingtype} is not a valid option, valid options are ['year','quaterly','month','week','day',None]")
+    if downsample not in [None,""]:
+        dictclass.addKeyValue("cleaning",{"downsample":downsample})
+    return df
+    
+class StationarityTest:
+    def __init__(self, SignificanceLevel=.05,test=[]):
+        self.SignificanceLevel = SignificanceLevel 
+        self.test=test
+    def ADF_Stationarity_Test(self, timeseries):
+        adfTest = adfuller(timeseries, autolag='AIC')
+        self.pValue = adfTest[1]
+        if (self.pValue<self.SignificanceLevel):
+            self.test.append(True)
+        else:
+            self.test.append(False)
+            
+    def kpss_test(self,timeseries):
+        statistic, p_value, n_lags, critical_values = kpss(timeseries)
+        if (p_value < self.SignificanceLevel):
+            self.test.append(False)
+        else:
+            self.test.append(True)
+    def seasonality_test(self,timeseries):
+        seasoanl = False
+        idx = np.arange(len(timeseries)) % 12
+        H_statistic, p_value = kruskal(timeseries, idx)
+        if p_value <= self.SignificanceLevel:
+            seasonal = True
+        self.test.append(seasonal)
+    def results(self,timeseries):
+        StationarityTest.ADF_Stationarity_Test(self, timeseries)
+        StationarityTest.kpss_test(self,timeseries)
+        StationarityTest.seasonality_test(self,timeseries)
+        
+        result=max(self.test, key=self.test.count)
+        return result
+
+
+    
