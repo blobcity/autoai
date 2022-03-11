@@ -341,7 +341,6 @@ def timeseries_cleaner(X,date,target,samplingtype,dictclass):
     s.results(X)
     updateddf=frequencysampling(updateddf,date,dictclass,samplingtype) if samplingtype!=None else updateddf
     updateddf=RemoveHighNullValues(updateddf)
-    print(updateddf.isnull().sum())
     return updateddf
 
 
@@ -362,10 +361,10 @@ def FrequencyChecker(df,date,dictclass):
     df['Year']=df[date].dt.year
     df['Hour']=df[date].dt.hour
     df['Days']=df[date].dt.day_name()
-    hh=df 
+    #hh=df 
     dd=df.iloc[0:30,:]
     d=df.Days.nunique()
-    h=hh.Hour.nunique()
+    h=df.Hour.nunique()
     m=df.Month.nunique()
     if(h>1 and h<=24):
         dictclass.time_frequency="H"
