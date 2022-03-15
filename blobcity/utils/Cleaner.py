@@ -17,7 +17,6 @@
 This Python file consists of function to perform basic data cleaning/data preprocessing operation on most dataset.
 Functions includes, Removal of Unique COlumns,High Null value ratio, Missing Value Handling, String Categorical feature Handling .
 """
-from calendar import different_locale
 import cv2
 import numpy as np
 import pandas as pd
@@ -28,15 +27,8 @@ from zipfile import ZipFile, is_zipfile
 from sklearn.preprocessing import LabelEncoder,MinMaxScaler,StandardScaler
 from blobcity.utils.ProblemType import ProType
 from blobcity.utils.progress_bar import Progress
-from tkinter import Y
-from turtle import update
-import datetime as dt
-import matplotlib.pyplot as plt
-from sqlalchemy import true
-from blobcity.store.DictClass import DictClass
 from scipy.stats import kruskal
-from statsmodels.tsa.stattools import kpss
-from statsmodels.tsa.stattools import adfuller
+from statsmodels.tsa.stattools import kpss,adfuller
 import warnings
 warnings.filterwarnings("ignore")
 
