@@ -17,6 +17,7 @@
 This Python file consists of function to perform basic data cleaning/data preprocessing operation on most dataset.
 Functions includes, Removal of Unique COlumns,High Null value ratio, Missing Value Handling, String Categorical feature Handling .
 """
+from calendar import different_locale
 import cv2
 import numpy as np
 import pandas as pd
@@ -335,11 +336,11 @@ def timeseries_cleaner(X,date,target,samplingtype,dictclass):
     updateddf=RemoveHighNullValues(X)
     updateddf=parsetime(X,date,dictclass)
     updateddf=FrequencyChecker(updateddf,date,dictclass)
-    updateddf=frequencysampling(updateddf,date,dictclass,samplingtype) if samplingtype!=None else updateddf
-    
     X = updateddf[target].values
     s = StationarityTest()
     s.results(X)
+    updateddf=frequencysampling(updateddf,date,dictclass,samplingtype) if samplingtype!=None else updateddf
+    updateddf=RemoveHighNullValues(updateddf)
     return updateddf
 
 
@@ -360,18 +361,16 @@ def FrequencyChecker(df,date,dictclass):
     df['Year']=df[date].dt.year
     df['Hour']=df[date].dt.hour
     df['Days']=df[date].dt.day_name()
-    hh=df.iloc[0:24,:]
-    
+    #hh=df 
     dd=df.iloc[0:30,:]
     d=df.Days.nunique()
-    h=hh.Hour.nunique()
+    h=df.Hour.nunique()
     m=df.Month.nunique()
     if(h>1 and h<=24):
         dictclass.time_frequency="H"
         
     elif(d>1 and d<=7):
         dictclass.time_frequency="D"
-    
         
     elif(m>1 and m<=12):
         dictclass.time_frequency="M"
@@ -380,35 +379,7 @@ def FrequencyChecker(df,date,dictclass):
         dictclass.time_frequency="Y"
         
     return df_copy
-
-def frequencysampling(df,date,dictclass,samplingtype):
-    downsample=""
-    df=df.set_index(date)
-    if (samplingtype=="day" and dictclass.time_frequency=="H"):
-        df=df.resample('H').mean()
-        downsample="day"
-        
-    elif(samplingtype=="week" and dictclass.time_frequency in ["H","D"]):
-        df=df.resample("D").mean()
-        downsample="week" 
-    elif (samplingtype=="month" and dictclass.time_frequency in ["H","D"]):
-        df=df.resample('M').mean()
-        downsample="month"    
-        
-    elif (samplingtype=="quarterly" and dictclass.time_frequency in ["H","D","M"]):
-        df=df.resample("Q").mean()
-        downsample="quarterly"
-        
-    elif (samplingtype=="year" and dictclass.time_frequency in ["H","D","M"]):
-        df=df.resample('M').mean()
-        downsample="year"
-
-    elif (samplingtype not in ["year","quaterly"," month","week","day",None]):
-        raise ValueError(f"{samplingtype} is not a valid option, valid options are ['year','quaterly','month','week','day',None]")
-    if downsample not in [None,""]:
-        dictclass.addKeyValue("cleaning",{"downsample":downsample})
-    return df
-    
+   
 class StationarityTest:
     def __init__(self, SignificanceLevel=.05,test=[]):
         self.SignificanceLevel = SignificanceLevel 
@@ -440,7 +411,36 @@ class StationarityTest:
         StationarityTest.seasonality_test(self,timeseries)
         
         result=max(self.test, key=self.test.count)
+       
         return result
 
+def frequencysampling(df,date,dictclass,samplingtype):
+    downsample=""
+    df=df.set_index(date)
+    if (samplingtype=="day" and dictclass.time_frequency=="H"):
+        dff=df.resample('H').mean()
+        downsample="day"
+        
+    elif(samplingtype=="week" and dictclass.time_frequency in ["H","D"]):
+        dff=df.resample("D").mean()
+        downsample="week" 
+    elif (samplingtype=="month" and dictclass.time_frequency in ["H","D"]):
+        dff=df.resample('M').mean()
+        downsample="month"    
+        
+    elif (samplingtype=="quarterly" and dictclass.time_frequency in ["H","D","M"]):
+        dff=df.resample("Q").mean()
+        downsample="quarterly"
+        
+    elif (samplingtype=="year" and dictclass.time_frequency in ["H","D","M"]):
+        different_locale=df.resample('M').mean()
+        downsample="year"
+
+    elif (samplingtype not in ["year","quaterly"," month","week","day",None]):
+        raise ValueError(f"{samplingtype} is not a valid option, valid options are ['year','quaterly','month','week','day',None]")
+    if downsample not in [None,""]:
+        dictclass.addKeyValue("cleaning",{"downsample":downsample})
+
+    return dff
 
     
