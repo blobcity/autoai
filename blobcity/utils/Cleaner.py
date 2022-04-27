@@ -28,6 +28,7 @@ from zipfile import ZipFile, is_zipfile
 from sklearn.preprocessing import LabelEncoder,MinMaxScaler,StandardScaler
 from blobcity.utils.ProblemType import ProType
 from blobcity.utils.progress_bar import Progress
+<<<<<<< HEAD
 from blobcity.store.DictClass import DictClass
 from scipy.stats import kruskal
 with warnings.catch_warnings():
@@ -38,6 +39,9 @@ with warnings.catch_warnings():
     from statsmodels.tsa.stattools import adfuller
     
 from scipy.stats import kruskal
+=======
+from scipy.stats import kruskal
+>>>>>>> 8d97c1f74901a9d47defe1a891315334747a9b19
 from statsmodels.tsa.stattools import kpss,adfuller
 import warnings
 warnings.filterwarnings("ignore")
