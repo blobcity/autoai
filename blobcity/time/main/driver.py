@@ -19,8 +19,7 @@ import pandas as pd
 import warnings,copy
 from blobcity.store import DictClass
 from blobcity.aicloud import send_yaml_to_cloud
-from sklearn.preprocessing import MinMaxScaler 
-from blobcity.main.modelSelection import model_search
+from blobcity.main.modelSelection import time_model #model_search_time
 from blobcity.code_gen import yml_reader,code_generator
 from sklearn.feature_selection import SelectKBest,f_regression,f_classif
 from blobcity.utils import ProType,get_dataframe_type
@@ -72,10 +71,11 @@ def train(file=None, df=None, target=None,features=None,date=None,frequency_samp
         dict_class.addKeyValue('data_read',{"type":"df","class":"df"})
         
     if(features==None):
-        #featureList=AutoFeatureSelection_dt.FeatureSelection(dataframe,target,dict_class,disable_colinearity)
         CleanedDF=timeseries_cleaner(dataframe,date,target,frequency_sampling_type,dict_class)
+        train_model=time_model(CleanedDF,DictClass,accuracy_criteria=None) #modelClass
        
    
     print(dict_class.getdict()) 
+    print(train_model)
     dict_class.resetVar()
     return None

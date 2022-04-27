@@ -16,16 +16,24 @@
 import os
 import optuna
 import warnings
+import pandas as pd
+import numpy as np
 from blobcity.main import modelSelection
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.model_selection import cross_val_score
 from blobcity.utils import Progress,scaling_data
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+from statsmodels.tsa.holtwinters import ExponentialSmoothing,SimpleExpSmoothing, Holt
+from blobcity.utils import * #timeseries_cleaner
+import warnings
+warnings.filterwarnings("ignore")
 from sklearn.metrics import r2_score,mean_squared_error,mean_absolute_error,f1_score,precision_score,recall_score,confusion_matrix
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     os.environ["PYTHONWARNINGS"] = "ignore"
-optuna.logging.set_verbosity(optuna.logging.WARNING)
+#optuna.logging.set_verbosity(optuna.logging.WARNING)
 """
 Python files consist of function to perform parameter tuning using optuna framework
 """
@@ -35,6 +43,12 @@ class EarlyStopper():
     iter_count = 0
     best_score = None
     criterion = 0.99
+
+class EarlyStopper_time():
+    iter_stop = 10
+    iter_count = 0
+    best_score = None
+    criterion = 1 
 
 def early_stopping_opt(study, trial):
     """
@@ -62,6 +76,34 @@ def early_stopping_opt(study, trial):
                 study.stop()
                 
     return
+
+def early_stopping_opt_time(study, trial):
+    """
+    param1:optuna.study.Study 
+    param2:optuna trial
+    
+    The function decides whether to stop parameter tunning based on the accuracy of the current trial. 
+    Condition to stop trials: if accuracy is more than equal to 99%. 
+    The second condition is to check whether accuracy is between 90%-99% and 
+    whether the current best accuracy has not changed for the last ten trials.
+
+    """
+    if EarlyStopper_time.best_score == None: EarlyStopper_time.best_score = study.best_value
+    if study.best_value <= EarlyStopper_time.criterion : study.stop()
+    if study.best_value < EarlyStopper_time.best_score:
+        EarlyStopper_time.best_score = study.best_value
+        EarlyStopper_time.iter_count = 0
+    else:
+        if  study.best_value > 1 and study.best_value < 10:
+            if EarlyStopper_time.iter_count < EarlyStopper_time.iter_stop:
+                EarlyStopper_time.iter_count=EarlyStopper_time.iter_count+1  
+            else:
+                EarlyStopper_time.iter_count = 0
+                EarlyStopper_time.best_score = None
+                study.stop()
+                
+    return
+
 
 def regression_metrics(y_true,y_pred):
     """
@@ -159,7 +201,8 @@ def objective(trial):
     score = cross_val_score(model, X, Y, cv=cv)
     accuracy = score.mean()
     prog.update_progressbar(1)
-    return accuracy   
+    return accuracy 
+ 
 
 def prediction_data(y_true,y_pred,ptype,prog):
     """
@@ -189,7 +232,7 @@ def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy,DictionaryClas
     param5: string : Problem type either classification or reggression
     param6: float : Value to consider for stop model fining tune on desired accuracy criteria
     param7: class object
-    return: tuple(model,parameter)
+    return: tuple(model,parameter)dataframe
 
     Function first fetchs required parameter details for the specific model by calling getParamList function and number of required kfold counts.
     then start a optuna study operation to fetch best tuning parameter for the model.
@@ -222,3 +265,33 @@ def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy,DictionaryClas
         return (model,study.best_params,study.best_value,metric_result,plots)
     except Exception as e:
         print(e)
+
+
+
+def timeobjective(trial):
+    #train_data, test_data=spliter(updateddf)
+    param1=get_params(trial)
+    mdl=modelName(train_data1,**param1)
+    try:
+        mdl1 = mdl.fit(disp=0)
+    except:
+        mdl1 = mdl.fit() 
+    predictions = mdl1.forecast(len(test_data1))
+    predictions = pd.Series(predictions, index=test_data1.index)
+    residuals = test_data1 - predictions
+    mse=np.sqrt(np.mean(residuals**2))
+    accuracy=mse
+    return accuracy
+ 
+
+def time_tuner(train_data, test_data,modelkey,modelList,accuracy=None):
+    #get_param_list({selected_model:0},models)
+    global train_data1,test_data1
+    train_data1=train_data
+    test_data1=test_data
+    print("this is my time tuner start..")
+    get_param_list(modelkey,modelList)
+    study=optuna.create_study(direction="minimize")
+    study.optimize(timeobjective,n_trials=30,callbacks=[early_stopping_opt_time])
+    print("time tuning complete")
+    return (study.best_params,study.best_value)
