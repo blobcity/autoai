@@ -36,8 +36,7 @@ with warnings.catch_warnings():
     os.environ["PYTHONWARNINGS"] = "ignore"
     from statsmodels.tsa.stattools import kpss
     from statsmodels.tsa.stattools import adfuller
-
-
+    
 from scipy.stats import kruskal
 from statsmodels.tsa.stattools import kpss,adfuller
 import warnings
