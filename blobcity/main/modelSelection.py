@@ -13,7 +13,9 @@
 # limitations under the License.
 
 import os
+from cv2 import DFT_COMPLEX_INPUT
 import numpy as np
+import pandas as pd
 from math import isnan
 import warnings,itertools
 from blobcity.store import Model
@@ -21,11 +23,18 @@ from sklearn.metrics import r2_score
 from blobcity.config import tuner as Tuner
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.model_selection import cross_val_score
-from blobcity.config import classifier_config,regressor_config
+from blobcity.config import classifier_config,regressor_config,time_config
 from blobcity.utils import Progress,scaling_data,AutoFeatureSelection
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+from statsmodels.tsa.holtwinters import SimpleExpSmoothing,ExponentialSmoothing, Holt
+from blobcity.utils import *
+import warnings
+warnings.filterwarnings("ignore")
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
     warnings.filterwarnings("ignore", category=DeprecationWarning)
+    warnings.simplefilter(action='ignore', category=FutureWarning)
     os.environ["PYTHONWARNINGS"] = "ignore"
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
     import autokeras as ak
@@ -331,3 +340,37 @@ def model_search(dataframe=None,target=None,DictClass=None,disable_colinearity=F
     else:print("Selected Model :- {} \nAccuracy Score : {:.2f}".format(class_name,DictClass.accuracy)) 
     
     return modelData
+
+
+def time_model(dataframe,DictClass,accuracy_criteria=None):
+    modelsList=time_config().models
+    train_data, test_data=spliter(dataframe)
+    modelkey = model_search_time(train_data, test_data)
+    modelResult = Tuner.time_tuner(train_data, test_data,modelkey,modelsList)
+    return modelResult
+
+
+def model_search_time(train_data, test_data,DictClass=None,accuracy_criteria=None):
+    global modelkey
+    
+    list1=[ARIMA(train_data, exog=None, order=(2, 2, 0)),
+          SARIMAX(train_data,order=(1, 0, 0), seasonal_order=(0, 0, 0, 12)),
+          ExponentialSmoothing(train_data,initialization_method='estimated'),
+          SimpleExpSmoothing(train_data),
+          Holt(train_data)] 
+    list2={}
+    for i in list1:
+        print("model",i)
+        try:
+            model = i.fit(disp=0)
+        except:
+            model = i.fit()
+        prediction = model.forecast(len(test_data))
+        predictions = pd.Series(prediction, index=test_data.index)
+        residuals = test_data - predictions
+        mse=np.sqrt(np.mean(residuals**2))
+        list2[i.__class__.__name__]=mse
+    a = sorted(list2.items(), key=lambda x: x[1])
+    selected_model =next(iter(a))[0]
+    modelkey={selected_model:0}
+    return  modelkey
