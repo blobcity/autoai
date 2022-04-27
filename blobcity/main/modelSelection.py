@@ -360,7 +360,7 @@ def model_search_time(train_data, test_data,DictClass=None,accuracy_criteria=Non
           Holt(train_data)] 
     list2={}
     for i in list1:
-        print("model",i)
+        
         try:
             model = i.fit(disp=0)
         except:

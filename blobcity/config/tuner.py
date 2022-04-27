@@ -33,7 +33,7 @@ with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     os.environ["PYTHONWARNINGS"] = "ignore"
-#optuna.logging.set_verbosity(optuna.logging.WARNING)
+optuna.logging.set_verbosity(optuna.logging.WARNING)
 """
 Python files consist of function to perform parameter tuning using optuna framework
 """
@@ -269,13 +269,13 @@ def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy,DictionaryClas
 
 
 def timeobjective(trial):
-    #train_data, test_data=spliter(updateddf)
+
     param1=get_params(trial)
     mdl=modelName(train_data1,**param1)
     try:
         mdl1 = mdl.fit(disp=0)
     except:
-        mdl1 = mdl.fit() 
+        mdl1 = mdl.fit()
     predictions = mdl1.forecast(len(test_data1))
     predictions = pd.Series(predictions, index=test_data1.index)
     residuals = test_data1 - predictions
@@ -285,13 +285,11 @@ def timeobjective(trial):
  
 
 def time_tuner(train_data, test_data,modelkey,modelList,accuracy=None):
-    #get_param_list({selected_model:0},models)
+
     global train_data1,test_data1
     train_data1=train_data
     test_data1=test_data
-    print("this is my time tuner start..")
     get_param_list(modelkey,modelList)
     study=optuna.create_study(direction="minimize")
     study.optimize(timeobjective,n_trials=30,callbacks=[early_stopping_opt_time])
-    print("time tuning complete")
     return (study.best_params,study.best_value)

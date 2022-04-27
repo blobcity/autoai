@@ -32,5 +32,17 @@ class time_config:
                 "trend":{"str":['add','mul',None]},
                 "initialization_method":{"str":['estimated','heuristic']}  
             }
+        ],
+        "Holt":[
+            Holt,
+            {
+              "initialization_method":{"str":['estimated','heuristic']}   
+            }
+        ],
+        "SimpleExpSmoothing":[
+            SimpleExpSmoothing,
+            {
+               "initialization_method":{"str":['estimated','heuristic']} 
+            }
         ]
     }
