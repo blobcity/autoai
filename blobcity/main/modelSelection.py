@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-from cv2 import DFT_COMPLEX_INPUT
 import numpy as np
 import pandas as pd
 from math import isnan
@@ -353,14 +352,13 @@ def time_model(dataframe,DictClass,accuracy_criteria=None):
 def model_search_time(train_data, test_data,DictClass=None,accuracy_criteria=None):
     global modelkey
     
-    list1=[ARIMA(train_data, exog=None, order=(2, 2, 0)),
+    list1=[ARIMA(train_data, exog=None, order=(1, 0, 0)),
           SARIMAX(train_data,order=(1, 0, 0), seasonal_order=(0, 0, 0, 12)),
           ExponentialSmoothing(train_data,initialization_method='estimated'),
           SimpleExpSmoothing(train_data),
           Holt(train_data)] 
     list2={}
     for i in list1:
-        
         try:
             model = i.fit(disp=0)
         except:

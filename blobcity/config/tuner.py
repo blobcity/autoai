@@ -269,7 +269,6 @@ def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy,DictionaryClas
 
 
 def timeobjective(trial):
-
     param1=get_params(trial)
     mdl=modelName(train_data1,**param1)
     try:
@@ -285,7 +284,6 @@ def timeobjective(trial):
  
 
 def time_tuner(train_data, test_data,modelkey,modelList,accuracy=None):
-
     global train_data1,test_data1
     train_data1=train_data
     test_data1=test_data
