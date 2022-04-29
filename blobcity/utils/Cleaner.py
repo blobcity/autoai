@@ -20,6 +20,7 @@ Functions includes, Removal of Unique COlumns,High Null value ratio, Missing Val
 import cv2
 import numpy as np
 import pandas as pd
+from sklearn import model_selection
 from tqdm.auto import tqdm
 from tarfile import is_tarfile
 import os,tarfile,requests,warnings
@@ -27,10 +28,34 @@ from zipfile import ZipFile, is_zipfile
 from sklearn.preprocessing import LabelEncoder,MinMaxScaler,StandardScaler
 from blobcity.utils.ProblemType import ProType
 from blobcity.utils.progress_bar import Progress
+<<<<<<< HEAD
+
+=======
+<<<<<<< HEAD
+>>>>>>> 9bd88378d3f57caebf86fafd910ddf3871f20878
+from blobcity.store.DictClass import DictClass
 from scipy.stats import kruskal
+with warnings.catch_warnings():
+    warnings.simplefilter(action='ignore', category=FutureWarning)
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    os.environ["PYTHONWARNINGS"] = "ignore"
+<<<<<<< HEAD
+    from statsmodels.tsa.stattools import kpss,adfuller
+    
+
+=======
+    from statsmodels.tsa.stattools import kpss
+    from statsmodels.tsa.stattools import adfuller
+    
+from scipy.stats import kruskal
+=======
+from scipy.stats import kruskal
+>>>>>>> 8d97c1f74901a9d47defe1a891315334747a9b19
 from statsmodels.tsa.stattools import kpss,adfuller
 import warnings
 warnings.filterwarnings("ignore")
+>>>>>>> 9bd88378d3f57caebf86fafd910ddf3871f20878
+
 
 def dataCleaner(df,features,target,DictionaryClass=None):
     """
@@ -322,7 +347,6 @@ def quick_image_processing(path,size):
 
 
 def timeseries_cleaner(X,date,target,samplingtype,dictclass):
-
     X=X.loc[0:X.shape[0],[date,target]].copy(deep=True) 
     updateddf=RemoveRowsWithHighNans(X)
     updateddf=RemoveHighNullValues(X)
@@ -353,8 +377,6 @@ def FrequencyChecker(df,date,dictclass):
     df['Year']=df[date].dt.year
     df['Hour']=df[date].dt.hour
     df['Days']=df[date].dt.day_name()
-    #hh=df 
-    dd=df.iloc[0:30,:]
     d=df.Days.nunique()
     h=df.Hour.nunique()
     m=df.Month.nunique()
@@ -369,7 +391,7 @@ def FrequencyChecker(df,date,dictclass):
         
     else:
         dictclass.time_frequency="Y"
-        
+    df_copy=df_copy.set_index(date)
     return df_copy
    
 class StationarityTest:
@@ -408,7 +430,7 @@ class StationarityTest:
 
 def frequencysampling(df,date,dictclass,samplingtype):
     downsample=""
-    df=df.set_index(date)
+    #df=df.set_index(date)
     if (samplingtype=="day" and dictclass.time_frequency=="H"):
         dff=df.resample('H').mean()
         downsample="day"
@@ -435,4 +457,11 @@ def frequencysampling(df,date,dictclass,samplingtype):
 
     return dff
 
-    
+def spliter(df):
+    size=df.shape[0]
+    trainsize=int(np.round(90*size/100))
+    train_data=df.iloc[0:trainsize,:].squeeze()
+    test_data=df.iloc[trainsize:,:].squeeze()
+    return train_data, test_data 
+
+
