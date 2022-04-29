@@ -28,35 +28,14 @@ from zipfile import ZipFile, is_zipfile
 from sklearn.preprocessing import LabelEncoder,MinMaxScaler,StandardScaler
 from blobcity.utils.ProblemType import ProType
 from blobcity.utils.progress_bar import Progress
-<<<<<<< HEAD
-
-=======
-<<<<<<< HEAD
->>>>>>> 9bd88378d3f57caebf86fafd910ddf3871f20878
 from blobcity.store.DictClass import DictClass
 from scipy.stats import kruskal
 with warnings.catch_warnings():
     warnings.simplefilter(action='ignore', category=FutureWarning)
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     os.environ["PYTHONWARNINGS"] = "ignore"
-<<<<<<< HEAD
     from statsmodels.tsa.stattools import kpss,adfuller
     
-
-=======
-    from statsmodels.tsa.stattools import kpss
-    from statsmodels.tsa.stattools import adfuller
-    
-from scipy.stats import kruskal
-=======
-from scipy.stats import kruskal
->>>>>>> 8d97c1f74901a9d47defe1a891315334747a9b19
-from statsmodels.tsa.stattools import kpss,adfuller
-import warnings
-warnings.filterwarnings("ignore")
->>>>>>> 9bd88378d3f57caebf86fafd910ddf3871f20878
-
-
 def dataCleaner(df,features,target,DictionaryClass=None):
     """
     Funciton to check null occurances and handles other functions.

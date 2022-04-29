@@ -103,7 +103,15 @@ def early_stopping_opt_time(study, trial):
                 study.stop()
                 
     return
+def time_metrics(y_true,y_pred):
 
+    R2=r2_score(y_true, y_pred)
+    print("R2 score",R2)
+    """
+    result['MAE']=round(mean_absolute_error(y_true, y_pred),3)
+    result['MSE']=round(mean_squared_error(y_true, y_pred),3)
+    result['RMSE']=round(mean_squared_error(y_true, y_pred,squared=False),3)"""
+    return R2
 
 def regression_metrics(y_true,y_pred):
     """
@@ -290,4 +298,12 @@ def time_tuner(train_data, test_data,modelkey,modelList,accuracy=None):
     get_param_list(modelkey,modelList)
     study=optuna.create_study(direction="minimize")
     study.optimize(timeobjective,n_trials=30,callbacks=[early_stopping_opt_time])
-    return (study.best_params,study.best_value)
+    finalmodel = modelName(train_data1,**study.best_params).fit()
+    predictions = finalmodel.forecast(len(test_data1))
+    predictions = pd.Series(predictions, index=test_data1.index)
+    metric_result=time_metrics(test_data1,predictions)
+    #plots=prediction_data(Y,model.predict(X),ptype,prog)
+    
+    return (finalmodel,study.best_params,study.best_value,metric_result)
+
+
