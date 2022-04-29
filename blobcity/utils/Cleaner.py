@@ -20,7 +20,6 @@ Functions includes, Removal of Unique COlumns,High Null value ratio, Missing Val
 import cv2
 import numpy as np
 import pandas as pd
-from sklearn import model_selection
 from tqdm.auto import tqdm
 from tarfile import is_tarfile
 import os,tarfile,requests,warnings
@@ -30,7 +29,10 @@ from blobcity.utils.ProblemType import ProType
 from blobcity.utils.progress_bar import Progress
 from blobcity.store.DictClass import DictClass
 from scipy.stats import kruskal
+from statsmodels.tsa.stattools import kpss,adfuller
+import warnings
 with warnings.catch_warnings():
+    warnings.filterwarnings("ignore")
     warnings.simplefilter(action='ignore', category=FutureWarning)
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     os.environ["PYTHONWARNINGS"] = "ignore"
