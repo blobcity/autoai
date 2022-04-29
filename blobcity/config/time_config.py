@@ -32,7 +32,6 @@ class time_config:
                 "trend":{"str":['add','mul',None]},
                 "initialization_method":{"str":['estimated','heuristic']}  
             }
-<<<<<<< HEAD
         ],
         "Holt":[
             Holt,
@@ -45,7 +44,5 @@ class time_config:
             {
                "initialization_method":{"str":['estimated','heuristic']} 
             }
-=======
->>>>>>> 9bd88378d3f57caebf86fafd910ddf3871f20878
         ]
     }
