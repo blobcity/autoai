@@ -346,7 +346,7 @@ def time_model(dataframe,DictClass,accuracy_criteria=None):
     train_data, test_data=spliter(dataframe)
     modelkey = model_search_time(train_data, test_data)
     modelResult = Tuner.time_tuner(train_data, test_data,modelkey,modelsList)
-    print("hi its prediction time...")
+    
     return modelResult
 
 

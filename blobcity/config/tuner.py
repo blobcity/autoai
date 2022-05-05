@@ -26,7 +26,7 @@ from blobcity.utils import Progress,scaling_data
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.holtwinters import ExponentialSmoothing,SimpleExpSmoothing, Holt
-from blobcity.utils import * #timeseries_cleaner
+from blobcity.utils import * 
 import warnings
 warnings.filterwarnings("ignore")
 from sklearn.metrics import r2_score,mean_squared_error,mean_absolute_error,f1_score,precision_score,recall_score,confusion_matrix,mean_absolute_percentage_error
@@ -105,27 +105,14 @@ def early_stopping_opt_time(study, trial):
                 
     return
 def time_metrics(y_true,y_pred):
-
-    R2=round(r2_score(y_true, y_pred),5)
-    print("R2 score",R2)
-    MAE=round(mean_absolute_error(y_true, y_pred),5)
-    MSE=round(mean_squared_error(y_true, y_pred),5)
-    RMSE=round(mean_squared_error(y_true, y_pred,squared=False),5)
-    MAPE=round(mean_absolute_percentage_error(y_true, y_pred),5)
-    print("rmse :- ",RMSE)
+    result=dict()
+    result['R2']=round(r2_score(y_true, y_pred),5)
+    result['MAE']=round(mean_absolute_error(y_true, y_pred),5)
+    result['MSE']=round(mean_squared_error(y_true, y_pred),5)
+    result['RMSE']=round(mean_squared_error(y_true, y_pred,squared=False),5)
+    result['MAPE']=round(mean_absolute_percentage_error(y_true, y_pred),5)
     
-    return R2,MAE,MSE,MAPE
-
-def time_plot(y_true,y_pred):
-    plt.figure(figsize=(10,6))
-    plt.plot(y_true, color = "green")
-    plt.plot(y_pred, color = "red")
-    plt.legend(["Actual","prediction"]) 
-    plt.title("Predicted vs True Value")
-    plt.xlabel("Record number")
-    plt.ylabel("target")
-    plt.show()
-    return None
+    return result
 
 def regression_metrics(y_true,y_pred):
     """
@@ -240,6 +227,11 @@ def prediction_data(y_true,y_pred,ptype,prog):
         cm=confusion_matrix(y_true,y_pred)
         prog.update_progressbar(1)
         return cm
+    elif ptype in ["Timeseries"]:
+        data_pred=[y_true.values,y_pred]
+        prog.update_progressbar(1)
+        return data_pred  
+
     else:
         data_pred=[y_true.values,y_pred]
         prog.update_progressbar(1)
@@ -301,8 +293,8 @@ def timeobjective(trial):
     predictions = pd.Series(predictions, index=test_data1.index)
     residuals = test_data1 - predictions
     rmse=round(np.sqrt(np.mean(residuals**2)),5)
-    accuracy=rmse
-    return accuracy
+
+    return rmse
  
 
 def time_tuner(train_data, test_data,modelkey,modelList,accuracy=None):
@@ -316,8 +308,8 @@ def time_tuner(train_data, test_data,modelkey,modelList,accuracy=None):
     predictions = finalmodel.forecast(len(test_data1))
     predictions = pd.Series(predictions, index=test_data1.index)
     metric_result=time_metrics(test_data1,predictions)
-    plots=time_plot(test_data1,predictions)
+    plots=prediction_data(test_data1,predictions,ptype="Timeseries")
     
-    return (finalmodel,study.best_params,study.best_value,metric_result)
+    return (finalmodel,study.best_params,study.best_value,metric_result,plots)
 
 
