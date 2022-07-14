@@ -1,4 +1,4 @@
-<a href="https://blobcity.com"><img src="https://blobcity.com/assets/svg/logos/logo.svg" style="width: 40%"/></a>
+<a href="https://blobcity.com"><img src="https://cdn.blobcity.com/assets/blobcity-logo.svg" style="width: 40%"/></a>
 
 [![PyPI version](https://badge.fury.io/py/blobcity.svg)](https://badge.fury.io/py/blobcity)
 [![Downloads](https://pepy.tech/badge/blobcity)](https://pepy.tech/project/blobcity)
