@@ -27,6 +27,7 @@ from zipfile import ZipFile, is_zipfile
 from sklearn.preprocessing import LabelEncoder,MinMaxScaler,StandardScaler
 from blobcity.utils.ProblemType import ProType
 from blobcity.utils.progress_bar import Progress
+from blobcity.store.DictClass import DictClass
 from scipy.stats import kruskal
 from statsmodels.tsa.stattools import kpss,adfuller
 import warnings
@@ -35,6 +36,7 @@ with warnings.catch_warnings():
     warnings.simplefilter(action='ignore', category=FutureWarning)
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     os.environ["PYTHONWARNINGS"] = "ignore"
+    from statsmodels.tsa.stattools import kpss,adfuller
     
 def dataCleaner(df,features,target,DictionaryClass=None):
     """

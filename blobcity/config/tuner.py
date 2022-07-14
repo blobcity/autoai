@@ -18,6 +18,7 @@ import optuna
 import warnings
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from blobcity.main import modelSelection
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.model_selection import cross_val_score
@@ -25,10 +26,10 @@ from blobcity.utils import Progress,scaling_data
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.holtwinters import ExponentialSmoothing,SimpleExpSmoothing, Holt
-from blobcity.utils import * #timeseries_cleaner
+from blobcity.utils import * 
 import warnings
 warnings.filterwarnings("ignore")
-from sklearn.metrics import r2_score,mean_squared_error,mean_absolute_error,f1_score,precision_score,recall_score,confusion_matrix
+from sklearn.metrics import r2_score,mean_squared_error,mean_absolute_error,f1_score,precision_score,recall_score,confusion_matrix,mean_absolute_percentage_error
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
     warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -103,7 +104,15 @@ def early_stopping_opt_time(study, trial):
                 study.stop()
                 
     return
-
+def time_metrics(y_true,y_pred):
+    result=dict()
+    result['R2']=round(r2_score(y_true, y_pred),5)
+    result['MAE']=round(mean_absolute_error(y_true, y_pred),5)
+    result['MSE']=round(mean_squared_error(y_true, y_pred),5)
+    result['RMSE']=round(mean_squared_error(y_true, y_pred,squared=False),5)
+    result['MAPE']=round(mean_absolute_percentage_error(y_true, y_pred),5)
+    
+    return result
 
 def regression_metrics(y_true,y_pred):
     """
@@ -218,6 +227,11 @@ def prediction_data(y_true,y_pred,ptype,prog):
         cm=confusion_matrix(y_true,y_pred)
         prog.update_progressbar(1)
         return cm
+    elif ptype in ["Timeseries"]:
+        data_pred=[y_true.values,y_pred]
+        prog.update_progressbar(1)
+        return data_pred  
+
     else:
         data_pred=[y_true.values,y_pred]
         prog.update_progressbar(1)
@@ -278,9 +292,9 @@ def timeobjective(trial):
     predictions = mdl1.forecast(len(test_data1))
     predictions = pd.Series(predictions, index=test_data1.index)
     residuals = test_data1 - predictions
-    mse=np.sqrt(np.mean(residuals**2))
-    accuracy=mse
-    return accuracy
+    rmse=round(np.sqrt(np.mean(residuals**2)),5)
+
+    return rmse
  
 
 def time_tuner(train_data, test_data,modelkey,modelList,accuracy=None):
@@ -290,4 +304,12 @@ def time_tuner(train_data, test_data,modelkey,modelList,accuracy=None):
     get_param_list(modelkey,modelList)
     study=optuna.create_study(direction="minimize")
     study.optimize(timeobjective,n_trials=30,callbacks=[early_stopping_opt_time])
-    return (study.best_params,study.best_value)
+    finalmodel = modelName(train_data1,**study.best_params).fit()
+    predictions = finalmodel.forecast(len(test_data1))
+    predictions = pd.Series(predictions, index=test_data1.index)
+    metric_result=time_metrics(test_data1,predictions)
+    plots=prediction_data(test_data1,predictions,ptype="Timeseries")
+    
+    return (finalmodel,study.best_params,study.best_value,metric_result,plots)
+
+
