@@ -109,7 +109,7 @@ def eval_model(models,m,X,Y,k,DictionaryClass):
     elif m in ['LGBMClassifier','LGBMRegressor']: model=models[m][0](verbose=-1)
     else: 
         try:model=models[m][0](n_jobs=-1)
-        except:model=models[m][0]()
+        except AttributeError:model=models[m][0]()
     return cv_score(model,X,Y,k)
 
 def train_on_sample_data(dataframe,target,models,DictionaryClass,stages):
