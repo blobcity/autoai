@@ -17,6 +17,7 @@
 This Python file consists of function to perform basic data cleaning/data preprocessing operation on most dataset.
 Functions includes, Removal of Unique COlumns,High Null value ratio, Missing Value Handling, String Categorical feature Handling .
 """
+from tkinter.tix import IMAGE
 import cv2
 import numpy as np
 import pandas as pd
@@ -31,12 +32,12 @@ from blobcity.store.DictClass import DictClass
 from scipy.stats import kruskal
 from statsmodels.tsa.stattools import kpss,adfuller
 import warnings
+import tensorflow as tf
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore")
     warnings.simplefilter(action='ignore', category=FutureWarning)
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     os.environ["PYTHONWARNINGS"] = "ignore"
-    from statsmodels.tsa.stattools import kpss,adfuller
     
 def dataCleaner(df,features,target,DictionaryClass=None):
     """
@@ -445,4 +446,27 @@ def spliter(df):
     test_data=df.iloc[trainsize:,:].squeeze()
     return train_data, test_data 
 
+def gan_image_proccessing(DATA_PATH,initals):
+    GENERATE_SQUARE=initals.GENERATE_SQUARE
+    training_binary_path = os.path.join("./",f'training_data_{GENERATE_SQUARE}_{GENERATE_SQUARE}.npy')
+    if not os.path.isfile(training_binary_path):
+        training_data = []
+        image_path = os.path.join(DATA_PATH)
+        for filename in tqdm(os.listdir(image_path)):
+            path = os.path.join(image_path,filename)
+            img = cv2.imread(path)
+            (b, g, r)=cv2.split(img)
+            img=cv2.merge([r,g,b])
+            image = cv2.resize(img, (GENERATE_SQUARE,GENERATE_SQUARE), interpolation = cv2.INTER_AREA)
+            training_data.append(np.asarray(image))
 
+        training_data = np.reshape(training_data,(-1,GENERATE_SQUARE,GENERATE_SQUARE,initals.IMAGE_CHANNELS))
+        training_data = training_data.astype(np.float32)
+        training_data = training_data / 127.5 - 1.
+        np.save(training_binary_path,training_data)
+        train_dataset = tf.data.Dataset.from_tensor_slices(training_data).shuffle(initals.BUFFER_SIZE).batch(initals.BATCH_SIZE)
+        return train_dataset
+    else:
+        training_data = np.load(training_binary_path)
+        train_dataset = tf.data.Dataset.from_tensor_slices(training_data).shuffle(initals.BUFFER_SIZE).batch(initals.BATCH_SIZE)
+        return train_dataset

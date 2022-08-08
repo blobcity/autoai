@@ -12,23 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import numpy as np
 import pandas as pd
 from math import isnan
-import warnings,itertools
+import warnings,itertools,os
 from blobcity.store import Model
 from sklearn.metrics import r2_score
 from blobcity.config import tuner as Tuner
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.model_selection import cross_val_score
 from blobcity.config import classifier_config,regressor_config,time_config
-from blobcity.utils import Progress,scaling_data,AutoFeatureSelection
+from blobcity.utils import Progress,scaling_data,AutoFeatureSelection,spliter
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing,ExponentialSmoothing, Holt
-from blobcity.utils import *
-import warnings
 warnings.filterwarnings("ignore")
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
@@ -109,7 +106,7 @@ def eval_model(models,m,X,Y,k,DictionaryClass):
     elif m in ['LGBMClassifier','LGBMRegressor']: model=models[m][0](verbose=-1)
     else: 
         try:model=models[m][0](n_jobs=-1)
-        except AttributeError:model=models[m][0]()
+        except:model=models[m][0]()
     return cv_score(model,X,Y,k)
 
 def train_on_sample_data(dataframe,target,models,DictionaryClass,stages):
@@ -373,3 +370,12 @@ def model_search_time(train_data, test_data,DictClass=None,accuracy_criteria=Non
     selected_model =next(iter(a))[0]
     modelkey={selected_model:0}
     return  modelkey
+
+def image_gan(dataset,initials,DictClass,epochs):
+    modelData=Model()
+    modelData.generator,modelData.discriminator=Tuner.train_gan(dataset,epochs,initials)
+    modelData.discriminator=None
+    modelData.output_folder="./output"
+    DictClass.addKeyValue('model',{'type':'TF'})
+    DictClass.UpdateNestedKeyValue('model','save_type',"h5")
+    return modelData

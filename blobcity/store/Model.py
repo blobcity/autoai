@@ -12,31 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import dill
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from PIL import Image
+import dill,glob,os,yaml
+from numpy.random import randn
 import matplotlib.pyplot as plt
 from blobcity.utils import get_dataframe_type,Progress,write_dataframe,quick_image_processing
 from blobcity.code_gen import code_generator
-import yaml
 
 """
 Python file consists of Class Model to initialize/store and retrive data associated to trained machine learning model.
 """
 class Model:
     
-    def __init__(self,params=dict(),featureList=[],model=None,metrics=dict(),yamldata=None,feature_importance=dict(),scaler=None,plot_data=None,target_encode=dict()):
+    def __init__(self,params=dict(),featureList=[],model=None,metrics=dict(),yamldata=None,output_folder="./output",
+        feature_importance=dict(),scaler=None,plot_data=None,target_encode=dict(),generator=None,discriminator=None):
         self.params=params
         self.featureList=featureList
         self.model=model
+        self.discriminator=discriminator
+        self.generator=generator
         self.metrics=metrics
         self.yamldata=yamldata
         self.feature_importance_=feature_importance
         self.plot_data=plot_data
         self.target_encode=target_encode
         self.scaler=scaler
+        self.output_folder=output_folder
     
     def __quick_clean(self,test_dataframe):
         """
@@ -204,19 +208,24 @@ class Model:
                 print("The model class is stored at {}".format(final_path))
             elif extension=='pkl' and self.yamldata['model']['type'] in ['TF','tf','Tensorflow']:
                 base_path=os.path.splitext(model_path)[0]
-                tmp=self.model
-                try:
-                    tmp.export_model().save(base_path+".h5")
-                    print(f"Stored Tensorflow model at: {base_path}.h5")
-                except:
-                    if os.path.exists(base_path+".h5"):
-                        os.remove(base_path+".h5")
-                    tmp.export_model().save(base_path, save_format="tf")
-                    print(f"Stored Custom Tensorflow files at : {base_path}")
-                self.model=None
+                tmp=self.model if self.yamldata['problem']['type']!="Image GAN" else self.generator
+                if self.yamldata['problem']['type']!="Image GAN":
+                    try:
+                        tmp.export_model().save(base_path+".h5")
+                        print(f"Stored Tensorflow model at: {base_path}.h5")
+                    except:
+                        if os.path.exists(base_path+".h5"):
+                            os.remove(base_path+".h5")
+                        tmp.export_model().save(base_path, save_format="tf")
+                        print(f"Stored Custom Tensorflow files at : {base_path}")
+                elif self.yamldata['problem']['type']=="Image GAN":
+                        tmp.save(base_path+".h5")
+                if self.yamldata['problem']['type']!="Image GAN":self.model=None
+                else: self.generator=None
                 dill.dump(self, open(model_path, 'wb'))
                 print(f"Stored Model Class at : {base_path}.pkl")
-                self.model=tmp
+                if self.yamldata['problem']['type']!="Image GAN":self.model=tmp
+                else: self.generator=tmp
             else:
                 raise TypeError(f"{extension} file type must be .pkl")
         else:
@@ -234,8 +243,11 @@ class Model:
             print("")
         if self.yamldata['model']['type'] in ['TF','tf','Tensorflow']:
             print("Selected Model Type: Neural Network")
-            try: self.model.summary()
-            except: self.model.export_model().summary()
+            if self.yamldata["problem"]["type"] not in ["Image GAN"]:
+                try: self.model.summary()
+                except: self.model.export_model().summary()
+            else:
+                self.generator.summary()
         else:
             print("Selected Model Type: Classic\nSelected Model Name: {}\nModel Tuning Parameter".format(self.model.__class__.__name__))
             for key, value in self.params.items():
@@ -347,3 +359,42 @@ class Model:
                     raise ValueError("entered row counts {} more than actual row counts {}".format(abs(len(self.plot_data[0])-abs(n_rows)),len(self.plot_data[0])))
             else:
                 raise ValueError("Number of rows can't be Zero")
+
+    # generate points in latent space as input for the generator
+    def generate_latent_points(self,latent_dim):
+        # generate points in the latent space
+        x_input = randn(latent_dim * 1)
+        # reshape into a batch of inputs for the network
+        x_input = x_input.reshape(1, latent_dim)
+        return x_input
+    
+    # plot the generated images
+    def create_plot(self,examples,save=False,file_location="./default.png"):
+        plt.axis('off')
+        # plot raw pixel data
+        plt.imshow(examples[0, :, :])
+        if save:plt.savefig(file_location,bbox_inches='tight')
+        plt.show()
+
+
+    def generate(self,save_file=False,file_path="./default.png"):
+        if self.yamldata['problem']['type']=="Image GAN":
+            latent_points = self.generate_latent_points(100)
+            # generate images
+            X = self.generator.predict(latent_points)
+            # scale from [-1,1] to [0,1]
+            X = (X + 1) / 2.0
+            # plot the result
+            self.create_plot(X,save=save_file,file_location=file_path)
+        else:
+            raise Exception("Function is only available for Generative AI problems")
+
+    def generate_inter_steps(self,path_to_save="./default_gif.gif"):
+        if self.yamldata['problem']['type']=="Image GAN":
+            frames=[Image.open(image,"r") for image in glob.glob("{}/*.png".format(self.output_folder))]
+            frame_one=frames[0]
+            frame_one.save(path_to_save,format="GIF",append_images=frames,save_all=True,duration=100,loop=0)
+            print("file saved")
+            return None
+        else:
+            raise Exception("Function is only available for Generative AI problems")
