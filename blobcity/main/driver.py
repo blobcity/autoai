@@ -103,9 +103,13 @@ def load(model_path=None):
                 if model.yamldata['model']['type'] in ['TF','tf','Tensorflow']:
                     if model.yamldata['model']['save_type'] in ['h5','pb']:
                         h5_path=base_path+".h5"
-                        if os.path.isfile(h5_path):model.model=tf.keras.models.load_model(h5_path)
-                        elif os.path.isdir(base_path):model.model=tf.keras.models.load_model(base_path, custom_objects=ak.CUSTOM_OBJECTS)
-                        else: raise FileNotFoundError(f"{h5_path} or {base_path} file doest exists in the directory")
+                        if model.yamldata['problem']['type'] not in ["Image GAN"]:
+                            if os.path.isfile(h5_path):model.model=tf.keras.models.load_model(h5_path)
+                            elif os.path.isdir(base_path):model.model=tf.keras.models.load_model(base_path, custom_objects=ak.CUSTOM_OBJECTS)
+                            else: raise FileNotFoundError(f"{h5_path} or {base_path} file doest exists in the directory")
+                        else:
+                            if os.path.isfile(h5_path):model.generator=tf.keras.models.load_model(h5_path)
+                            else: raise FileNotFoundError(f"{h5_path} or {base_path} file doest exists in the directory")
                     else:
                         raise TypeError(f"{model.yamldata['model']['save_type']}, not supported save format")
                 return model

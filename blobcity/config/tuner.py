@@ -13,27 +13,22 @@
 # limitations under the License.
 
 
-import os
-import optuna
-import warnings
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+from PIL import Image
+import warnings,optuna,os
 from blobcity.main import modelSelection
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.model_selection import cross_val_score
 from blobcity.utils import Progress,scaling_data
-from statsmodels.tsa.arima.model import ARIMA
-from statsmodels.tsa.statespace.sarimax import SARIMAX
-from statsmodels.tsa.holtwinters import ExponentialSmoothing,SimpleExpSmoothing, Holt
-from blobcity.utils import * 
-import warnings
-warnings.filterwarnings("ignore")
 from sklearn.metrics import r2_score,mean_squared_error,mean_absolute_error,f1_score,precision_score,recall_score,confusion_matrix,mean_absolute_percentage_error
 with warnings.catch_warnings():
+    warnings.filterwarnings("ignore")
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     os.environ["PYTHONWARNINGS"] = "ignore"
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+    import tensorflow as tf
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 """
 Python files consist of function to perform parameter tuning using optuna framework
@@ -50,6 +45,12 @@ class EarlyStopper_time():
     iter_count = 0
     best_score = None
     criterion = 1 
+
+class Image_GAN_Model():
+    generator=None
+    discriminator=None
+    generator_optimizer = tf.keras.optimizers.Adam(1.5e-4,0.5)
+    discriminator_optimizer = tf.keras.optimizers.Adam(1.5e-4,0.5)
 
 def early_stopping_opt(study, trial):
     """
@@ -312,4 +313,78 @@ def time_tuner(train_data, test_data,modelkey,modelList,accuracy=None):
     
     return (finalmodel,study.best_params,study.best_value,metric_result,plots)
 
+@tf.function
+def train_step(images,initials):
+  seed = tf.random.normal([initials.BATCH_SIZE, initials.SEED_SIZE])
+
+  with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
+    generated_images = Image_GAN_Model.generator(seed, training=True)
+
+    real_output = Image_GAN_Model.discriminator(images, training=True)
+    fake_output = Image_GAN_Model.discriminator(generated_images, training=True)
+
+    gen_loss = initials.generator_loss(fake_output)
+    disc_loss = initials.discriminator_loss(real_output, fake_output)
+    
+
+    gradients_of_generator = gen_tape.gradient(gen_loss, Image_GAN_Model.generator.trainable_variables)
+    gradients_of_discriminator = disc_tape.gradient(disc_loss, Image_GAN_Model.discriminator.trainable_variables)
+
+    Image_GAN_Model.generator_optimizer.apply_gradients(zip(gradients_of_generator, Image_GAN_Model.generator.trainable_variables))
+    Image_GAN_Model.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, Image_GAN_Model.discriminator.trainable_variables))
+  return gen_loss,disc_loss
+
+def save_inter_images(cnt,noise,initials):
+    PREVIEW_ROWS,PREVIEW_COLS,PREVIEW_MARGIN=initials.PREVIEW_ROWS,initials.PREVIEW_COLS,initials.PREVIEW_MARGIN
+    GENERATE_SQUARE,IMAGE_CHANNELS=initials.GENERATE_SQUARE,initials.IMAGE_CHANNELS
+
+    image_array = np.full(( 
+        PREVIEW_MARGIN + (PREVIEW_ROWS * (GENERATE_SQUARE+PREVIEW_MARGIN)), 
+        PREVIEW_MARGIN + (PREVIEW_COLS * (GENERATE_SQUARE+PREVIEW_MARGIN)), IMAGE_CHANNELS), 
+        255, dtype=np.uint8)
+    
+    generated_images = Image_GAN_Model.generator.predict(noise)
+
+    generated_images = 0.5 * generated_images + 0.5
+
+    image_count = 0
+    for row in range(PREVIEW_ROWS):
+        for col in range(PREVIEW_COLS):
+            r = row * (GENERATE_SQUARE+16) + PREVIEW_MARGIN
+            c = col * (GENERATE_SQUARE+16) + PREVIEW_MARGIN
+            image_array[r:r+GENERATE_SQUARE,c:c+GENERATE_SQUARE] = generated_images[image_count] * 255
+            image_count += 1
+
+            
+    output_path = os.path.join(initials.DATA_PATH,'./output')
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    
+    filename = os.path.join(output_path,f"train-{cnt}.png")
+    im = Image.fromarray(image_array)
+    im.save(filename)
+
+def train_gan(dataset,epochs,initials):
+    prog=Progress()
+    image_shape = (initials.GENERATE_SQUARE,initials.GENERATE_SQUARE,initials.IMAGE_CHANNELS)
+    Image_GAN_Model.generator=initials.build_generator()
+    Image_GAN_Model.discriminator=initials.build_discriminator(image_shape=image_shape)
+    fixed_seed = np.random.normal(0, 1, (initials.PREVIEW_ROWS * initials.PREVIEW_COLS, initials.SEED_SIZE))
+    prog.create_progressbar(epochs+1,"Training Image GAN")
+    for epoch in range(epochs):
+        gen_loss_list,disc_loss_list = [],[]
+        for image_batch in dataset:
+            t = train_step(image_batch,initials)
+            gen_loss_list.append(t[0])
+            disc_loss_list.append(t[1])
+
+        g_loss = sum(gen_loss_list) / len(gen_loss_list)
+        d_loss = sum(disc_loss_list) / len(disc_loss_list)
+        # print("Epoch - {}, gen loss= {}, disc loss={}".format(epoch+1,g_loss,d_loss ))
+        save_inter_images(epoch,fixed_seed,initials)
+        prog.update_progressbar(1)
+
+    prog.update_progressbar(prog.trials)
+    prog.close_progressbar()
+    return Image_GAN_Model.generator,Image_GAN_Model.discriminator
 
