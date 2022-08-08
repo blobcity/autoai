@@ -29,6 +29,7 @@ with warnings.catch_warnings():
     os.environ["PYTHONWARNINGS"] = "ignore"
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
     import tensorflow as tf
+    tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 """
 Python files consist of function to perform parameter tuning using optuna framework
