@@ -316,26 +316,39 @@ def time_tuner(train_data, test_data,modelkey,modelList,accuracy=None):
 
 @tf.function
 def train_step(images,initials):
-  seed = tf.random.normal([initials.BATCH_SIZE, initials.SEED_SIZE])
+    """
+    param1: numpy/tensor : subset/ batchs of images from the whole dataset
+    param2: object
+    return: tuple : return losses for both the generator and discriminator on the give batch of the images from the dataset.
+    """
+    seed = tf.random.normal([initials.BATCH_SIZE, initials.SEED_SIZE])
 
-  with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
-    generated_images = Image_GAN_Model.generator(seed, training=True)
+    with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
+        generated_images = Image_GAN_Model.generator(seed, training=True)
 
-    real_output = Image_GAN_Model.discriminator(images, training=True)
-    fake_output = Image_GAN_Model.discriminator(generated_images, training=True)
+        real_output = Image_GAN_Model.discriminator(images, training=True)
+        fake_output = Image_GAN_Model.discriminator(generated_images, training=True)
 
-    gen_loss = initials.generator_loss(fake_output)
-    disc_loss = initials.discriminator_loss(real_output, fake_output)
-    
+        gen_loss = initials.generator_loss(fake_output)
+        disc_loss = initials.discriminator_loss(real_output, fake_output)
+        
 
-    gradients_of_generator = gen_tape.gradient(gen_loss, Image_GAN_Model.generator.trainable_variables)
-    gradients_of_discriminator = disc_tape.gradient(disc_loss, Image_GAN_Model.discriminator.trainable_variables)
+        gradients_of_generator = gen_tape.gradient(gen_loss, Image_GAN_Model.generator.trainable_variables)
+        gradients_of_discriminator = disc_tape.gradient(disc_loss, Image_GAN_Model.discriminator.trainable_variables)
 
-    Image_GAN_Model.generator_optimizer.apply_gradients(zip(gradients_of_generator, Image_GAN_Model.generator.trainable_variables))
-    Image_GAN_Model.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, Image_GAN_Model.discriminator.trainable_variables))
-  return gen_loss,disc_loss
+        Image_GAN_Model.generator_optimizer.apply_gradients(zip(gradients_of_generator, Image_GAN_Model.generator.trainable_variables))
+        Image_GAN_Model.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, Image_GAN_Model.discriminator.trainable_variables))
+    return gen_loss,disc_loss
 
 def save_inter_images(cnt,noise,initials):
+    """
+    param1: int : currnet epoch stage.
+    param2: int : random integer noise to generate image.
+    param3: Object
+
+    Function save inter epochs generated image to the local storage
+    
+    """
     PREVIEW_ROWS,PREVIEW_COLS,PREVIEW_MARGIN=initials.PREVIEW_ROWS,initials.PREVIEW_COLS,initials.PREVIEW_MARGIN
     GENERATE_SQUARE,IMAGE_CHANNELS=initials.GENERATE_SQUARE,initials.IMAGE_CHANNELS
 
@@ -366,6 +379,14 @@ def save_inter_images(cnt,noise,initials):
     im.save(filename)
 
 def train_gan(dataset,epochs,initials):
+    """
+    param1: numpy/tensor object
+    param2: int : number of epochs to train on.
+    param3: Object
+    return: tuple : Returns tuple of generator and discriminator model objects after training.
+    Function train the calls the helper functions to train a Image GAN and also calls function to calculate metrics and save inter results.
+
+    """
     prog=Progress()
     image_shape = (initials.GENERATE_SQUARE,initials.GENERATE_SQUARE,initials.IMAGE_CHANNELS)
     Image_GAN_Model.generator=initials.build_generator()

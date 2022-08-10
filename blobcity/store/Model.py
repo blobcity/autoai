@@ -368,8 +368,12 @@ class Model:
         x_input = x_input.reshape(1, latent_dim)
         return x_input
     
-    # plot the generated images
     def create_plot(self,examples,save=False,file_location="./default.png"):
+        """
+        param1: boolean: whether to save the file or not 
+        param2: string: path to save the png file for the generated image.
+        Function generates new image using the trained Generator Model from the GAN and has ability to save the file on the specified path/location.
+        """
         plt.axis('off')
         # plot raw pixel data
         plt.imshow(examples[0, :, :])
@@ -378,6 +382,11 @@ class Model:
 
 
     def generate(self,save_file=False,file_path="./default.png"):
+        """
+        param1: boolean: whether to save the file or not 
+        param2: string: path to save the png file for the generated image.
+        Function generates new image using the trained Generator Model from the GAN.
+        """
         if self.yamldata['problem']['type']=="Image GAN":
             latent_points = self.generate_latent_points(100)
             # generate images
@@ -389,7 +398,11 @@ class Model:
         else:
             raise Exception("Function is only available for Generative AI problems")
 
-    def generate_inter_steps(self,path_to_save="./default_gif.gif"):
+    def get_inter_steps(self,path_to_save="./default_gif.gif"):
+        """
+        param1: string: path to save the GIF.
+        Function save a gif image by combine inter epochs results of the generator model for visual training represetation.
+        """
         if self.yamldata['problem']['type']=="Image GAN":
             frames=[Image.open(image,"r") for image in glob.glob("{}/*.png".format(self.output_folder))]
             frame_one=frames[0]

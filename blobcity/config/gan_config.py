@@ -17,7 +17,9 @@ from tensorflow.keras.layers import Input, Reshape, Dropout, Dense,Flatten, Batc
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.optimizers import Adam
 
-
+"""
+This python file consist of Class variable models to store detail regarding different model to be utilized for Image Generative problem
+"""
 class DCGAN:
     
     def __init__(self,GENERATE_RES=3,IMAGE_CHANNELS=3,PREVIEW_ROWS = 4,PREVIEW_COLS = 7,PREVIEW_MARGIN = 16,SEED_SIZE = 100,
@@ -43,6 +45,9 @@ class DCGAN:
         self.CROSS_ENTROPY = CROSS_ENTROPY
 
     def build_generator(self):
+        """
+        Function build generative Model for the DCGAN
+        """
         GENERATE_RES=self.GENERATE_RES
         model = Sequential()
 
@@ -77,6 +82,9 @@ class DCGAN:
 
 
     def build_discriminator(self,image_shape):
+        """
+        Function build discriminator Model for the DCGAN
+        """
         model = Sequential()
 
         model.add(Conv2D(32, kernel_size=3, strides=2, input_shape=image_shape, padding="same"))

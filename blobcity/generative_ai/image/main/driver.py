@@ -12,12 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os,copy
-from blobcity.config.tuner import train_gan
+import os
 from blobcity.main import load as model_loader
 from blobcity.main import spill as code_spill
 from blobcity.aicloud import send_yaml_to_cloud
-from blobcity.main import modelSelection
 from blobcity.store import DictClass
 from blobcity.main.modelSelection import image_gan
 from blobcity.utils import ProType,gan_image_proccessing
