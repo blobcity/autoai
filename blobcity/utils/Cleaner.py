@@ -452,7 +452,7 @@ def gan_image_proccessing(DATA_PATH,initals):
     if not os.path.isfile(training_binary_path):
         training_data = []
         image_path = os.path.join(DATA_PATH)
-        for filename in tqdm(os.listdir(image_path)):
+        for filename in tqdm(os.listdir(image_path),desc="Data Preprocessing"):
             path = os.path.join(image_path,filename)
             img = cv2.imread(path)
             (b, g, r)=cv2.split(img)

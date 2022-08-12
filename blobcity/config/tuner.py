@@ -357,7 +357,7 @@ def save_inter_images(cnt,noise,initials):
         PREVIEW_MARGIN + (PREVIEW_COLS * (GENERATE_SQUARE+PREVIEW_MARGIN)), IMAGE_CHANNELS), 
         255, dtype=np.uint8)
     
-    generated_images = Image_GAN_Model.generator.predict(noise)
+    generated_images = Image_GAN_Model.generator.predict(noise,verbose=0)
 
     generated_images = 0.5 * generated_images + 0.5
 

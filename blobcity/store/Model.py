@@ -390,7 +390,7 @@ class Model:
         if self.yamldata['problem']['type']=="Image GAN":
             latent_points = self.generate_latent_points(100)
             # generate images
-            X = self.generator.predict(latent_points)
+            X = self.generator.predict(latent_points,verbose=0)
             # scale from [-1,1] to [0,1]
             X = (X + 1) / 2.0
             # plot the result
