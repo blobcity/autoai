@@ -2,8 +2,8 @@ from blobcity.generative_ai import image as bc
 
 path=r"C:\blobcity\code generator\New folder\samples"
 
-model= bc.train(file=path,epochs=5)
+model= bc.train(file=path,epochs=1)
 
 model.generate()
 
-model.generate_inter_steps()
+model.get_inter_steps()
