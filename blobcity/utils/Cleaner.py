@@ -17,7 +17,7 @@
 This Python file consists of function to perform basic data cleaning/data preprocessing operation on most dataset.
 Functions includes, Removal of Unique COlumns,High Null value ratio, Missing Value Handling, String Categorical feature Handling .
 """
-from tkinter.tix import IMAGE
+
 import cv2
 import numpy as np
 import pandas as pd
@@ -429,7 +429,7 @@ def frequencysampling(df,date,dictclass,samplingtype):
         downsample="quarterly"
         
     elif (samplingtype=="year" and dictclass.time_frequency in ["H","D","M"]):
-        different_locale=df.resample('M').mean()
+        dff=df.resample('M').mean()
         downsample="year"
 
     elif (samplingtype not in ["year","quaterly"," month","week","day",None]):
@@ -448,7 +448,8 @@ def spliter(df):
 
 def gan_image_proccessing(DATA_PATH,initals):
     GENERATE_SQUARE=initals.GENERATE_SQUARE
-    training_binary_path = os.path.join("./",f'training_data_{GENERATE_SQUARE}_{GENERATE_SQUARE}.npy')
+    head, tail = os.path.split(DATA_PATH)
+    training_binary_path = os.path.join("./",f'{tail}_{GENERATE_SQUARE}_{GENERATE_SQUARE}.npy')
     if not os.path.isfile(training_binary_path):
         training_data = []
         image_path = os.path.join(DATA_PATH)
