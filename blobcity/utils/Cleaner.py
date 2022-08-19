@@ -453,12 +453,15 @@ def gan_image_proccessing(DATA_PATH,initals):
         training_data = []
         image_path = os.path.join(DATA_PATH)
         for filename in tqdm(os.listdir(image_path),desc="Data Preprocessing"):
-            path = os.path.join(image_path,filename)
-            img = cv2.imread(path)
-            (b, g, r)=cv2.split(img)
-            img=cv2.merge([r,g,b])
-            image = cv2.resize(img, (GENERATE_SQUARE,GENERATE_SQUARE), interpolation = cv2.INTER_AREA)
-            training_data.append(np.asarray(image))
+            try:
+                path = os.path.join(image_path,filename)
+                img = cv2.imread(path)
+                (b, g, r)=cv2.split(img)
+                img=cv2.merge([r,g,b])
+                image = cv2.resize(img, (GENERATE_SQUARE,GENERATE_SQUARE), interpolation = cv2.INTER_AREA)
+                training_data.append(np.asarray(image))
+            except:
+                pass
 
         training_data = np.reshape(training_data,(-1,GENERATE_SQUARE,GENERATE_SQUARE,initals.IMAGE_CHANNELS))
         training_data = training_data.astype(np.float32)
