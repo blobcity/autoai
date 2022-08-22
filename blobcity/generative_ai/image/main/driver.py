@@ -24,7 +24,7 @@ from blobcity.config import DCGAN
 """
 This file consists of Function to deal with Image GAN  problem in python.
 """
-def train(file=None,resolution_factor=3,epochs=10):
+def train(file=None,resolution_factor=3,epochs=10,batch_size=32):
     """
     param1: string: file path 
 
@@ -32,6 +32,7 @@ def train(file=None,resolution_factor=3,epochs=10):
 
     param3: int: Number of training epochs
 
+    param4: int : batch size for training model.
     return: Model Class Object
     Performs a model search on the data proivded. A yaml file is generated once the best fit model configuration
     is discovered. The yaml file is later used for generating source code. 
@@ -41,7 +42,7 @@ def train(file=None,resolution_factor=3,epochs=10):
     dict_class=DictClass()
     dict_class.resetVar()
     exp_id=ProType.generate_uuid()
-    dcgan= DCGAN(GENERATE_RES=resolution_factor)
+    dcgan= DCGAN(GENERATE_RES=resolution_factor,BATCH_SIZE=batch_size)
     #data read
     if file!=None:
         dict_class.addKeyValue('problem',{'type':'Image GAN'})
