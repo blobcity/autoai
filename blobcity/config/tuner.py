@@ -392,13 +392,23 @@ def train_gan(dataset,epochs,initials):
     Image_GAN_Model.generator=initials.build_generator()
     Image_GAN_Model.discriminator=initials.build_discriminator(image_shape=image_shape)
     fixed_seed = np.random.normal(0, 1, (initials.PREVIEW_ROWS * initials.PREVIEW_COLS, initials.SEED_SIZE))
-    prog.create_progressbar(epochs+1,"Training Image GAN")
+    
+    try:
+        total_prog=epochs*len(dataset)
+    except:
+        num_elements=0
+        for element in dataset:
+            num_elements += 1 
+        total_prog=epochs*num_elements
+
+    prog.create_progressbar(total_prog,"Training Image GAN")
     for epoch in range(epochs):
         gen_loss_list,disc_loss_list = [],[]
         for image_batch in dataset:
             t = train_step(image_batch,initials)
             gen_loss_list.append(t[0])
             disc_loss_list.append(t[1])
+            prog.update_progressbar(1)
 
         g_loss = sum(gen_loss_list) / len(gen_loss_list)
         d_loss = sum(disc_loss_list) / len(disc_loss_list)
