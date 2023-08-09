@@ -263,7 +263,7 @@ def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy,DictionaryClas
     cv=modelSelection.getKFold(X.shape[0])
     get_param_list(modelkey,modelList)
     EarlyStopper.criterion=accuracy
-    n_trials=50
+    n_trials=100
     try:
         if modelName().__class__.__name__ in ['SVC','NuSVC','LinearSVC','SVR','NuSVR','LinearSVR','KNeighborsClassifier','KNeighborsRegressor','RadiusNeighborsClassifier','RadiusNeighborsRegressor','NearestCentroid']:
             X = scaling_data(X,DictionaryClass,update=True)

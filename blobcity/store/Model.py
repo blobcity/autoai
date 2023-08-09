@@ -84,6 +84,7 @@ class Model:
                 if i not in test.columns.to_list():
                     test.insert(n_cols, i, [0]*test.shape[0])
                 n_cols+=1
+            test=test[cols]
         return test
 
     def __encode_result(self,result,target_encode):
@@ -127,7 +128,12 @@ class Model:
         """
 
         if self.yamldata['problem']["type"]!='Image Classification':
-            if type(test)==str:test=get_dataframe_type(test)
+            if type(test)==str:
+                test=get_dataframe_type(test)
+                og=test.copy(deep=True)
+            elif isinstance(test, pd.DataFrame):
+                og=test.copy(deep=True)
+
             if isinstance(test,pd.DataFrame):test=Model().__quick_clean(test[self.yamldata['features']['X_values']])
             if isinstance(test,dict):
                 if list(test.keys())==self.yamldata['features']['X_values']:test=Model().__json_to_df(test)
@@ -153,6 +159,7 @@ class Model:
             
             result_dataframe=test.copy(deep=True)
             result_dataframe['prediction']=result
+            og['prediction']=result
 
         elif self.yamldata['problem']["type"]=='Image Classification' :
             extension = os.path.splitext(test)[1]
@@ -168,7 +175,8 @@ class Model:
                 result=Model().__multi_file_prediction(self.model,test,self.yamldata['cleaning']["resize"])
                 result= Model().__encode_result(result,self.target_encode)
 
-        if path!="" and self.yamldata['problem']["type"]!='Image Classification':write_dataframe(dataframe=result_dataframe,path=path)
+        if path!="" and self.yamldata['problem']["type"]!='Image Classification':
+            write_dataframe(dataframe=og,path=path)
         if return_type=="list": return result
         elif return_type=="df" and isinstance(test,pd.DataFrame):return result_dataframe
 
@@ -309,7 +317,7 @@ class Model:
             return {'true':self.plot_data[0],'predicted':self.plot_data[1]}
 
             
-    def plot_prediction(self,n_rows=1000):
+    def plot_prediction(self,n_rows=1000,kind="default"):
         """
         param1: integer : signed and unsigned integer for plot number of records for regression problem.
 
@@ -317,33 +325,39 @@ class Model:
         """
         
         problem=self.yamldata['problem']["type"]
-        if problem in ['Classification','Image Classification']:
-            if self.target_encode!={}: targets=self.target_encode.values()
-            cf_matrix=self.plot_data
-            group_counts = ['{0:0.0f}'.format(value) for value in cf_matrix.flatten()]
-            group_percentages = ["{0:.2%}".format(value) for value in cf_matrix.flatten()/np.sum(cf_matrix)]
-            labels = [f'{v1}\n\n{v2}' for v1, v2 in zip(group_counts,group_percentages)]
-            labels = np.asarray(labels).reshape(cf_matrix.shape[0],cf_matrix.shape[0])
-            if self.target_encode!={}:
-                sns.heatmap(cf_matrix, annot=labels, fmt='',xticklabels=targets,yticklabels=targets,cmap='Blues')
-            else: 
-                sns.heatmap(cf_matrix, annot=labels, fmt='',cmap='Blues')
+        if kind=="default":
+            if problem in ['Classification','Image Classification']:
+                if self.target_encode!={}: targets=self.target_encode.values()
+                cf_matrix=self.plot_data
+                group_counts = ['{0:0.0f}'.format(value) for value in cf_matrix.flatten()]
+                group_percentages = ["{0:.2%}".format(value) for value in cf_matrix.flatten()/np.sum(cf_matrix)]
+                labels = [f'{v1}\n\n{v2}' for v1, v2 in zip(group_counts,group_percentages)]
+                labels = np.asarray(labels).reshape(cf_matrix.shape[0],cf_matrix.shape[0])
+                if self.target_encode!={}:
+                    sns.heatmap(cf_matrix, annot=labels, fmt='',xticklabels=targets,yticklabels=targets,cmap='Blues')
+                else: 
+                    sns.heatmap(cf_matrix, annot=labels, fmt='',cmap='Blues')
+                plt.show()
+            elif problem=="Regression":
+                #plot for regression problem
+                if  abs(n_rows)!=0:
+                    if abs(n_rows)<=len(self.plot_data[0]) or abs(n_rows)==1000:
+                        n=len(self.plot_data[0]) if len(self.plot_data[0])<abs(n_rows) else n_rows
+                        if n < 0: true,predict=self.plot_data[0][n:],self.plot_data[1][n:]
+                        else:true,predict=self.plot_data[0][0:n],self.plot_data[1][0:n]
+                        plt.figure(figsize=(14,10))
+                        plt.plot(range(abs(n)),true, color = "green")
+                        plt.plot(range(abs(n)),predict,linestyle='--',color = "red")
+                        plt.legend(["Actual","prediction"]) 
+                        plt.xlabel("Record number")
+                        plt.ylabel(self.yamldata['features']['Y_values'])
+                        plt.show()
+                    elif abs(n_rows)>len(self.plot_data[0]):
+                        raise ValueError("entered row counts {} more than actual row counts {}".format(abs(len(self.plot_data[0])-abs(n_rows)),len(self.plot_data[0])))
+                else:
+                    raise ValueError("Number of rows can't be Zero")
+        elif kind=="residual" and problem=="Regression":
+            residuals=self.plot_data[0]-self.plot_data[1]
+            if len(residuals.shape)==2:sns.residplot(x=residuals[1],y=self.plot_data[1],data=None)
+            else:sns.residplot(x=residuals,y=self.plot_data[1],data=None)
             plt.show()
-        elif problem=="Regression":
-            #plot for regression problem
-            if  abs(n_rows)!=0:
-                if abs(n_rows)<=len(self.plot_data[0]) or abs(n_rows)==1000:
-                    n=len(self.plot_data[0]) if len(self.plot_data[0])<abs(n_rows) else n_rows
-                    if n < 0: true,predict=self.plot_data[0][n:],self.plot_data[1][n:]
-                    else:true,predict=self.plot_data[0][0:n],self.plot_data[1][0:n]
-                    plt.figure(figsize=(14,10))
-                    plt.plot(range(abs(n)),true, color = "green")
-                    plt.plot(range(abs(n)),predict,linestyle='--',color = "red")
-                    plt.legend(["Actual","prediction"]) 
-                    plt.xlabel("Record number")
-                    plt.ylabel(self.yamldata['features']['Y_values'])
-                    plt.show()
-                elif abs(n_rows)>len(self.plot_data[0]):
-                    raise ValueError("entered row counts {} more than actual row counts {}".format(abs(len(self.plot_data[0])-abs(n_rows)),len(self.plot_data[0])))
-            else:
-                raise ValueError("Number of rows can't be Zero")

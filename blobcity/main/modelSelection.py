@@ -58,11 +58,12 @@ def getKFold(rows):
 
     Function returns number of kfold to consider for Cross validation on the basis of dataset row counts
     """
-    if(rows>100 and rows<300):k=2
-    elif(rows>300 and rows<=500): k=4
+
+    if(rows>100 and rows<500):k=3
     elif(rows>500 and rows <=5000 ):k=5
-    elif(rows>5000):k=10
-    else:k=2
+    elif(rows>5000 and rows <=50000):k=7
+    elif rows>50000: k=10
+    else:k=3
     return k
 
 def cv_score(model,X,Y,k):
@@ -107,9 +108,7 @@ def eval_model(models,m,X,Y,k,DictionaryClass):
     if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0)
     elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
     elif m in ['LGBMClassifier','LGBMRegressor']: model=models[m][0](verbose=-1)
-    else: 
-        try:model=models[m][0](n_jobs=-1)
-        except AttributeError:model=models[m][0]()
+    else:model=models[m][0]()
     return cv_score(model,X,Y,k)
 
 def train_on_sample_data(dataframe,target,models,DictionaryClass,stages):
@@ -138,9 +137,12 @@ def train_on_sample_data(dataframe,target,models,DictionaryClass,stages):
     k=getKFold(rows)
     modelScore={}
     prog.create_progressbar(len(models_List),"Quick Search (Stage 1 of {}) :".format(stages))
-    for m in models_List:
-        modelScore[m]=eval_model(models,m,X,Y,k,DictionaryClass)
-        prog.update_progressbar(1)
+    try:
+        for m in models_List:
+            modelScore[m]=eval_model(models,m,X,Y,k,DictionaryClass)
+            prog.update_progressbar(1)
+    except:
+        pass
     prog.update_progressbar(prog.trials)
     prog.close_progressbar()
     clean_dict = {k: modelScore[k] for k in modelScore if not isnan(modelScore[k])}
@@ -183,7 +185,7 @@ def train_on_neural(X,Y,ptype,epochs,max_neural_search,stage,ofstage):
     if ptype!="Image Classification":
         clf = ak.StructuredDataClassifier(overwrite=True,max_trials=max_neural_search) if ptype=='Classification' else ak.StructuredDataRegressor(overwrite=True,max_trials=max_neural_search) 
     else: clf= ak.ImageClassifier(overwrite=True,max_trials=max_neural_search)
-    clf.fit(X,Y,verbose=0,epochs=epochs,callbacks=[CustomCallback()])
+    clf.fit(X,Y,verbose=0,epochs=epochs,callbacks=[CustomCallback()],batch_size=8)
     loss,acc=clf.evaluate(X,Y,verbose=0)
     y_pred=clf.predict(X,verbose=0)
     if ptype in ["Classification","Image Classification"]:y_pred= y_pred.astype(np.int)

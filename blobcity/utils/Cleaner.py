@@ -88,7 +88,7 @@ def dropUniqueColumn(X_values,target):
     """    
     row_counts = len(X_values)
     for i in X_values.columns.to_list():
-        if len(X_values[i].unique())==row_counts and i!=target:
+        if len(X_values[i].unique())==row_counts and i!=target and X_values.shape[1]>2:
             X_values.drop(i, axis=1, inplace=True)
     return X_values
 
