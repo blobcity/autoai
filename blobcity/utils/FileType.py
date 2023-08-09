@@ -109,9 +109,9 @@ def save_dataframe(dataframe,path,ftype):
     """
     try:
         if ftype=='csv':
-            dataframe.to_csv(path)
+            dataframe.to_csv(path,index=False)
         elif ftype=='xlsx':
-            dataframe.to_excel(path)
+            dataframe.to_excel(path,index=False)
         elif ftype=='json':
             dataframe.to_json(path,orient="index")
         print("saved at path {}".format(path))

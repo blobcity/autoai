@@ -88,7 +88,7 @@ class regressor_config:
             ensemble.GradientBoostingRegressor,
             {
                 "criterion":{'str':['squared_error','friedman_mse']},
-                "n_estimators":{'int':[50,1000]},
+                "n_estimators":{'int':[100,1000]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
                 "max_depth":{'int':[3,18]},
                 "loss":{'str':['ls','lad','huber']},
@@ -117,7 +117,6 @@ class regressor_config:
                 "weights":{'str':['uniform','distance']},
                 "algorithm":{'str':['auto', 'ball_tree', 'kd_tree', 'brute']},
                 "p":{'int':[1,2]},
-                "leaf_size":{'int':[10,50]}
             }
         ],
         "PoissonRegressor":[
@@ -248,7 +247,7 @@ class regressor_config:
                 "num_leaves":{'int':[5, 30]},
                 "learning_rate":{'float':[1e-4,1e-2]},
                 "max_depth":{'int':[3,16]},
-                "n_estimators":{'int':[100, 1000]},
+                "n_estimators":{'int':[100, 2000]},
                 'bagging_fraction':{'float':[0.1,0.9]},
                 'subsample_freq':{'int':[5,10]},
                 'verbose':{'bool':[-1]},
@@ -277,10 +276,9 @@ class regressor_config:
         "HuberRegressor":[
             linear_model.HuberRegressor, 
             {
-                "epsilon":{'float':[1,1.5]},
                 "max_iter":{'int':[100,10000]},
-                "alpha":{'float':[1e-4,0.1]},
-                "tol":{'float':[1e-3,0.1]} 
+                "alpha":{'float':[0.01,0.1]},
+                "tol":{'float':[0.01,0.01]} 
             }
         ],
         "HistGradientBoostingRegressor":[
@@ -288,7 +286,7 @@ class regressor_config:
             {
                 "loss":{'str':['least_squares', 'least_absolute_deviation', 'poisson']},
                 "learning_rate":{'float':[1e-3,0.1]},
-                "max_iter":{"int":[50,5000]},
+                "max_iter":{"int":[100,5000]},
                 "max_depth":{'int':[3,18]},
                 "tol":{'float':[1e-3,0.1]}
             }

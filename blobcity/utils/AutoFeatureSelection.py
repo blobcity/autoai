@@ -122,7 +122,7 @@ class AutoFeatureSelection:
         keylist=[]
         imp_dict={}
         for key, value in resdic.items():
-            if value < 0.01: 
+            if value < 0.001: 
                 for key_2 in impmain.keys():
                     if key in key_2:
                         keylist.append(key_2)
