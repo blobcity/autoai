@@ -61,14 +61,14 @@ class regressor_config:
                 "criterion":{'str':['squared_error', 'friedman_mse', 'absolute_error', 'poisson']},
                 "splitter":{'str':['random','best']},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
-                "max_depth":{'int':[3,50]}
+                "max_depth":{'int':[3,18]}
             }
         ],
         "RandomForestRegressor":[
             ensemble.RandomForestRegressor,
             {
                 "criterion":{'str':['squared_error']},
-                "n_estimators":{'int':[50,1000]},
+                "n_estimators":{'int':[50,500]},
                 "max_features":{"str":["auto", "sqrt", "log2"]},
                 "max_depth":{'int':[3,18]},
                 'n_jobs':{'str':[-1]}
@@ -212,7 +212,7 @@ class regressor_config:
             XGBRegressor,
             {
                 "n_estimators":{'int':[100, 5000]},
-                "max_depth":{'int':[3,16]},
+                "max_depth":{'int':[3,18]},
                 "learning_rate":{'float':[1e-3,0.1]},
                 "booster":{'str':['gbtree', 'gblinear', 'dart']},
                 'reg_alpha': {'float':[1e-3,0.1]},
@@ -246,7 +246,7 @@ class regressor_config:
                 "boosting_type":{'str':['gbdt', 'dart','rf']},
                 "num_leaves":{'int':[5, 30]},
                 "learning_rate":{'float':[1e-4,1e-2]},
-                "max_depth":{'int':[3,16]},
+                "max_depth":{'int':[3,18]},
                 "n_estimators":{'int':[100, 2000]},
                 'bagging_fraction':{'float':[0.1,0.9]},
                 'subsample_freq':{'int':[5,10]},
@@ -260,7 +260,7 @@ class regressor_config:
                 "l2_leaf_reg":{'float':[1e-3, 1.0]},
                 "loss_function":{'str': ["RMSE", "MultiRMSE"]},
                 "iterations":{'int':[200, 1000]},
-                "max_depth":{'int':[3,16]},
+                "max_depth":{'int':[3,18]},
                 "verbose":{'bool':[False]},
             }
         ],
@@ -269,7 +269,7 @@ class regressor_config:
             {
                 "max_iter":{'int':[1000,10000]},
                 "epsilon":{'float':[1e-3,1]},
-                "loss":{"str":['huber','epsilon_insensitive','squared_epsilon_insensitive','squared_loss']},
+                "loss":{"str":['epsilon_insensitive','squared_epsilon_insensitive']},
                 "tol":{'float':[1e-3,0.1]}
             }
         ],
