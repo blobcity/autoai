@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name = "blobcity",
-    version = "0.0.12",
+    version = "0.0.13",
     author = "BlobCity, Inc",
     author_email = "support@blobcity.com",
     url = "https://github.com/blobcity/autoai",
