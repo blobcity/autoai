@@ -178,7 +178,7 @@ class Model:
         if path!="" and self.yamldata['problem']["type"]!='Image Classification':
             write_dataframe(dataframe=og,path=path)
         if return_type=="list": return result
-        elif return_type=="df" and isinstance(test,pd.DataFrame):return result_dataframe
+        elif return_type=="df" and isinstance(test,pd.DataFrame):return og
 
     def parameters(self):
         """
