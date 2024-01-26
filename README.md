@@ -189,7 +189,10 @@ Leverage BlobCity AI Cloud for fast training on large datasets. Reasonable cloud
 - [x] Automatic feature selection
 - [x] Code generation
 - [x] Neural Networks & Deep Learning
-- [ ] Image Classification
-- [ ] Optical Character Recognition (english only)
-- [ ] Video tagging with YOLO
-- [ ] Generative AI using GAN
+
+# Upcoming Releases
+- [ ] ChatGPT API integration
+- [ ] Natural Language Processing
+- [ ] Text to Audio / Audio to Text
+- [ ] Generative AI using GAN (train your own model)
+
