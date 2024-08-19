@@ -25,21 +25,25 @@ setuptools.setup(
     py_modules=["blobcity"],             # Name of the python package
     # package_dir={'':'autoai/blobcity'},     # Directory of the source code of the package
     install_requires=[
-        "dill>=0.3.4",
-        "cliff>=3.6.0",
-        "joblib>=1.0.0",
-        "nbformat>=5.1.3",
-        "requests>=2.26.0",
-        "numpy>=1.21.0",
-        "pandas>=1.3.0",
-        "httplib2>=0.20.0",
-        "PyYAML>=6.0",
-        "scikit-learn>=0.23.0",
-        "seaborn>=0.10.0",
-        "optuna>=2.6.0",
-        "imbalanced-learn >= 0.8.0",
-        "xgboost>=1.4.0",
-        "catboost>=0.26",
-        "lightgbm>=3.2.0"
+        "dill==0.3.4",
+        "cliff==3.6.0",
+        "joblib==1.0.0",
+        "nbformat==5.1.3",
+        "requests==2.26.0",
+        "numpy==1.21.0",
+        "pandas==1.5.3",
+        "httplib2==0.20.0",
+        "PyYAML==6.0",
+        "scikit-learn==0.24",
+        "seaborn==0.10.0",
+        "optuna==2.10.1",
+        "imbalanced-learn == 0.8.0",
+        "xgboost==1.4.0",
+        "catboost==0.26",
+        "lightgbm==3.2.0",
+        "opencv-python==4.10.0.84",
+        "statsmodels==0.14.0",
+        "autokeras==1.0.20",
+        "ipython"
     ] 
 )

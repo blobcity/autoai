@@ -281,16 +281,16 @@ class regressor_config:
                 "tol":{'float':[0.01,0.01]} 
             }
         ],
-        "HistGradientBoostingRegressor":[
-            ensemble.HistGradientBoostingRegressor,
-            {
-                "loss":{'str':['least_squares', 'least_absolute_deviation', 'poisson']},
-                "learning_rate":{'float':[1e-3,0.1]},
-                "max_iter":{"int":[100,5000]},
-                "max_depth":{'int':[3,18]},
-                "tol":{'float':[1e-3,0.1]}
-            }
-        ],
+        # "HistGradientBoostingRegressor":[
+        #     ensemble.HistGradientBoostingRegressor,
+        #     {
+        #         "loss":{'str':['least_squares', 'least_absolute_deviation', 'poisson']},
+        #         "learning_rate":{'float':[1e-3,0.1]},
+        #         "max_iter":{"int":[100,5000]},
+        #         "max_depth":{'int':[3,18]},
+        #         "tol":{'float':[1e-3,0.1]}
+        #     }
+        # ],
         "OrthogonalMatchingPursuit":[
             linear_model.OrthogonalMatchingPursuit,
             {

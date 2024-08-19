@@ -156,18 +156,18 @@ class classifier_config:
                 "fit_prior":{'bool':[True,False]}
             }
         ],
-        "HistGradientBoostingClassifier":[
-            ensemble.HistGradientBoostingClassifier,
-            {
-                "loss":{"str":['auto']},
-                "learning_rate":{'float':[1e-3,0.1]},
-                "max_iter":{"int":[50,5000]},
-                "max_depth":{"int":[3,18]},
-                "l2_regularization":{"float":[1e-3,0.1]},
-                "tol":{"float":[1e-7,0.1]},
-                "scoring":{"str":["accuracy", "precision", "loss"]},
-            }
-        ],
+        # "HistGradientBoostingClassifier":[
+        #     ensemble.HistGradientBoostingClassifier,
+        #     {
+        #         "loss":{"str":['auto']},
+        #         "learning_rate":{'float':[1e-3,0.1]},
+        #         "max_iter":{"int":[50,5000]},
+        #         "max_depth":{"int":[3,18]},
+        #         "l2_regularization":{"float":[1e-3,0.1]},
+        #         "tol":{"float":[1e-7,0.1]},
+        #         "scoring":{"str":["accuracy", "precision", "loss"]},
+        #     }
+        # ],
         "AdaBoostClassifier":[
             ensemble.AdaBoostClassifier,
             {

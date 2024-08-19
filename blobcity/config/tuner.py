@@ -131,6 +131,7 @@ def regression_metrics(y_true,y_pred):
     result['MAE']=round(mean_absolute_error(y_true, y_pred),3)
     result['MSE']=round(mean_squared_error(y_true, y_pred),3)
     result['RMSE']=round(mean_squared_error(y_true, y_pred,squared=False),3)
+    result['MAPE']=round(mean_absolute_percentage_error(y_true, y_pred),3)
     return result
 
 def classification_metrics(y_true,y_pred):
