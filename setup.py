@@ -44,6 +44,7 @@ setuptools.setup(
         "opencv-python==4.10.0.84",
         "statsmodels==0.14.0",
         "autokeras==1.0.20",
-        "ipython"
+        "ipython",
+        "openpyxl==3.1.5"
     ] 
 )

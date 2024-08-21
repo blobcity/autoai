@@ -31,7 +31,7 @@ with warnings.catch_warnings():
     import tensorflow as tf
     tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
-def train(file=None, df=None, target=None,features=None,model_types='all',accuracy_criteria=0.99,disable_colinearity=False,epochs=20,max_neural_search=10):
+def train(file=None, df=None, target=None,features=None,model_types='all',accuracy_criteria=0.99,disable_colinearity=False,epochs=100,max_neural_search=10):
     """
     param1: string: dataset file path 
 
