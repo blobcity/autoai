@@ -18,10 +18,10 @@ This file runs a sample regression problem on the AutoAI framework. Can be used 
 """
 import blobcity as bc
 import pandas as pd
-file_path,target="https://raw.githubusercontent.com/Thilakraj1998/Datasets_general/main/CarPrice.csv",'Price'
-features=['Present_Price', 'Kms_Driven', 'Fuel_Type', 'Seller_Type', 'Transmission']
+file_path,target="./us_comm.csv",'Commission'
+features=['month_sin', 'month_cos', 'Headcount', 'Adj Close', 'T1', 'T2']
 
-model=bc.train(file=file_path,target=target,features=None) # function to test AutoAI Process
+model=bc.train(file=file_path,target=target,features=features) # function to test AutoAI Process
 
 model.summary() # function to log summary about trained model
 
