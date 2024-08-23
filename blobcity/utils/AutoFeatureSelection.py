@@ -35,7 +35,7 @@ class AutoFeatureSelection:
         and drop one of the feature which are highly correlated to each other,
         """
         cor_matrix = X.corr()
-        upper_tri = cor_matrix.where(np.triu(np.ones(cor_matrix.shape),k=1).astype(np.bool))
+        upper_tri = cor_matrix.where(np.triu(np.ones(cor_matrix.shape),k=1).astype(bool))
         to_drop = [column for column in upper_tri.columns if any(upper_tri[column] > 0.95)]
         if to_drop!=[]: return X.drop(to_drop, axis=1)
         else: return X
