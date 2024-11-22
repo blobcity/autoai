@@ -305,7 +305,7 @@ def model_search(dataframe=None,target=None,DictClass=None,disable_colinearity=F
     elif model_types=='neural':
         if ptype =="Image Classification":X=X.reshape(DictClass.original_shape)
         gpu_num=tf.config.list_physical_devices('GPU')
-        if len(gpu_num)==0: print("No GPU was detected on your system. Defaulting to CPU. Consider running on a GPU plan on BlobCity AI Cloud for faster training. https://cloud.blobcity.com")
+        if len(gpu_num)==0: print("No GPU was detected on your system. Defaulting to CPU. Consider running on a GPU plan on BlobCity AI Cloud for faster training. https://blobcity.com")
         neural_network=train_on_neural(X,Y,ptype,epochs,max_neural_search,1,1)
         DictClass.accuracy=round(neural_network[1],3)
         modelData=neural_model_records(modelData,neural_network,DictClass,ptype,dataframe,target)
@@ -315,7 +315,7 @@ def model_search(dataframe=None,target=None,DictClass=None,disable_colinearity=F
         modelResult=classic_model(ptype,dataframe,target,X,Y,DictClass,modelsList,accuracy_criteria,4)
         if modelResult[2]<accuracy_criteria:
             gpu_num=tf.config.list_physical_devices('GPU')
-            if len(gpu_num)==0: print("No GPU was detected on your system. Defaulting to CPU. Consider running on a GPU plan on BlobCity AI Cloud for faster training. https://cloud.blobcity.com")
+            if len(gpu_num)==0: print("No GPU was detected on your system. Defaulting to CPU. Consider running on a GPU plan on BlobCity AI Cloud for faster training. https://blobcity.com")
             neural_network=train_on_neural(X,Y,ptype,epochs,max_neural_search,4,4)
             if modelResult[2]>neural_network[1]:
                 DictClass.accuracy=round(modelResult[2],3)
