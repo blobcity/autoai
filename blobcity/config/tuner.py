@@ -104,69 +104,103 @@ def early_stopping_opt_time(study, trial):
                 study.stop()
                 
     return
-def time_metrics(y_true,y_pred):
-    result=dict()
-    result['R2']=round(r2_score(y_true, y_pred),5)
-    result['MAE']=round(mean_absolute_error(y_true, y_pred),5)
-    result['MSE']=round(mean_squared_error(y_true, y_pred),5)
-    result['RMSE']=round(mean_squared_error(y_true, y_pred,squared=False),5)
-    result['MAPE']=round(mean_absolute_percentage_error(y_true, y_pred),5)
-    
-    return result
 
-def regression_metrics(y_true,y_pred):
+def time_metrics(y_true, y_pred):
     """
-    param1: pandas.Series/pandas.DataFrame/numpy.darray
-    param2: pandas.Series/pandas.DataFrame/numpy.darray 
+    Computes performance metrics for time series forecasting.
 
-    return: dictionary
+    Args:
+        y_true (array-like): Actual observed values.
+        y_pred (array-like): Forecasted/predicted values.
 
-    Function accept actual prediction labels from the dataset and predicted values from the model and utilizes this
-    two values/data to calculate r2 score, mean absolute error, mean squared error, and root mean squared error at same time add them to result dictionary.
-    Finally return the result dictionary 
-    
+    Returns:
+        dict: Dictionary containing R2-score, MAE, MSE, RMSE, and MAPE.
+
+    Raises:
+        ValueError: If y_true and y_pred have different lengths.
     """
-    result=dict()
-    result['R2']=round(r2_score(y_true, y_pred),3)
-    result['MAE']=round(mean_absolute_error(y_true, y_pred),3)
-    result['MSE']=round(mean_squared_error(y_true, y_pred),3)
-    result['RMSE']=round(mean_squared_error(y_true, y_pred,squared=False),3)
-    result['MAPE']=round(mean_absolute_percentage_error(y_true, y_pred),3)
-    return result
+    if len(y_true) != len(y_pred):
+        raise ValueError("y_true and y_pred must have the same length.")
 
-def classification_metrics(y_true,y_pred):
+    return {
+        "R2": round(r2_score(y_true, y_pred), 5),
+        "MAE": round(mean_absolute_error(y_true, y_pred), 5),
+        "MSE": round(mean_squared_error(y_true, y_pred), 5),
+        "RMSE": round(mean_squared_error(y_true, y_pred, squared=False), 5),
+        "MAPE": round(mean_absolute_percentage_error(y_true, y_pred), 5),
+    }
+
+def regression_metrics(y_true, y_pred):
     """
-    param1: pandas.Series/pandas.DataFrame/numpy.darray
-    param2: pandas.Series/pandas.DataFrame/numpy.darray 
+    Computes regression performance metrics.
 
-    return: dictionary
+    Args:
+        y_true (array-like): True target values (pandas Series, DataFrame, or numpy array).
+        y_pred (array-like): Predicted values (pandas Series, DataFrame, or numpy array).
 
-    Function accept actual prediction labels from the dataset and predicted values from the model and utilizes this
-    two values/data to calculate f1 score,precision score, and recall for the classification problem. And finally 
-    return them in a dictionary
+    Returns:
+        dict: Dictionary containing R2-score, MAE, MSE, RMSE, and MAPE.
+
+    Raises:
+        ValueError: If y_true and y_pred have different lengths.
     """
-    result=dict()
-    result['F1-Score']=round(f1_score(y_true, y_pred, average="weighted"),3)
-    result['Precision']=round(precision_score(y_true, y_pred,average="weighted"),3)
-    result['Recall']=round(recall_score(y_true, y_pred,average="weighted"),3)
-    return result
+    if len(y_true) != len(y_pred):
+        raise ValueError("y_true and y_pred must have the same length.")
 
-def metricResults(y_true,y_pred,ptype,prog):
+    return {
+        "R2": round(r2_score(y_true, y_pred), 3),
+        "MAE": round(mean_absolute_error(y_true, y_pred), 3),
+        "MSE": round(mean_squared_error(y_true, y_pred), 3),
+        "RMSE": round(mean_squared_error(y_true, y_pred, squared=False), 3),
+        "MAPE": round(mean_absolute_percentage_error(y_true, y_pred), 3),
+    }
+
+def classification_metrics(y_true, y_pred):
     """
-    param1: model object (keras/sklearn/xgboost/catboost/lightgbm)
-    param2: pandas.DataFrame
-    param3: pandas.DataFrame/pandas.Series/numpy.darray
-    param4: String
+    Computes classification performance metrics.
 
-    return: Dictionary
+    Args:
+        y_true (array-like): True labels (pandas Series, DataFrame, or numpy array).
+        y_pred (array-like): Predicted labels (pandas Series, DataFrame, or numpy array).
 
-    Function first perform an train test split of 80:20 split and train the selected model (with parameter tuning) 
-    on training set. based on problem type call appropriate metric function either regression_metrics() or classification_metrics()
-    return the resulting output(Dictionary).
+    Returns:
+        dict: Dictionary containing F1-score, Precision, and Recall (weighted average).
+
+    Raises:
+        ValueError: If y_true and y_pred have different lengths.
     """
-    results = classification_metrics(y_true,y_pred) if ptype in ["Classification","Image Classification"] else regression_metrics(y_true,y_pred)
+    if len(y_true) != len(y_pred):
+        raise ValueError("y_true and y_pred must have the same length.")
+
+    return {
+        "F1-Score": round(f1_score(y_true, y_pred, average="weighted"), 3),
+        "Precision": round(precision_score(y_true, y_pred, average="weighted"), 3),
+        "Recall": round(recall_score(y_true, y_pred, average="weighted"), 3),
+    }
+
+def metricResults(y_true, y_pred, ptype, prog):
+    """
+    Computes evaluation metrics based on the problem type.
+
+    Args:
+        y_true (array-like): Actual target values.
+        y_pred (array-like): Predicted values.
+        ptype (str): Problem type - "Classification" or "Regression".
+        prog (Progress): Progress bar object for tracking optimization.
+
+    Returns:
+        dict: Computed metrics based on the problem type.
+    """
+    if ptype in ["Classification", "Image Classification"]:
+        results = classification_metrics(y_true, y_pred)
+    elif ptype in ["Regression", "Timeseries"]:
+        results = regression_metrics(y_true, y_pred)
+    else:
+        raise ValueError(f"Unsupported problem type: {ptype}")
+
     prog.update_progressbar(1)
     return results
+
 
 def get_param_list(modelkey,modelList):
     """
@@ -181,62 +215,78 @@ def get_param_list(modelkey,modelList):
 
 def get_params(trial):
     """
-    param1: optuna.trial
-    return: dictionary
+    Fetches different parameter values using the Optuna trial object.
 
-    Function fetch different parameter values associated to model using appropriate optuna.trial class.
-    then finally return the dictionary of parameters.
+    Args:
+        trial (optuna.trial): The trial object for hyperparameter optimization.
+
+    Returns:
+        dict: A dictionary of suggested parameter values.
     """
-    params=dict()
-    for key,value in parameter.items():
-        for datatype,arg in value.items():
-            if datatype == "int":
-                params[key]=trial.suggest_int(key,arg[0],arg[1])
-            elif datatype=="float":
-                params[key]=trial.suggest_float(key,arg[0],arg[1])
-            elif datatype in ['str','bool','object']:
-                params[key]=trial.suggest_categorical(key,arg)
-    return params
+    return {
+        key: (
+            trial.suggest_int(key, *arg) if datatype == "int" else
+            trial.suggest_float(key, *arg) if datatype == "float" else
+            trial.suggest_categorical(key, arg)
+        )
+        for key, value in parameter.items()
+        for datatype, arg in value.items()
+    }
+
 
 def objective(trial):
     """
-    param1: optuna.Trial
-    return: float
+    Optuna objective function for hyperparameter optimization.
 
-    function trains model of randomized tuning parameter and return cross_validation score on specified kfold counts.
-    the accuracy is average over the specified kfold counts.
+    Args:
+        trial (optuna.Trial): An Optuna trial object.
+
+    Returns:
+        float: The mean cross-validation score for the model.
     """
-    params=get_params(trial)
-    model=modelName(**params)
-    score = cross_val_score(model, X, Y, cv=cv)
-    accuracy = score.mean()
+    params = get_params(trial)  # Fetch hyperparameters
+    model = modelName(**params)  # Initialize model with hyperparameters
+    
+    try:
+        score = cross_val_score(model, X, Y, cv=cv, scoring='accuracy')  # Perform cross-validation
+        accuracy = score.mean()
+    except Exception as e:
+        print(f"Error during cross-validation: {e}")
+        return float('-inf')  # Return worst possible score in case of failure
+
     prog.update_progressbar(1)
-    return accuracy 
- 
+    return accuracy
 
-def prediction_data(y_true,y_pred,ptype,prog):
+
+def prediction_data(y_true, y_pred, ptype, prog):
     """
-    param1:pandas.Series/numpy.darray
-    param2:pandas.Series/numpy.darray
-    param3:string
+    Generates data for plotting appropriate graphs/diagrams based on the problem type.
 
-    return:array/2D array
+    Args:
+        y_true (pandas.Series | numpy.ndarray): Actual values.
+        y_pred (pandas.Series | numpy.ndarray): Predicted values.
+        ptype (str): Problem type ('Classification', 'Image Classification', 'Timeseries', etc.).
+        prog (object): Progress tracking object.
 
-    Function generate data for ploting appropriate graph/diagram on the basis of problem type.
+    Returns:
+        array | 2D array: Confusion matrix for classification or prediction data for other problem types.
     """
-    if ptype in ['Classification','Image Classification']:
-        cm=confusion_matrix(y_true,y_pred)
-        prog.update_progressbar(1)
-        return cm
-    elif ptype in ["Timeseries"]:
-        data_pred=[y_true.values,y_pred]
-        prog.update_progressbar(1)
-        return data_pred  
+    prog.update_progressbar(1)  # Update progress at the beginning
 
-    else:
-        data_pred=[y_true.values,y_pred]
-        prog.update_progressbar(1)
-        return data_pred        
+    try:
+        if ptype in ['Classification', 'Image Classification']:
+            return confusion_matrix(y_true, y_pred)
+
+        elif ptype == "Timeseries":
+            return [y_true.values, y_pred]
+
+        else:  # Default case (Regression or other problem types)
+            return [y_true.values, y_pred]
+
+    except Exception as e:
+        print(f"Error in prediction_data: {e}")
+        return None  # Return None to handle failures gracefully
+      
 
 def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy,DictionaryClass,stages):
     """
@@ -281,36 +331,70 @@ def tune_model(dataframe,target,modelkey,modelList,ptype,accuracy,DictionaryClas
     except Exception as e:
         print(e)
 
-
-
 def timeobjective(trial):
-    param1=get_params(trial)
-    mdl=modelName(train_data1,**param1)
+    """
+    Optimizes a time-series forecasting model using Optuna.
+
+    Args:
+        trial (optuna.Trial): Optuna trial object for hyperparameter tuning.
+
+    Returns:
+        float: RMSE (Root Mean Squared Error) of the forecasted values.
+    """
+    params = get_params(trial)  # Fetch hyperparameters
+    mdl = modelName(train_data1, **params)  # Initialize model
+
     try:
-        mdl1 = mdl.fit(disp=0)
+        mdl1 = mdl.fit(disp=0)  # Try fitting with disp=0 (for models that support it)
     except:
-        mdl1 = mdl.fit()
+        mdl1 = mdl.fit()  # Fallback to default fitting
+
+    # Generate predictions
     predictions = mdl1.forecast(len(test_data1))
     predictions = pd.Series(predictions, index=test_data1.index)
+
+    # Calculate residuals and RMSE
     residuals = test_data1 - predictions
-    rmse=round(np.sqrt(np.mean(residuals**2)),5)
+    rmse = round(np.sqrt(np.mean(residuals**2)), 5)
 
     return rmse
  
+def time_tuner(train_data, test_data, modelkey, modelList, accuracy=None):
+    """
+    Performs hyperparameter tuning for a time-series forecasting model using Optuna.
 
-def time_tuner(train_data, test_data,modelkey,modelList,accuracy=None):
-    global train_data1,test_data1
-    train_data1=train_data
-    test_data1=test_data
-    get_param_list(modelkey,modelList)
-    study=optuna.create_study(direction="minimize")
-    study.optimize(timeobjective,n_trials=30,callbacks=[early_stopping_opt_time])
-    finalmodel = modelName(train_data1,**study.best_params).fit()
-    predictions = finalmodel.forecast(len(test_data1))
+    Args:
+        train_data (pd.Series or pd.DataFrame): Training dataset.
+        test_data (pd.Series or pd.DataFrame): Test dataset.
+        modelkey (dict): Dictionary mapping model names to their configurations.
+        modelList (dict): Dictionary containing model objects and hyperparameter ranges.
+        accuracy (optional): Placeholder for compatibility; not used in this function.
+
+    Returns:
+        tuple: Contains the final trained model, best hyperparameters, best score, metric results, and plots.
+    """
+    # Set global train/test data variables
+    global train_data1, test_data1
+    train_data1, test_data1 = train_data, test_data
+
+    # Initialize model parameters
+    get_param_list(modelkey, modelList)
+
+    # Create and optimize the Optuna study
+    study = optuna.create_study(direction="minimize")
+    study.optimize(timeobjective, n_trials=30, callbacks=[early_stopping_opt_time])
+
+    # Train the final model with the best parameters
+    final_model = modelName(train_data1, **study.best_params).fit()
+
+    # Generate predictions
+    predictions = final_model.forecast(len(test_data1))
     predictions = pd.Series(predictions, index=test_data1.index)
-    metric_result=time_metrics(test_data1,predictions)
-    plots=prediction_data(test_data1,predictions,ptype="Timeseries")
-    
-    return (finalmodel,study.best_params,study.best_value,metric_result,plots)
 
+    # Evaluate model performance
+    metric_result = time_metrics(test_data1, predictions)
 
+    # Generate plot data
+    plots = prediction_data(test_data1, predictions, ptype="Timeseries")
+
+    return final_model, study.best_params, study.best_value, metric_result, plots
