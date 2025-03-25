@@ -19,7 +19,9 @@ from blobcity.aicloud import send_yaml_to_cloud
 from blobcity.store import DictClass
 from blobcity.main.modelSelection import model_search
 from blobcity.utils import check_subfolder_data,ProType
-from blobcity.utils import uncompress_file,validate_url,file_from_url,AutoFeatureSelection
+from blobcity.utils import uncompress_file,file_from_url,AutoFeatureSelection
+from blobcity.utils.FileType import DataFrameHandler,URLValidator
+
 
 """
 This file consists of Function to deal with Image Classification problem in python.
@@ -52,13 +54,13 @@ def train(file=None, target=None,model_types='classic',accuracy_criteria=0.99,re
         compress_list=[".zip",".tar",".gz",'.tar.gz','.bz2']
         dict_class.addKeyValue('data_read',{'file':file})
         if not ext and ext not in compress_list and target==None:
-            if validate_url(file): 
+            if URLValidator().validate(file): 
                 file=file_from_url(file,dict_class) 
             else:
                 dict_class.UpdateNestedKeyValue('data_read','from','Local')
             data,target=check_subfolder_data(file,dict_class)
         elif ext in compress_list:
-            if validate_url(file): 
+            if URLValidator().validate(file): 
                 file=file_from_url(file,dict_class) 
             else:
                 dict_class.UpdateNestedKeyValue('data_read','from','Local')

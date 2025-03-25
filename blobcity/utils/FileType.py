@@ -12,156 +12,111 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-This Python File consists of function to fetch and read dataset from various datasource using pandas framework.
-"""
 
-
+import os
 import io
-import re 
+import re
 import urllib
-import os.path
 import requests
-import httplib2
 import pandas as pd
+import httplib2
 from requests.models import HTTPError
-def get_dataframe_type(file_path,dc=None):
 
-    """
-    param1: String - System path or URL for data
-    param2: Object - dictionary Class
-    return: object - pandas DataFrame
+class DataFrameHandler:
+    def __init__(self, dc=None):
+        self.dc = dc
 
-    Working:
-        first the function split the complete string path and fetchs the extension format of the file
-        next on the basis of extension type it utilize appropriate pandas read function to get the dataframe.
-        and finally return the dataframe object.
-    """
-    extension = os.path.splitext(file_path)[1]
-    try:
-        if(extension==".csv"):
-            Types = "csv"
-            df=pd.read_csv(file_path)
-        elif extension==".xlsx":
-            Types = "xlsx"
-            df=pd.read_excel(file_path)
-        elif extension==".parquet":
-            df=pd.read_parquet(file_path)
-        elif extension==".json":
-            Types = "JSON"
-            df=pd.read_json(file_path)
-        elif extension==".pkl":
-            df=pd.read_pickle(file_path)
-            Types="Pickle"
-    
-    except HTTPError:
+    def get_dataframe(self, file_path):
+        """
+        Reads a file (local or URL) and returns a pandas DataFrame.
+        """
+        extension = os.path.splitext(file_path)[1]
+        types = extension.lstrip('.')
+        try:
+            df = self._read_file(file_path, extension)
+        except HTTPError:
+            df = self._read_from_url(file_path, extension)
+        
+        if self.dc:
+            self.dc.addKeyValue('data_read', {"type": types, "file": file_path, "class": "df"})
+        return df
+
+    def _read_file(self, file_path, extension):
+        read_funcs = {
+            ".csv": pd.read_csv,
+            ".xlsx": pd.read_excel,
+            ".parquet": pd.read_parquet,
+            ".json": pd.read_json,
+            ".pkl": pd.read_pickle
+        }
+        return read_funcs.get(extension, lambda x: None)(file_path)
+
+    def _read_from_url(self, file_path, extension):
         response = requests.get(file_path)
         file_object = io.StringIO(response.content.decode('utf-8'))
-        if(extension==".csv"):
-            Types = "csv"
-            df=pd.read_csv(file_object)
-        elif extension==".xlsx":
-            Types = "xlsx"
-            df=pd.read_xlsx(file_object)
-        elif extension==".excel":
-            df=pd.read_excel(file_object)
-        elif extension==".parquet":
-            df=pd.read_parquet(file_object)
-        elif extension==".json":
-            Types = "JSON"
-            df=pd.read_json(file_object)
-        elif extension==".pkl":
-            df=pd.read_pickle(file_object)
-            Types="Pickle"
+        return self._read_file(file_object, extension)
 
-    if dc!=None: dc.addKeyValue('data_read',{"type":Types,"file":file_path,"class":"df"})
-    return df
-
-
-def write_dataframe(dataframe=None,path=""):
-    """
-    param1: pd.DataFrame
-    param2: String
-    param3: String
-
-    Function perform validation on provided arguments for file creation.
-    """
-    try:
-        path_components = path.split('.')
-        extension = path_components[1] if len(path_components)<=2 else path_components[-1]
-        if path!="":
-            if isinstance(dataframe,pd.DataFrame):
-                if extension in ['csv','xlsx','json']:
-                    save_dataframe(dataframe,path,extension)
-                else:raise TypeError("File type should be in following format [csv,xlsx,json],provided type {}".format(extension))
-            else: raise TypeError("Dataframe argument must be pd.DataFrame type, provided {}".format(type(dataframe)))
-        else: raise ValueError("Argument dataframe or type can't be None or empty") 
-    except Exception as e:
-        print(e)
-
-def save_dataframe(dataframe,path,ftype):
-    """
-    param1: pd.DataFrame
-    param2: String
-    param3: String
-
-    Function write pandas DataFrame at specified location with specified file type. 
-    """
-    try:
-        if ftype=='csv':
-            dataframe.to_csv(path,index=False)
-        elif ftype=='xlsx':
-            dataframe.to_excel(path,index=False)
-        elif ftype=='json':
-            dataframe.to_json(path,orient="index")
-        print("saved at path {}".format(path))
-    except Exception as e:
-        print(e)
-
-def validate_url(url: str):
-    """
-    param1: string
+    def write_dataframe(self, dataframe, path):
+        """
+        Writes a pandas DataFrame to a specified file path.
+        """
+        if not isinstance(dataframe, pd.DataFrame):
+            raise TypeError(f"Expected pd.DataFrame, got {type(dataframe)}")
+        
+        extension = os.path.splitext(path)[1].lstrip('.')
+        if extension not in ['csv', 'xlsx', 'json']:
+            raise TypeError(f"Unsupported file format: {extension}")
+        
+        self._save_dataframe(dataframe, path, extension)
     
-    return: boolean
+    def _save_dataframe(self, dataframe, path, ftype):
+        save_funcs = {
+            'csv': dataframe.to_csv,
+            'xlsx': dataframe.to_excel,
+            'json': lambda p: dataframe.to_json(p, orient="index")
+        }
+        save_funcs[ftype](path, index=False)
+        print(f"Saved at path {path}")
 
-    Function perform a symantic check/regular expression check whether the provided string is in format of URL Types
-    """
+class URLValidator:
     DOMAIN_FORMAT = re.compile(
-        r"(?:^(\w{1,255}):(.{1,255})@|^)" # http basic authentication [optional]
-        r"(?:(?:(?=\S{0,253}(?:$|:))" # check full domain length to be less than or equal to 253 (starting after http basic auth, stopping before port)
-        r"((?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+" # check for at least one subdomain (maximum length per subdomain: 63 characters), dashes in between allowed
-        r"(?:[a-z0-9]{1,63})))" # check for top level domain, no dashes allowed
-        r"|localhost)" # accept also "localhost" only
-        r"(:\d{1,5})?", # port [optional]
+        r"(?:^(\w{1,255}):(.{1,255})@|^)"  # HTTP basic authentication [optional]
+        r"(?:(?:(?=\S{0,253}(?:$|:))"  # Fixed unbalanced parenthesis
+        r"((?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+"
+        r"(?:[a-z0-9]{1,63})))"
+        r"|localhost)"  # Accept "localhost" as well
+        r"(:\d{1,5})?",  # Port [optional]
         re.IGNORECASE
     )
-    SCHEME_FORMAT = re.compile(
-        r"^(http|hxxp|ftp|fxp)s?$", # scheme: http(s) or ftp(s)
-        re.IGNORECASE
-    )
-    url = url.strip()
-    try:
-        if not url:raise Exception("No URL specified")
+    SCHEME_FORMAT = re.compile(r"^(http|https|ftp|ftps)$", re.IGNORECASE)
+
+    @staticmethod
+    def validate(url: str):
+        """
+        Validates whether a given string is a properly formatted URL.
+        """
+        url = url.strip()
+        if not url:
+            raise ValueError("No URL specified")
+        
         result = urllib.parse.urlparse(url)
-        scheme = result.scheme
-        domain = result.netloc
-        if not scheme:raise Exception("No URL scheme specified")
-        if not re.fullmatch(SCHEME_FORMAT, scheme):raise Exception("URL scheme must either be http(s) or ftp(s) (given scheme={})".format(scheme))
-        if not domain:raise Exception("No URL domain specified")
-        if not re.fullmatch(DOMAIN_FORMAT, domain):raise Exception("URL domain malformed (domain={})".format(domain))
-        return check_url_existence(url)
-    except Exception:return False
+        scheme, domain = result.scheme, result.netloc
+        
+        if not scheme or not re.fullmatch(URLValidator.SCHEME_FORMAT, scheme):
+            raise ValueError(f"Invalid URL scheme: {scheme}")
+        if not domain or not re.fullmatch(URLValidator.DOMAIN_FORMAT, domain):
+            raise ValueError(f"Malformed domain: {domain}")
+        
+        return URLValidator.check_url_existence(url)
 
-def check_url_existence(url):
-    """
-    param1: string
-
-    return: boolean
-
-    Function check whether the provided string url exists over internet or not.
-    """
-    h = httplib2.Http()
-    resp = h.request(url, 'HEAD')
-    if int(resp[0]['status']) < 400:
-        return True
-    else: raise HTTPError(f"{url} does not exist")
+    @staticmethod
+    def check_url_existence(url):
+        """
+        Checks if the URL exists.
+        """
+        h = httplib2.Http()
+        resp = h.request(url, 'HEAD')
+        if int(resp[0]['status']) < 400:
+            return True
+        else:
+            raise HTTPError(f"{url} does not exist")

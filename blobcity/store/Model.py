@@ -18,7 +18,8 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from blobcity.utils import get_dataframe_type,Progress,write_dataframe,quick_image_processing
+from blobcity.utils import Progress,quick_image_processing
+from blobcity.utils.FileType import DataFrameHandler
 from blobcity.code_gen import code_generator
 import yaml
 
@@ -129,7 +130,7 @@ class Model:
 
         if self.yamldata['problem']["type"]!='Image Classification':
             if type(test)==str:
-                test=get_dataframe_type(test)
+                test=DataFrameHandler().get_dataframe(test)
                 og=test.copy(deep=True)
             elif isinstance(test, pd.DataFrame):
                 og=test.copy(deep=True)
@@ -176,7 +177,7 @@ class Model:
                 result= Model().__encode_result(result,self.target_encode)
 
         if path!="" and self.yamldata['problem']["type"]!='Image Classification':
-            write_dataframe(dataframe=og,path=path)
+            DataFrameHandler().write_dataframe(dataframe=og,path=path)
         if return_type=="list": return result
         elif return_type=="df" and isinstance(test,pd.DataFrame):return og
 

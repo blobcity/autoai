@@ -22,7 +22,8 @@ from sklearn.preprocessing import MinMaxScaler
 from blobcity.main.modelSelection import model_search
 from blobcity.code_gen import yml_reader,code_generator
 from sklearn.feature_selection import SelectKBest,f_regression,f_classif
-from blobcity.utils import ProType, AutoFeatureSelection,get_dataframe_type,dataCleaner
+from blobcity.utils import ProType, AutoFeatureSelection,data_cleaner
+from blobcity.utils.FileType import DataFrameHandler 
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore")
     os.environ["PYTHONWARNINGS"] = "ignore"
@@ -62,17 +63,18 @@ def train(file=None, df=None, target=None,features=None,model_types='all',accura
     dict_class=DictClass()
     dict_class.resetVar()
     exp_id=ProType.generate_uuid()
+    df_handler=DataFrameHandler(dict_class)
     if file!=None:
-        dataframe= get_dataframe_type(file, dict_class)
+        dataframe=df_handler.get_dataframe(file)
     else: 
         dataframe = df
         dict_class.addKeyValue('data_read',{"type":"df","class":"df"})
                 
     if(features==None):
-        featureList=AutoFeatureSelection.FeatureSelection(dataframe,target,dict_class,disable_colinearity)
-        CleanedDF=dataCleaner(dataframe,featureList,target,dict_class)
+        featureList=AutoFeatureSelection.feature_selection(dataframe,target,dict_class,disable_colinearity)
+        CleanedDF=data_cleaner(dataframe,featureList,target,dict_class)
     else:
-        CleanedDF=dataCleaner(dataframe,features,target,dict_class)
+        CleanedDF=data_cleaner(dataframe,features,target,dict_class)
     accuracy_criteria= accuracy_criteria if accuracy_criteria<=1.0 else (accuracy_criteria/100)
     modelClass = model_search(dataframe=CleanedDF,target=target,DictClass=dict_class,disable_colinearity=disable_colinearity,model_types=model_types,accuracy_criteria=accuracy_criteria,epochs=epochs,max_neural_search=max_neural_search)
     modelClass.yamldata=dict_class.getdict()

@@ -23,6 +23,7 @@ from sklearn.metrics import r2_score
 from blobcity.config import tuner as Tuner
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.model_selection import cross_val_score
+from sklearn.metrics import mean_squared_error
 from blobcity.config import classifier_config,regressor_config,time_config
 from blobcity.utils import Progress,scaling_data,AutoFeatureSelection
 from statsmodels.tsa.arima.model import ARIMA
@@ -67,20 +68,26 @@ def getKFold(rows):
     else:k=3
     return k
 
-def cv_score(model,X,Y,k):
-
+def cv_score(model, X, Y, k):
     """
-    param1: sklearn/xgboost/lightgbm/catboost model 
-    param2: pandas.DataFrame
-    param3: pandas.DataFrame/pandas.Series
-    param4: integer for kfold 
-    return: float
+    Computes the cross-validation score for a given model.
 
-    function gets above mentioned argument and uses cross_val_score to calculate average accuracy on specified kfolds
+    :param model: Scikit-learn/XGBoost/LightGBM/CatBoost model instance
+    :param X: pd.DataFrame, Feature matrix
+    :param Y: pd.Series or pd.DataFrame, Target variable
+    :param k: int, Number of cross-validation folds
+    :return: float, Mean cross-validation score
+
+    Uses cross_val_score to calculate average accuracy on k-folds.
+    Optimizes parallel execution based on model type.
     """
-    n_jobs = 1 if model.__class__.__name__ in ['XGBClassifier','XGBRegressor','LGBMRegressor','LGBMClassifier','CatBoostRegressor','CatBoostClassifier'] else -1
-    accuracy = cross_val_score(model, X, Y, cv = k,n_jobs=n_jobs)
-    return accuracy.mean()
+    
+    # Restrict parallel processing for specific models
+    restricted_models = {'XGBClassifier', 'XGBRegressor', 'LGBMRegressor', 'LGBMClassifier', 
+                         'CatBoostRegressor', 'CatBoostClassifier'}
+    n_jobs = 1 if model.__class__.__name__ in restricted_models else -1
+
+    return cross_val_score(model, X, Y, cv=k, n_jobs=n_jobs).mean()
 
 def sort_score(modelScore):
     """
@@ -92,287 +99,444 @@ def sort_score(modelScore):
     sorted_dict=dict(sorted(modelScore.items(), key=lambda item: item[1],reverse=True))
     return sorted_dict
 
-def eval_model(models,m,X,Y,k,DictionaryClass):
+def eval_model(models, model_key, X, Y, k, DictionaryClass):
     """
-    param1: dictionary : Dictionary of models
-    param2: string : model key
-    param3: pd.DataFrame 
-    param4: pd.Dataframe/pd.Series/numpy.array
-    param5: int : cv split
-    param6: Class object
-    return: float
+    Evaluates a model using cross-validation.
 
-    Function to fetch cross validation score for specific models from the dictionary.
-    If the model/algorithm belong to distance based prediction and training scale the data to speedup the training.
-    """
-    X = X if m not in ['SVC','NuSVC','LinearSVC','SVR','NuSVR','LinearSVR','KNeighborsClassifier','KNeighborsRegressor','RadiusNeighborsClassifier','RadiusNeighborsRegressor','NearestCentroid'] else scaling_data(X,DictionaryClass)
-    if m in ['XGBClassifier','XGBRegressor']: model=models[m][0](verbosity=0)
-    elif m in ['CatBoostRegressor','CatBoostClassifier']: model=models[m][0](verbose=False)
-    elif m in ['LGBMClassifier','LGBMRegressor']: model=models[m][0](verbose=-1)
-    else:model=models[m][0]()
-    return cv_score(model,X,Y,k)
+    :param models: dict, Dictionary of model constructors
+    :param model_key: str, Key to select model
+    :param X: pd.DataFrame, Feature matrix
+    :param Y: pd.Series or np.array, Target variable
+    :param k: int, Number of cross-validation splits
+    :param DictionaryClass: Class object, Used for scaling if required
+    :return: float, Cross-validation score
 
-def train_on_sample_data(dataframe,target,models,DictionaryClass,stages):
+    If the model belongs to distance-based algorithms, scales the data to speed up training.
     """
-    param1: pandas.DataFrame
-    param2: string
-    param3: Dictionary (sklearn/xgboost/lightgbm/catboost model object)
-    param4: Class object
-    return: Dictionary
-
-    Function returns top 5 models with best accuracy in a dictionary.
-    The models where accuracy is calculate on sampled data from the dataset.
-    Accuracy is calculated using average cross validation score on specified kfold counts.
-    """
-    rows=dataframe.shape[0]
-    sample_rate=round((500+(((rows-500)*0.2)))/rows,1)
-    if DictionaryClass.YAML['problem']['type']=="Image Classification":
-        dataframe=dataframe.sample(frac=1,random_state=123)
-        df=dataframe.sample(frac=sample_rate,random_state=123)
-        X,Y=AutoFeatureSelection.get_reshaped_image(df.values)
-        models_List=DictionaryClass.image_models
-    else:
-        df=dataframe.sample(frac=sample_rate,random_state=123)
-        X,Y=df.drop(target,axis=1),df[target]
-        models_List=models.keys()
-    k=getKFold(rows)
-    modelScore={}
-    prog.create_progressbar(len(models_List),"Quick Search (Stage 1 of {}) :".format(stages))
-    try:
-        for m in models_List:
-            modelScore[m]=eval_model(models,m,X,Y,k,DictionaryClass)
-            prog.update_progressbar(1)
-    except:
-        pass
-    prog.update_progressbar(prog.trials)
-    prog.close_progressbar()
-    clean_dict = {k: modelScore[k] for k in modelScore if not isnan(modelScore[k])}
-    return dict(itertools.islice(sort_score(clean_dict).items(), 5))
-
-def train_on_full_data(X,Y,models,best,DictionaryClass,stages):
-    """
-    param1: pandas.DataFrame
-    param2: pandas.Series/Pandas.DataFrame
-    param3: Dictionary (sklearn/xgboost/lightgbm/catboost model object)
-    param4: Dictionary (sklearn/xgboost/lightgbm/catboost model class names)
-    param5: Class object
-    return: Dictionary
-
-    Function returns single best model with best accuracy in a dictionary. 
-    Accuracy is calculated using average cross validation score on specified kfold counts.
-    """
-    k=getKFold(X.shape[0])
-    modelScore={}
-    if DictionaryClass.YAML['problem']['type']=="Image Classification" and len(best)>5:best=DictionaryClass.image_models
-    prog.create_progressbar(len(best),"Deep Search (Stage 2 of {}) :".format(stages))
-    for m in best:
-        modelScore[m]=eval_model(models,m,X,Y,k,DictionaryClass)
-        prog.update_progressbar(1)
-    prog.update_progressbar(prog.trials)
-    prog.close_progressbar()
-    clean_dict = {k: modelScore[k] for k in modelScore if not isnan(modelScore[k])}
-    return dict(itertools.islice(sort_score(clean_dict).items(), 1))
-
-def train_on_neural(X,Y,ptype,epochs,max_neural_search,stage,ofstage):
-    """
-    param1: pandas.DataFrame
-    param2: pandas.Series/Pandas.DataFrame
-    param3: string
-    return: keras model
-
-    Function perform neural network model search and tuning using autokeras api and finally returns selected keras model.
-    """
-    prog.create_progressbar(n_counters=((max_neural_search+2)*epochs),desc="Neural Networks (stage {} of {})".format(stage,ofstage))
-    if ptype!="Image Classification":
-        clf = ak.StructuredDataClassifier(overwrite=True,max_trials=max_neural_search) if ptype=='Classification' else ak.StructuredDataRegressor(overwrite=True,max_trials=max_neural_search) 
-    else: clf= ak.ImageClassifier(overwrite=True,max_trials=max_neural_search)
-    clf.fit(X,Y,verbose=0,epochs=epochs,callbacks=[CustomCallback()],batch_size=8)
-    loss,acc=clf.evaluate(X,Y,verbose=0)
-    y_pred=clf.predict(X,verbose=0)
-    if ptype in ["Classification","Image Classification"]:y_pred= y_pred.astype(np.int)
-    if ptype=='Regression':acc=r2_score(Y,y_pred)
-    results= Tuner.metricResults(Y,y_pred,ptype,prog)
-    plot_data=Tuner.prediction_data(Y, y_pred, ptype,prog)
-    prog.update_progressbar(prog.trials)
-    prog.close_progressbar()
-    return (clf,acc,results,plot_data)
-
-def classic_model(ptype,dataframe,target,X,Y,DictClass,modelsList,accuracy_criteria,stages):
-    """
-    param1: string : problem type either classification or regression
-    param2: pd.DataFrame
-    param3: string: target column name
-    param4: pd.DataFrame
-    param5: pd.DataFrame/pd.Series
-    param6: Class object
-    param7: dictionary: consist of model class and configuration specific to problem type
-    param8: float: accuracy criterion to stop further training process/hyper parameters tuning
-    param9: int: stage count for progress par visualization
-    return: tuple : tuple consisting of various object and results associated to model object
-
-    Funciton perform model search in two stages,if the dataset has more than 500 entries then first fetch top 5 best performing models on 10% sample dataset 
-    then run the top 5 models on full dataset to get single best model for hyper parameter tuning.
-    The single model is then sent for hyper parameter tuning to tuneModel function of tuner Class.
-    """
-    if dataframe.shape[0]>500:
-        best=train_on_full_data(X,Y,modelsList,train_on_sample_data(dataframe,target,modelsList,DictClass,stages),DictClass,stages)
-    else:
-        print("Quick Search(Stage 1 of {}) is skipped".format(stages))
-        best = train_on_full_data(X,Y,modelsList,DictClass.image_models,DictClass,stages)if ptype=="Image Classification" else train_on_full_data(X,Y,modelsList,modelsList,DictClass,stages)
     
-    if ptype=="Image Classification":
-        modelResult = Tuner.tune_model(X,Y,best,modelsList,ptype,accuracy_criteria,DictClass,stages)
+    # Apply scaling for distance-based models
+    distance_based_models = {
+        'SVC', 'NuSVC', 'LinearSVC', 'SVR', 'NuSVR', 'LinearSVR',
+        'KNeighborsClassifier', 'KNeighborsRegressor', 
+        'RadiusNeighborsClassifier', 'RadiusNeighborsRegressor', 'NearestCentroid'
+    }
+    
+    if model_key in distance_based_models:
+        X = scaling_data(X, DictionaryClass)
+
+    # Handle verbosity for specific models
+    verbosity_params = {
+        'XGBClassifier': {'verbosity': 0},
+        'XGBRegressor': {'verbosity': 0},
+        'CatBoostRegressor': {'verbose': False},
+        'CatBoostClassifier': {'verbose': False},
+        'LGBMClassifier': {'verbose': -1},
+        'LGBMRegressor': {'verbose': -1}
+    }
+    
+    model_class = models[model_key][0]
+    model = model_class(**verbosity_params.get(model_key, {}))
+
+    return cv_score(model, X, Y, k)
+
+
+def train_on_sample_data(dataframe, target, models, DictionaryClass, stages):
+    """
+    Trains models on a sampled subset of the data and returns the top 5 models with the best accuracy.
+
+    :param dataframe: pandas.DataFrame, dataset
+    :param target: str, target column name
+    :param models: dict, mapping of model names to model objects (sklearn/xgboost/lightgbm/catboost)
+    :param DictionaryClass: object, dictionary class with metadata
+    :param stages: int, total number of search stages
+
+    :return: dict, top 5 models with the best accuracy scores
+    """
+
+    # Determine sample rate based on dataset size
+    rows = dataframe.shape[0]
+    sample_rate = min(round((500 + ((rows - 500) * 0.2)) / rows, 1), 1.0)  # Ensuring sample_rate <= 1
+
+    # Handle Image Classification separately
+    if DictionaryClass.YAML['problem']['type'] == "Image Classification":
+        dataframe = dataframe.sample(frac=1, random_state=123)  # Shuffle dataset
+        df = dataframe.sample(frac=sample_rate, random_state=123)
+        X, Y = AutoFeatureSelection.get_reshaped_image(df.values)
+        models_List = DictionaryClass.image_models
     else:
-        modelResult = Tuner.tune_model(dataframe,target,best,modelsList,ptype,accuracy_criteria,DictClass,stages)
+        df = dataframe.sample(frac=sample_rate, random_state=123)
+        X, Y = df.drop(target, axis=1), df[target]
+        models_List = models.keys()
+
+    # Get the number of folds for cross-validation
+    k = getKFold(rows)
+    
+    modelScore = {}
+    prog.create_progressbar(len(models_List), f"Quick Search (Stage 1 of {stages}):")
+
+    for model_name in models_List:
+        try:
+            modelScore[model_name] = eval_model(models, model_name, X, Y, k, DictionaryClass)
+        except Exception as e:
+            print(f"Error evaluating model {model_name}: {e}")  # Log errors instead of passing silently
+        prog.update_progressbar(1)
+
+    prog.close_progressbar()
+
+    # Remove NaN values and sort models by accuracy
+    clean_dict = {k: v for k, v in modelScore.items() if not np.isnan(v)}
+    return dict(itertools.islice(sort_score(clean_dict).items(), 5))  # Return top 5 models
+
+def train_on_full_data(X, Y, models, best, DictionaryClass, stages):
+    """
+    Trains selected models on the full dataset and returns the best model based on accuracy.
+
+    :param X: pandas.DataFrame, feature dataset
+    :param Y: pandas.Series or pandas.DataFrame, target dataset
+    :param models: dict, mapping of model names to model objects (sklearn/xgboost/lightgbm/catboost)
+    :param best: dict, selected model names from Stage 1
+    :param DictionaryClass: object, dictionary class with metadata
+    :param stages: int, total number of search stages
+
+    :return: dict, single best model with the highest accuracy
+    """
+
+    # Get the number of folds for cross-validation
+    k = getKFold(X.shape[0])
+    modelScore = {}
+
+    # Adjust best model list for Image Classification
+    if DictionaryClass.YAML['problem']['type'] == "Image Classification" and len(best) > 5:
+        best = DictionaryClass.image_models  # Use predefined image models
+
+    # Initialize progress bar
+    prog.create_progressbar(len(best), f"Deep Search (Stage 2 of {stages}):")
+
+    for model_name in best:
+        try:
+            modelScore[model_name] = eval_model(models, model_name, X, Y, k, DictionaryClass)
+        except Exception as e:
+            print(f"Error evaluating model {model_name}: {e}")  # Improved error handling
+        prog.update_progressbar(1)
+
+    prog.close_progressbar()
+
+    # Remove NaN values and return the best model
+    clean_dict = {k: v for k, v in modelScore.items() if not np.isnan(v)}
+    return dict(itertools.islice(sort_score(clean_dict).items(), 1))  # Return the single best model
+
+def train_on_neural(X, Y, ptype, epochs, max_neural_search, stage, ofstage):
+    """
+    Performs neural network model search and tuning using AutoKeras and returns the best Keras model.
+
+    :param X: pandas.DataFrame, feature dataset
+    :param Y: pandas.Series or pandas.DataFrame, target dataset
+    :param ptype: str, problem type ('Classification', 'Regression', 'Image Classification')
+    :param epochs: int, number of training epochs
+    :param max_neural_search: int, maximum number of trials for AutoKeras search
+    :param stage: int, current training stage
+    :param ofstage: int, total number of stages
+
+    :return: tuple (AutoKeras model, accuracy, metric results, prediction data)
+    """
+
+    # Initialize progress bar
+    total_steps = (max_neural_search + 2) * epochs
+    prog.create_progressbar(n_counters=total_steps, desc=f"Neural Networks (stage {stage} of {ofstage})")
+
+    # Select the appropriate AutoKeras model
+    if ptype == "Image Classification":
+        clf = ak.ImageClassifier(overwrite=True, max_trials=max_neural_search)
+    elif ptype == "Classification":
+        clf = ak.StructuredDataClassifier(overwrite=True, max_trials=max_neural_search)
+    else:  # Regression
+        clf = ak.StructuredDataRegressor(overwrite=True, max_trials=max_neural_search)
+
+    # Train the model
+    clf.fit(X, Y, verbose=0, epochs=epochs, callbacks=[CustomCallback()], batch_size=8)
+
+    # Evaluate the model
+    loss, acc = clf.evaluate(X, Y, verbose=0)
+    y_pred = clf.predict(X, verbose=0)
+
+    # Handle classification predictions
+    if ptype in ["Classification", "Image Classification"]:
+        y_pred = y_pred.astype(int)  # Use int() instead of np.int (deprecated in NumPy 1.20+)
+
+    # Handle regression metrics
+    if ptype == "Regression":
+        acc = r2_score(Y, y_pred)
+
+    # Compute metrics and plot data
+    results = Tuner.metricResults(Y, y_pred, ptype, prog)
+    plot_data = Tuner.prediction_data(Y, y_pred, ptype, prog)
+
+    # Finalize progress bar
+    prog.update_progressbar(prog.trials)
+    prog.close_progressbar()
+
+    return clf, acc, results, plot_data
+
+
+def classic_model(ptype, dataframe, target, X, Y, DictClass, modelsList, accuracy_criteria, stages):
+    """
+    Performs a two-stage model search and hyperparameter tuning for classification or regression.
+
+    :param ptype: str, problem type ('Classification' or 'Regression')
+    :param dataframe: pd.DataFrame, input dataset
+    :param target: str, target column name
+    :param X: pd.DataFrame, feature dataset
+    :param Y: pd.Series or pd.DataFrame, target dataset
+    :param DictClass: Class object, contains configurations and YAML data
+    :param modelsList: dict, model class and configurations based on problem type
+    :param accuracy_criteria: float, threshold to stop further hyperparameter tuning
+    :param stages: int, total stages for progress bar visualization
+    :return: tuple, consisting of trained model and evaluation results
+
+    The function performs a two-stage model search:
+    1. If dataset size > 500, it selects the top 5 models using a 10% sample and evaluates them on the full dataset.
+    2. Runs the best-performing model through hyperparameter tuning using `Tuner.tune_model`.
+    """
+
+    # Stage 1: Quick Search on Sample Data (if dataset > 500 rows)
+    if dataframe.shape[0] > 500:
+        sampled_best_models = train_on_sample_data(dataframe, target, modelsList, DictClass, stages)
+        best_model = train_on_full_data(X, Y, modelsList, sampled_best_models, DictClass, stages)
+    else:
+        print(f"Quick Search (Stage 1 of {stages}) is skipped.")
+        best_model = train_on_full_data(X, Y, modelsList, 
+                                        DictClass.image_models if ptype == "Image Classification" else modelsList, 
+                                        DictClass, stages)
+
+    # Stage 2: Hyperparameter Tuning
+    modelResult = Tuner.tune_model(
+        X if ptype == "Image Classification" else dataframe, 
+        Y if ptype == "Image Classification" else target, 
+        best_model, modelsList, ptype, accuracy_criteria, DictClass, stages
+    )
+
     return modelResult
 
-def classic_model_records(modelData,modelResult,DictClass):
-    """
-    param1: Class object
-    param2: Tuple
-    param3: Class object
-    return: Class object
 
-    Function extras different data from modelResult tuple and assigns it to Model Class object attributes.
-    Then update YAML configuration data
+def classic_model_records(modelData, modelResult, DictClass):
     """
-    modelData.model,modelData.params,acc,modelData.metrics,modelData.plot_data = modelResult
-    DictClass.addKeyValue('model',{'type': modelData.model.__class__.__name__})
-    DictClass.UpdateNestedKeyValue('model','parameters',modelResult[1])
-    modelData.scaler=DictClass.Scaler
+    Extracts model details from `modelResult` and updates `modelData` and YAML configuration.
+
+    :param modelData: Class object, stores model-related attributes
+    :param modelResult: tuple, contains model, parameters, accuracy, metrics, and plot data
+    :param DictClass: Class object, manages YAML configuration updates
+    :return: Class object with updated model attributes
+    """
+
+    # Unpack modelResult tuple into modelData attributes
+    modelData.model, modelData.params, _, modelData.metrics, modelData.plot_data = modelResult
+
+    # Update YAML configuration with model type and parameters
+    DictClass.addKeyValue('model', {'type': modelData.model.__class__.__name__})
+    DictClass.UpdateNestedKeyValue('model', 'parameters', modelData.params)
+
+    # Assign scaler from DictClass
+    modelData.scaler = DictClass.Scaler
+
     return modelData
 
-def neural_model_records(modelData,neural_network,DictClass,ptype,dataframe,target):
+def neural_model_records(modelData, neural_network, DictClass, ptype, dataframe, target):
     """
-    param1: Class object
-    param2: Tuples
-    param3: Class object
-    param4: String : problem Type either Classification or Regression
-    param5: pd.DataFrame
-    param6: String : Target Columns name
-    return: Class object
-    Function extras different data from neural_network tuple and assigns it to Model Class object attributes.
-    Then update YAML configuration data
+    Updates the Model Class object attributes with data from the neural network model.
+
+    :param modelData: Class object storing model details
+    :param neural_network: Tuple containing model, accuracy, metrics, and plot data
+    :param DictClass: Class object managing YAML configuration
+    :param ptype: str, Problem type ('Classification', 'Image Classification', 'Regression')
+    :param dataframe: pd.DataFrame, Dataset
+    :param target: str, Target column name
+    :return: Updated modelData object
+
+    Extracts data from the neural_network tuple and assigns it to modelData attributes.
+    Updates the YAML configuration accordingly.
     """
 
-    modelData.model,acc,modelData.metrics,modelData.plot_data = neural_network
-    DictClass.addKeyValue('model',{'type':'TF'})
-    if ptype in ["Classification", "Image Classification"]:
-        n_labels=dataframe[target].nunique(dropna=False)
-        cls_type='binary' if n_labels<=2 else 'multiclass'
-        DictClass.UpdateNestedKeyValue('model','classification_type',cls_type)
-        DictClass.UpdateNestedKeyValue('model','save_type',"h5")
-    if ptype=='Regression':DictClass.UpdateNestedKeyValue('model','save_type',"pb")
+    modelData.model, acc, modelData.metrics, modelData.plot_data = neural_network
+
+    # Update model type
+    DictClass.addKeyValue('model', {'type': 'TF'})
+
+    # Handle classification-specific details
+    if ptype in {"Classification", "Image Classification"}:
+        n_labels = dataframe[target].nunique(dropna=False)
+        classification_type = 'binary' if n_labels <= 2 else 'multiclass'
+
+        DictClass.UpdateNestedKeyValue('model', 'classification_type', classification_type)
+        DictClass.UpdateNestedKeyValue('model', 'save_type', "h5")
+    
+    # Handle regression-specific details
+    elif ptype == 'Regression':
+        DictClass.UpdateNestedKeyValue('model', 'save_type', "pb")
+
     return modelData
 
-def model_search(dataframe=None,target=None,DictClass=None,disable_colinearity=False,model_types="all",accuracy_criteria=0.99,epochs=20,max_neural_search=10):
+def model_search(
+    dataframe=None,
+    target=None,
+    DictClass=None,
+    disable_colinearity=False,
+    model_types="all",
+    accuracy_criteria=0.99,
+    epochs=20,
+    max_neural_search=10
+):
     """
-    param1: pandas.DataFrame
-    param2: string
-    param3: Class object
-    param4: boolean
-    param5: string : Option to selection model selection on either neural networks or Classic GOFAI models
-    param6: float : Ranges between 0.1 to 1.0
-    param7: int: Number of epoches for Neural Network training
-    param8: int: Max number of Neural Network Models to try on.
-    return: Class object
+    Conducts a model search using classical and/or neural network approaches.
 
-    Function first fetches model dictionary which consists of model object and required parameter,
-    on the basis of problem type a specific class variable for dictionary is fetched.
-    After model search and training the model object and model tuning parameters are assigned to class variable in model class.
-    Then update YAML dictionary with appropriate model details such has selected type and parameters.
-    Function finally return a model class object.
+    :param dataframe: pd.DataFrame, Input dataset
+    :param target: str, Target column name
+    :param DictClass: Class object managing dataset metadata
+    :param disable_colinearity: bool, Option to disable collinearity checking
+    :param model_types: str, Model selection method ('classic', 'neural', 'all')
+    :param accuracy_criteria: float, Accuracy threshold (0.1 to 1.0)
+    :param epochs: int, Number of epochs for neural networks
+    :param max_neural_search: int, Maximum number of neural models to search
+    :return: Class object with the best model and details
     """
     global prog
-    prog=Progress()
-    modelData=Model()
-    ptype=DictClass.getdict()['problem']["type"]
-    cls_types,prob_types= ["Classification","Image Classification"],["Classification","Regression"]
-    if ptype in cls_types :modelsList=classifier_config().models
-    else:modelsList= regressor_config().models
-
-    if ptype in prob_types: X,Y=dataframe.drop(target,axis=1),dataframe[target]
-    if ptype =="Image Classification":X,Y=AutoFeatureSelection.get_reshaped_image(dataframe.values)
-    if ptype in cls_types:modelData.target_encode=DictClass.get_encoded_label()
-    if ptype in prob_types: modelData.featureList=dataframe.drop(target,axis=1).columns.to_list()
-
-    if model_types=='classic':
-        modelResult=classic_model(ptype,dataframe,target,X,Y,DictClass,modelsList,accuracy_criteria,3)
-        DictClass.accuracy=round(modelResult[2],3)
-        modelData=classic_model_records(modelData,modelResult,DictClass)
-        class_name=modelData.model.__class__.__name__
-
-    elif model_types=='neural':
-        if ptype =="Image Classification":X=X.reshape(DictClass.original_shape)
-        gpu_num=tf.config.list_physical_devices('GPU')
-        if len(gpu_num)==0: print("No GPU was detected on your system. Defaulting to CPU. Consider running on a GPU plan on BlobCity AI Cloud for faster training. https://blobcity.com")
-        neural_network=train_on_neural(X,Y,ptype,epochs,max_neural_search,1,1)
-        DictClass.accuracy=round(neural_network[1],3)
-        modelData=neural_model_records(modelData,neural_network,DictClass,ptype,dataframe,target)
-        class_name="Neural Network"
-
-    elif model_types=='all':
-        modelResult=classic_model(ptype,dataframe,target,X,Y,DictClass,modelsList,accuracy_criteria,4)
-        if modelResult[2]<accuracy_criteria:
-            gpu_num=tf.config.list_physical_devices('GPU')
-            if len(gpu_num)==0: print("No GPU was detected on your system. Defaulting to CPU. Consider running on a GPU plan on BlobCity AI Cloud for faster training. https://blobcity.com")
-            neural_network=train_on_neural(X,Y,ptype,epochs,max_neural_search,4,4)
-            if modelResult[2]>neural_network[1]:
-                DictClass.accuracy=round(modelResult[2],3)
-                modelData=classic_model_records(modelData,modelResult,DictClass)
-                class_name=modelData.model.__class__.__name__
-            else:
-                if 'cleaning' in DictClass.YAML.keys():
-                    if 'rescale' in DictClass.YAML['cleaning'].keys():
-                        del DictClass.YAML['cleaning']['rescale']
-                if ptype =="Image Classification":X=X.reshape(DictClass.original_shape)
-                DictClass.accuracy=round(neural_network[1],3)
-                modelData=neural_model_records(modelData,neural_network,DictClass,ptype,dataframe,target)
-                class_name="Neural Network"
-        else:
-            print("Neural Network Search(Stage 4 of 4) is skipped")
-            DictClass.accuracy=round(modelResult[2],3)
-            modelData=classic_model_records(modelData,modelResult,DictClass)
-            class_name=modelData.model.__class__.__name__
-
-    if not disable_colinearity and ptype!="Image Classification":
-        if DictClass.accuracy< 0.8:  print("Recommendation: Disable Colinearity in train function")
-
-    if class_name !="Neural Network":print("Selected Model :- {} \nCV Score : {:.2f}".format(class_name,DictClass.accuracy)) 
-    else:print("Selected Model :- {} \nAccuracy Score : {:.2f}".format(class_name,DictClass.accuracy)) 
+    prog = Progress()
+    modelData = Model()
     
+    ptype = DictClass.getdict()['problem']["type"]
+    is_classification = ptype in {"Classification", "Image Classification"}
+    is_regression = ptype in {"Classification", "Regression"}
+
+    # Get appropriate model dictionary
+    modelsList = classifier_config().models if is_classification else regressor_config().models
+
+    # Extract features & target
+    if is_regression:
+        X, Y = dataframe.drop(columns=[target]), dataframe[target]
+    elif ptype == "Image Classification":
+        X, Y = AutoFeatureSelection.get_reshaped_image(dataframe.values)
+
+    # Handle target encoding and feature lists
+    if is_classification:
+        modelData.target_encode = DictClass.get_encoded_label()
+    if is_regression:
+        modelData.featureList = dataframe.drop(columns=[target]).columns.to_list()
+
+    ### Stage-wise Model Training ###
+    if model_types == 'classic':
+        modelResult = classic_model(ptype, dataframe, target, X, Y, DictClass, modelsList, accuracy_criteria, 3)
+        DictClass.accuracy = round(modelResult[2], 3)
+        modelData = classic_model_records(modelData, modelResult, DictClass)
+        class_name = modelData.model.__class__.__name__
+
+    elif model_types == 'neural':
+        if ptype == "Image Classification":
+            X = X.reshape(DictClass.original_shape)
+        
+        # Check for GPU availability
+        if not tf.config.list_physical_devices('GPU'):
+            print("No GPU detected. Running on CPU. Consider using a GPU for faster training.")
+
+        neural_network = train_on_neural(X, Y, ptype, epochs, max_neural_search, 1, 1)
+        DictClass.accuracy = round(neural_network[1], 3)
+        modelData = neural_model_records(modelData, neural_network, DictClass, ptype, dataframe, target)
+        class_name = "Neural Network"
+
+    elif model_types == 'all':
+        modelResult = classic_model(ptype, dataframe, target, X, Y, DictClass, modelsList, accuracy_criteria, 4)
+
+        if modelResult[2] < accuracy_criteria:
+            # Check for GPU availability
+            if not tf.config.list_physical_devices('GPU'):
+                print("No GPU detected. Running on CPU.")
+
+            neural_network = train_on_neural(X, Y, ptype, epochs, max_neural_search, 4, 4)
+
+            if modelResult[2] > neural_network[1]:
+                DictClass.accuracy = round(modelResult[2], 3)
+                modelData = classic_model_records(modelData, modelResult, DictClass)
+                class_name = modelData.model.__class__.__name__
+            else:
+                # Clean up rescale settings for neural networks
+                DictClass.YAML.get('cleaning', {}).pop('rescale', None)
+
+                if ptype == "Image Classification":
+                    X = X.reshape(DictClass.original_shape)
+
+                DictClass.accuracy = round(neural_network[1], 3)
+                modelData = neural_model_records(modelData, neural_network, DictClass, ptype, dataframe, target)
+                class_name = "Neural Network"
+        else:
+            print("Neural Network Search (Stage 4 of 4) skipped")
+            DictClass.accuracy = round(modelResult[2], 3)
+            modelData = classic_model_records(modelData, modelResult, DictClass)
+            class_name = modelData.model.__class__.__name__
+
+    ### Final Steps: Colinearity Check & Model Selection ###
+    if not disable_colinearity and ptype != "Image Classification" and DictClass.accuracy < 0.8:
+        print("Recommendation: Disable Colinearity in train function")
+
+    accuracy_label = "CV Score" if class_name != "Neural Network" else "Accuracy Score"
+    print(f"Selected Model :- {class_name} \n{accuracy_label} : {DictClass.accuracy:.2f}")
+
     return modelData
 
 
-def time_model(dataframe,DictClass,accuracy_criteria=None):
-    modelsList=time_config().models
-    train_data, test_data=spliter(dataframe)
-    modelkey = model_search_time(train_data, test_data)
-    modelResult = Tuner.time_tuner(train_data, test_data,modelkey,modelsList)
-    
-    return modelResult
+def time_model(dataframe, DictClass, accuracy_criteria=None):
+    """
+    Trains and tunes a time series model.
+
+    :param dataframe: pd.DataFrame, Input dataset for time series modeling.
+    :param DictClass: Class object containing dataset metadata.
+    :param accuracy_criteria: float, Accuracy threshold for model selection (optional).
+    :return: Tuned time series model results.
+    """
+    modelsList = time_config().models  # Fetch available time series models
+
+    # Split dataset into training and testing sets
+    train_data, test_data = spliter(dataframe)
+
+    # Identify the best initial model
+    model_key = model_search_time(train_data, test_data)
+
+    # Perform model tuning
+    model_result = Tuner.time_tuner(train_data, test_data, model_key, modelsList)
+
+    return model_result
 
 
-def model_search_time(train_data, test_data,DictClass=None,accuracy_criteria=None):
+
+def model_search_time(train_data, test_data):
+    """
+    Identifies the best time series model based on RMSE.
+
+    :param train_data: pandas Series, training data
+    :param test_data: pandas Series, test data
+    :return: Dictionary with the selected model name
+    """
     global modelkey
-    
-    list1=[ARIMA(train_data, exog=None, order=(1, 0, 0)),
-          SARIMAX(train_data,order=(1, 0, 0), seasonal_order=(0, 0, 0, 12)),
-          ExponentialSmoothing(train_data,initialization_method='estimated'),
-          SimpleExpSmoothing(train_data),
-          Holt(train_data)] 
-    list2={}
-    for i in list1:
+
+    models = {
+        "ARIMA": ARIMA(train_data, order=(1, 0, 0)),
+        "SARIMAX": SARIMAX(train_data, order=(1, 0, 0), seasonal_order=(0, 0, 0, 12)),
+        "ExponentialSmoothing": ExponentialSmoothing(train_data, initialization_method='estimated'),
+        "SimpleExpSmoothing": SimpleExpSmoothing(train_data),
+        "Holt": Holt(train_data),
+    }
+
+    errors = {}
+    for name, model in models.items():
         try:
-            model = i.fit(disp=0)
-        except:
-            model = i.fit()
-        prediction = model.forecast(len(test_data))
-        predictions = pd.Series(prediction, index=test_data.index)
-        residuals = test_data - predictions
-        mse=np.sqrt(np.mean(residuals**2))
-        list2[i.__class__.__name__]=mse
-    a = sorted(list2.items(), key=lambda x: x[1])
-    selected_model =next(iter(a))[0]
-    modelkey={selected_model:0}
-    return  modelkey
+            fitted_model = model.fit()
+            predictions = fitted_model.forecast(len(test_data))
+            rmse = np.sqrt(mean_squared_error(test_data, predictions))
+            errors[name] = rmse
+        except Exception as e:
+            print(f"Model {name} failed: {e}")  # Logs failed models
+
+    if not errors:
+        raise ValueError("All models failed to fit.")
+
+    # Select model with the lowest RMSE
+    selected_model = min(errors, key=errors.get)
+    modelkey = {selected_model: 0}
+    return modelkey

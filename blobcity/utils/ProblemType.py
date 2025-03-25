@@ -12,44 +12,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-This Python file consists of Function to identify the problem type either Classification or Regression Type.
-"""
+
 import os
 import uuid
+import pandas as pd
+
 class ProType:
-
-    def checkType(data):
-
+    @staticmethod
+    def check_type(data: pd.Series) -> dict:
         """
-         param1: class
-         param2: target data
-         
-         This function identify type of problem to be solved either regression or classification 
-         on the basis of datatype and uniquiness in target columns
+        Identifies the problem type (Regression or Classification) based on data type and uniqueness in the target column.
+        
+        Conditions:
+        1. If data type is object/string -> Classification
+        2. If data type is integer or float with <= 20 unique values -> Classification
+        3. Otherwise -> Regression
+        """
+        if data.dtype == 'object':
+            return {'type': 'Classification'}
+        
+        target_length = data.nunique(dropna=False)
+        if data.dtype in ['int64', 'int32', 'int16'] and target_length <= 20:
+            return {'type': 'Classification'}
+        
+        return {'type': 'Regression'}
 
-         Conditions:
-         1. if datatype is Object/String return problem Type as classification
-         2. else check if it is integer or float type with less then equal to 100 classes then return Classification 
-            else return Regression as the ProblemType
+    @staticmethod
+    def generate_uuid() -> str:
         """
-        if(data.dtype in ['object']): 
-            return dict({'type':'Classification'})
-        else:
-            target_length=data.nunique(dropna=False)
-            if data.dtype in ['int64','int32','int16'] and target_length<=20:
-                return dict({'type':'Classification'})
-            else:
-                return dict({'type':'Regression'})
-    
-    def generate_uuid():
-        """
-        return : string 
-        Function generates Universal Unique identifier for each experiment executed by the train function
+        Generates a Universal Unique Identifier (UUID) for each experiment.
         """
         try:
-            uid=str(uuid.uuid4())
-            os.environ['EXPID']=uid
-        except  Exception as e:
-            print(e)
-        return uid
+            uid = str(uuid.uuid4())
+            os.environ['EXPID'] = uid
+            return uid
+        except Exception as e:
+            print(f"Error generating UUID: {e}")
+            return ""

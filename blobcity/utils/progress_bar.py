@@ -14,61 +14,50 @@
 
 
 
-from tqdm import tqdm_notebook,tqdm
-"""
-Class to handle custom progress bar for model tuning process
-"""
-class Progress():
+from tqdm import tqdm, tqdm_notebook
 
-    def __init__(self,trials=0,pbar=None):
-        self.trials=trials
-        self.pbar=pbar
+class Progress:
+    def __init__(self, trials=0):
+        self.trials = trials
+        self.pbar = None
 
-    def isnotebook(self):
+    @staticmethod
+    def is_notebook() -> bool:
         """
-        return: boolean
-        Function to identify type of python utilized either ipython or Python
+        Identifies if the code is running in a Jupyter Notebook or a terminal.
         """
         try:
             from IPython import get_ipython
             shell = get_ipython().__class__.__name__
-            
-            if shell == 'ZMQInteractiveShell':
-                return True  
-            elif get_ipython().__class__.__module__ == "google.colab._shell":
-                return True
-            elif shell == 'TerminalInteractiveShell':
-                return False  
-            else:
-                return False 
+            return shell in ('ZMQInteractiveShell', 'google.colab._shell')
         except NameError:
-            return False 
+            return False
 
-    def create_progressbar(self,n_counters,desc=""):
+    def create_progressbar(self, n_counters: int, desc: str = ""):
         """
-        param1: integer : number of iteration in progress bar
-        Function initializes a tqdm_notebook progress bar.
+        Initializes a tqdm progress bar with appropriate handler for notebooks.
         """
-        self.trials=n_counters
-        if Progress().isnotebook():
-            self.pbar=tqdm_notebook(total=n_counters,desc=desc, bar_format="{l_bar}{bar} [elapsed: {elapsed}< remaining:{remaining}]")
+        self.trials = n_counters
+        if self.is_notebook():
+            self.pbar = tqdm_notebook(total=n_counters, desc=desc, bar_format="{l_bar}{bar} [elapsed: {elapsed} < remaining:{remaining}]")
         else:
-            self.pbar=tqdm(total=n_counters, desc=desc, bar_format="{l_bar}{bar} [elapsed: {elapsed}< remaining:{remaining}]")
-    
-    def update_progressbar(self,i):
-        """
-        param1: integer
+            self.pbar = tqdm(total=n_counters, desc=desc, bar_format="{l_bar}{bar} [elapsed: {elapsed} < remaining:{remaining}]")
 
-        Function updates a tqdm_notebook progress bar with specified integer count.
+    def update_progressbar(self, step: int = 1):
         """
-        self.trials=self.trials-1
-        self.pbar.update(i)
+        Updates the progress bar.
+        """
+        if self.pbar:
+            self.pbar.update(step)
+            self.trials -= step
 
     def close_progressbar(self):
         """
-        Function close and reset required variable for progress bar
+        Closes and resets the progress bar.
         """
-        self.pbar.close()
-        self.trials=50
-        self.pbar=None
+        if self.pbar:
+            self.pbar.close()
+            self.pbar = None
+        self.trials = 0
+
     
